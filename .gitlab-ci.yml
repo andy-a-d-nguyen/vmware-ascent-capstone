@@ -1,0 +1,68 @@
+image: adoptopenjdk:8
+
+stages:
+  - build
+  - test
+#  - docker
+  - codeCoverage
+#  - deploy
+
+build:
+  stage: build
+  script:
+    ./gradlew assemble
+  artifacts:
+    paths:
+      - build/libs/*.jar
+
+test:
+  stage: test
+  script:
+    ./gradlew test
+  artifacts:
+    paths:
+      - build/test-results/test/TEST*.xml
+
+#docker:
+#  stage: docker
+#  image: docker:latest
+#  needs:
+#    - build
+#  services:
+#    - docker:dind
+#  before_script:
+#    - echo "$MY_NAME"
+#    - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+#  script:
+#    - docker build --pull -t "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" .
+#    - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
+#    - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
+#    - docker push "$CI_REGISTRY_IMAGE":"latest"
+
+codeCoverage:
+  image: adoptopenjdk:8
+  needs:
+    - build
+    - test
+  stage: codeCoverage
+  script:
+    - ./gradlew jacocoTestReport
+    - ./gradlew jacocoTestCoverageVerification
+  allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - build/reports/jacoco/
+
+
+#deploy:
+#  stage: deploy
+#  image: ruby:latest
+#  script:
+#    - apt-get update -qy
+#    - apt-get install -y ruby-dev
+#    - gem install dpl
+#    #                        App name from prev step  Key from your heroku account
+#    - dpl --provider=heroku --app=am-autos-api --api-key=$HEROKU_API_KEY
+#  only: # Heroku will ONLY deploy from main or master branch!
+#    - main
