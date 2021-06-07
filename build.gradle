@@ -24,11 +24,6 @@ test {
 	useJUnitPlatform()
 }
 
-plugins {
-	id 'jacoco'
-}
-
-
 jacocoTestReport {
 	dependsOn test // tests are required to run before generating the report
 }
