@@ -1,5 +1,5 @@
 # Uses Open JDK as base image, the tag 8-jdk-alpine denotes the "version" we are using
-FROM adoptopenjdk:8
+FROM adoptopenjdk:11
 
 # Set the working directory inside the container when run, here it is root
 WORKDIR /app

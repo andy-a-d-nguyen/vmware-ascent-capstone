@@ -1,4 +1,4 @@
-image: adoptopenjdk:8
+image: adoptopenjdk:11
 
 stages:
   - build
@@ -40,7 +40,7 @@ test:
 #    - docker push "$CI_REGISTRY_IMAGE":"latest"
 
 codeCoverage:
-  image: adoptopenjdk:8
+  image: adoptopenjdk:11
   needs:
     - build
     - test
