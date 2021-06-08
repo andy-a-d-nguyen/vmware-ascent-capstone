@@ -10,9 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.mockito.ArgumentMatchers.any;
-
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,11 +34,20 @@ public class UsersControllerTests {
         User userToAdd = new User(1232L, "bakerBob", "password123", "bakerBob@gmail.com");
         when(usersService.createUser(any(User.class))).thenReturn(userToAdd);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/users").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(userToAdd)))
+        mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(userToAdd)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("username").value("bakerBob"));
 
-        }
+    }
 
+    @Test
+    public void deleteUser_byId_acceptedStatusCode() throws Exception {
+        User userToDelete = new User(1232L, "bakerBob", "password123", "bakerBob@gmail.com");
+
+        mockMvc.perform(delete("/api/users/" + userToDelete.getId()))
+                .andExpect(status().isAccepted());
+
+        verify(usersService).deleteUser(anyLong());
+    }
 }

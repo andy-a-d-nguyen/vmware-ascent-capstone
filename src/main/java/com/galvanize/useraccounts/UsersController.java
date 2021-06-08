@@ -1,9 +1,7 @@
 package com.galvanize.useraccounts;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -20,5 +18,16 @@ public class UsersController {
     @PostMapping("/users")
     public User createUser(@RequestBody User user){
         return usersService.createUser(user);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity deleteUser(@PathVariable Long id) {
+        try {
+            usersService.deleteUser(id);
+        } catch(Exception e) {
+            return ResponseEntity.noContent().build();
+        }
+        
+        return ResponseEntity.accepted().build();
     }
 }

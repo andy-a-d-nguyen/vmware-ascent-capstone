@@ -13,4 +13,8 @@ public class UsersService {
     public User createUser(User user) {
        return null;
     }
+
+    public void deleteUser(Long id) {
+        return;
+    }
 }
