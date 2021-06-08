@@ -26,10 +26,9 @@ public class UsersControllerTests {
     UsersService usersService;
     ObjectMapper mapper = new ObjectMapper();
 
-    @DisplayName("It can successfully create a user with valid attributes")
+    @DisplayName("It can successfully create a user with valid attributes with a status of 200 OK")
     @Test
     public void createUser() throws Exception {
-
         User userToAdd = new User(1232L, "bakerBob", "password123", "bakerBob@gmail.com");
         when(usersService.createUser(any(User.class))).thenReturn(userToAdd);
 
@@ -37,7 +36,16 @@ public class UsersControllerTests {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("username").value("bakerBob"));
+    }
 
-        }
+    @DisplayName("It should not create a user with invalid attributes and return a Bad Request 400")
+    @Test
+    public void CreateUser_invalidAttr() throws Exception {
+        when(usersService.createUser(any(User.class))).thenThrow(InvalidUserException.class);
 
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/users").contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 }
