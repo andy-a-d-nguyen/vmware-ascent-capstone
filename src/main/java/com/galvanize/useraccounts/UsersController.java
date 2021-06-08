@@ -24,7 +24,7 @@ public class UsersController {
     public ResponseEntity deleteUser(@PathVariable Long id) {
         try {
             usersService.deleteUser(id);
-        } catch(Exception e) {
+        } catch(UserNotFoundException e) {
             return ResponseEntity.noContent().build();
         }
         
