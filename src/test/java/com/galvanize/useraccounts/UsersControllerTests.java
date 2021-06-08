@@ -12,6 +12,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+
+import static org.mockito.Mockito.when;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,10 +30,9 @@ public class UsersControllerTests {
     UsersService usersService;
     ObjectMapper mapper = new ObjectMapper();
 
-    @DisplayName("It can successfully create a user with valid attributes")
+    @DisplayName("It can successfully create a user with valid attributes with a status of 200 OK")
     @Test
     public void createUser() throws Exception {
-
         User userToAdd = new User(1232L, "bakerBob", "password123", "bakerBob@gmail.com");
         when(usersService.createUser(any(User.class))).thenReturn(userToAdd);
 
@@ -37,7 +40,17 @@ public class UsersControllerTests {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("username").value("bakerBob"));
+    }
 
+    @DisplayName("It should not create a user with invalid attributes and return a Bad Request 400")
+    @Test
+    public void CreateUser_invalidAttr() throws Exception {
+        when(usersService.createUser(any(User.class))).thenThrow(InvalidUserException.class);
+
+        mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -56,4 +69,5 @@ public class UsersControllerTests {
         mockMvc.perform(delete("/api/users/1495"))
                 .andExpect(status().isNoContent());
     }
+
 }

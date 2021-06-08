@@ -16,7 +16,7 @@ public class UsersController {
     }
 
     @PostMapping("/users")
-    public User createUser(@RequestBody User user){
+    public User createUser(@RequestBody User user) throws InvalidUserException {
         return usersService.createUser(user);
     }
 
@@ -30,4 +30,12 @@ public class UsersController {
         
         return ResponseEntity.accepted().build();
     }
+
+    /*
+     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public void invalidAutoException(InvalidAutoException exception) {
+
+    }
+    */
 }
