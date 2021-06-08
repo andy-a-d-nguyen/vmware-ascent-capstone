@@ -10,9 +10,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 
 import static org.mockito.Mockito.when;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,4 +52,22 @@ public class UsersControllerTests {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void deleteUser_byId_acceptedStatusCode() throws Exception {
+        User userToDelete = new User(1232L, "bakerBob", "password123", "bakerBob@gmail.com");
+
+        mockMvc.perform(delete("/api/users/" + userToDelete.getId()))
+                .andExpect(status().isAccepted());
+
+        verify(usersService).deleteUser(anyLong());
+    }
+
+    @Test
+    public void deleteUser_byId_noContentStatusCode() throws Exception {
+        doThrow(new UserNotFoundException()).when(usersService).deleteUser(anyLong());
+        mockMvc.perform(delete("/api/users/1495"))
+                .andExpect(status().isNoContent());
+    }
+
 }
