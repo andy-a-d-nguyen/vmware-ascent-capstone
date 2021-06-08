@@ -1,0 +1,148 @@
+openapi: 3.0.1
+info:
+  title: User Accounts
+  description: 'This is an API for user accounts'
+  version: 0.0.1
+tags:
+  - name: user
+    description: Everything about user accounts
+components:
+  schemas:
+    user:
+      type: object
+      properties:
+        id:
+          type: integer
+        image:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+        # password:
+        #   type: string
+        email:
+          type: string
+        address:
+          type: string
+        # creditCard:
+        #   type: string
+        verified:
+          type: boolean
+    userLogin:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+servers:
+  - url: https://localhost:/8080
+
+paths:
+  /api/users:
+    get:
+      tags:
+        - users
+      summary: Find all users
+      description:
+      responses:
+        '200':
+          description: Successful operation
+  /api/users/registration:
+    post:
+      tags:
+        - Authentication
+      summary: Add a new user
+      description: user object that needs to be added
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+  /api/users/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login an existing user
+      description: log in an existing user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userLogin'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+  /api/users/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout an existing user
+      description: log out an existing user
+      responses:
+        '202':
+          description: Accepted
+  /api/users/{id}:
+    get:
+      tags:
+        - user
+      summary: Find user by id
+      description: Returns a single user
+      parameters:
+        - name: id
+          in: path
+          description: id of user to return
+          required: true
+      responses:
+        '200':
+          description: Successful operation
+        '204':
+          description: No content
+    patch:
+      tags:
+        - user
+      summary: Edit user by id
+      description: Edit a user by id
+      parameters:
+        - name: id
+          in: path
+          description: id of user to edit
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+      responses:
+        '200':
+          description: Successful operation
+        '204':
+          description: No content
+    delete:
+      tags:
+        - user
+      summary: Delete user by ID
+      parameters:
+        - name: id
+          in: path
+          description: id of user to delete
+          required: true
+      responses:
+        '202':
+          description: Accepted
+        '204':
+          description: No content
+  
