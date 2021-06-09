@@ -20,4 +20,7 @@ public class UsersService {
     }
 
     public User updateUser(Long id, UpdateUserRequest updatedUser) { return null; }
+
+    public Boolean updateUserPassword(long anyLong, String oldPassword, String newPassword) { return null;
+    }
 }

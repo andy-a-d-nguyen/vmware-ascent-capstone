@@ -29,6 +29,13 @@ public class UsersController {
         return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
     }
 
+    @PatchMapping("/users/{id}/reset")
+    public ResponseEntity<Boolean> update(@PathVariable Long id, @RequestBody UpdateUserPasswordRequest updatedUserPassword) throws InvalidUserException {
+        Boolean isUpdated = usersService.updateUserPassword(id, updatedUserPassword.getOldPassword(), updatedUserPassword.getNewPassword());
+
+        return isUpdated == false ? ResponseEntity.noContent().build() : ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/users/{id}")
     public ResponseEntity deleteUser(@PathVariable Long id) {
         try {
@@ -38,6 +45,7 @@ public class UsersController {
         }
         
         return ResponseEntity.accepted().build();
+
     }
 
     /*
