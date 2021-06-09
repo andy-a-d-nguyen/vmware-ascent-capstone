@@ -22,6 +22,11 @@ public class UpdateUserRequestTest {
 
         assertEquals("Sally", updateUserRequest.getFirstName());
         assertEquals("Smith", updateUserRequest.getLastName());
+        assertEquals("121password", updateUserRequest.getPassword());
+        assertEquals("ajskfdl@gmail.com", updateUserRequest.getEmail());
+        assertEquals("asdfjk12123", updateUserRequest.getCreditCard());
+        assertEquals(false, updateUserRequest.isVerify());
+
 
     }
 }
