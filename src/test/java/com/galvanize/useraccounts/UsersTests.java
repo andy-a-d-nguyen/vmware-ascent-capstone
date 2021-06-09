@@ -77,4 +77,36 @@ public class UsersTests {
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }
+
+    @Test
+    public void createUser_validatesFirstNameIsNotBlank() {
+        User user = new User("bakerBob", "", "bob", "password123", "bakerBob@gmail.com");
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    public void createUser_validatesLastNameIsNotBlank() {
+        User user = new User("bakerBob", "baker", "", "password123", "bakerBob@gmail.com");
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    public void createUser_validatesPasswordIsNotBlank() {
+        User user = new User("bakerBob", "baker", "bob", "", "bakerBob@gmail.com");
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    public void createUser_validatesEmailIsNotBlank() {
+        User user = new User("bakerBob", "baker", "bob", "password123", "");
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
 }

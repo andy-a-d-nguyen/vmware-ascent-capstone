@@ -9,10 +9,18 @@ public class User {
     @NotBlank
     @Size(min = 5, max = 20)
     private String username;
+    
+    @NotBlank
     private String firstName;
+    
+    @NotBlank
     private String lastName;
     private String avatar;
+    
+    @NotBlank
     private String password;
+    
+    @NotBlank
     private String email;
     private String address;
     private String creditCard;
