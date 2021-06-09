@@ -33,7 +33,7 @@ public class UsersControllerTests {
     @DisplayName("It can successfully create a user with valid attributes with a status of 200 OK")
     @Test
     public void createUser() throws Exception {
-        User userToAdd = new User(1232L, "bakerBob", "password123", "bakerBob@gmail.com");
+        User userToAdd = new User("bakerBob", "password123", "bakerBob@gmail.com");
         when(usersService.createUser(any(User.class))).thenReturn(userToAdd);
 
         mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(userToAdd)))
@@ -55,7 +55,8 @@ public class UsersControllerTests {
 
     @Test
     public void deleteUser_byId_acceptedStatusCode() throws Exception {
-        User userToDelete = new User(1232L, "bakerBob", "password123", "bakerBob@gmail.com");
+        User userToDelete = new User("bakerBob", "password123", "bakerBob@gmail.com");
+        userToDelete.setId(new Long(1));
 
         mockMvc.perform(delete("/api/users/" + userToDelete.getId()))
                 .andExpect(status().isAccepted());

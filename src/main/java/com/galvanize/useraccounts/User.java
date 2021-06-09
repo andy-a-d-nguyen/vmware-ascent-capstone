@@ -1,7 +1,11 @@
 package com.galvanize.useraccounts;
 
+import javax.validation.constraints.Size;
+
 public class User {
     private Long id;
+
+    @Size(max = 20)
     private String username;
     private String password;
     private String email;
@@ -12,11 +16,12 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String username, String password, String email) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.email = email;
+    public User(String username, String password, String email) {
+//        if (username.length() <= 20) {
+            this.username = username;
+            this.password = password;
+            this.email = email;
+//        }
     }
 
     public Long getId() {
