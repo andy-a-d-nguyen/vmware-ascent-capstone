@@ -1,10 +1,12 @@
 package com.galvanize.useraccounts;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 public class User {
     private Long id;
 
+    @NotBlank
     @Size(max = 20)
     private String username;
     private String firstName;

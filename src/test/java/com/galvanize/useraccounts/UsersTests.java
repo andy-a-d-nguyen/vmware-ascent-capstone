@@ -61,4 +61,12 @@ public class UsersTests {
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }
+
+    @Test
+    public void createUser_validatesUsernameIsNotBlank() {
+        User user = new User("", "baker", "bob", "password123", "bakerBob@gmail.com");
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
 }
