@@ -110,4 +110,13 @@ public class UsersControllerTests {
                 .andExpect(jsonPath("lastName").value(user.getLastName()))
                 .andExpect(jsonPath("password").doesNotExist());
     }
+
+    @Test
+    public void showUser_invalidID_returnsNoContent() throws Exception {
+
+        when(usersService.getUser(anyLong())).thenReturn(null);
+
+        mockMvc.perform(get("/api/users/1234"))
+                .andExpect(status().isNoContent());
+    }
 }

@@ -43,7 +43,7 @@ public class UsersController {
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         User user = usersService.getUser(id);
-        return ResponseEntity.ok(user);
+        return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
     }
 
     /*
