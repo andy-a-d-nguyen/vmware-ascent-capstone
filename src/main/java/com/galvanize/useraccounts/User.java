@@ -1,5 +1,6 @@
 package com.galvanize.useraccounts;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -9,19 +10,23 @@ public class User {
     @NotBlank
     @Size(min = 5, max = 20)
     private String username;
-    
+
     @NotBlank
     private String firstName;
-    
+
     @NotBlank
     private String lastName;
+
     private String avatar;
-    
+
     @NotBlank
     private String password;
-    
+
     @NotBlank
+    @Email
+    @Size(max = 30)
     private String email;
+
     private String address;
     private String creditCard;
     private boolean verified;

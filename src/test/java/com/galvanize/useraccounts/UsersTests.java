@@ -109,4 +109,20 @@ public class UsersTests {
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }
+
+    @Test
+    public void createUser_validatesEmailIsValid() {
+        User user = new User("bakerBob", "baker", "bob", "password123", "bakerBob");
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    public void createUser_validatesEmailIsLessThan30Characters() {
+        User user = new User("bakerBob", "baker", "bob", "password123", "bakerBobHasMoreThan20Characters@gmail.com");
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
 }
