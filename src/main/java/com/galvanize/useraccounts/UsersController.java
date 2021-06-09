@@ -39,6 +39,12 @@ public class UsersController {
         
         return ResponseEntity.accepted().build();
     }
+    
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
+        User user = usersService.getUser(id);
+        return ResponseEntity.ok(user);
+    }
 
     /*
      @ExceptionHandler

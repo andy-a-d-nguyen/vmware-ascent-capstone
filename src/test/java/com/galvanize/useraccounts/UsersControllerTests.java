@@ -96,4 +96,18 @@ public class UsersControllerTests {
 
     }
 
+    @Test
+    public void showUser_inputID_returnsUsers() throws Exception {
+        User user = new User("bakerBob", "password123", "baker", "bob","bakerBob@gmail.com");
+        user.setId(1L);
+
+        when(usersService.getUser(anyLong())).thenReturn(user);
+
+        mockMvc.perform(get("/api/users/" + user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("username").value(user.getUsername()))
+                .andExpect(jsonPath("firstName").value(user.getFirstName()))
+                .andExpect(jsonPath("lastName").value(user.getLastName()))
+                .andExpect(jsonPath("password").doesNotExist());
+    }
 }
