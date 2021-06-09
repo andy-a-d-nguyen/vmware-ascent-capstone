@@ -22,6 +22,11 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+	//finalizedBy jacocoTestReport
+	/*jacoco {
+		destinationFile file("$buildDir/jacoco/junitPlatformTest.exec")
+	}*/
+
 }
 
 jacocoTestReport {
