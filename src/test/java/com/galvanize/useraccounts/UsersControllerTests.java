@@ -55,9 +55,10 @@ public class UsersControllerTests {
 
     @Test
     public void deleteUser_byId_acceptedStatusCode() throws Exception {
-        User userToDelete = new User("bakerBob", "baker", "bob","password123", "bakerBob@gmail.com");
+        User userToAdd = new User("bakerBob", "baker", "bob","password123", "bakerBob@gmail.com");
+        userToAdd.setId(new Long(1));
 
-        mockMvc.perform(delete("/api/users/" + userToDelete.getId()))
+        mockMvc.perform(delete("/api/users/" + userToAdd.getId()))
                 .andExpect(status().isAccepted());
 
         verify(usersService).deleteUser(anyLong());
