@@ -1,13 +1,32 @@
 package com.galvanize.useraccounts;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 public class User {
     private Long id;
+
+    @NotBlank
+    @Size(min = 5, max = 20)
     private String username;
+
+    @NotBlank
     private String firstName;
+
+    @NotBlank
     private String lastName;
+
     private String avatar;
+
+    @NotBlank
     private String password;
+
+    @NotBlank
+    @Email
+    @Size(max = 30)
     private String email;
+
     private String address;
     private String creditCard;
     private boolean verified;
@@ -16,13 +35,11 @@ public class User {
     }
 
     public User(String username, String firstName, String lastName, String password, String email) {
-
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
-
     }
 
     public String getFirstName() {

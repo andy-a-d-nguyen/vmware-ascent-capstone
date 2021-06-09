@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -34,6 +33,7 @@ public class UsersControllerTests {
     @Test
     public void createUser() throws Exception {
         User userToAdd = new User("bakerBob", "baker", "bob","password123", "bakerBob@gmail.com");
+
         when(usersService.createUser(any(User.class))).thenReturn(userToAdd);
 
         mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(userToAdd)))
@@ -55,10 +55,11 @@ public class UsersControllerTests {
 
     @Test
     public void deleteUser_byId_acceptedStatusCode() throws Exception {
-        User userToAdd = new User("bakerBob", "baker", "bob","password123", "bakerBob@gmail.com");
-        userToAdd.setId(new Long(1));
+        User userToDelete = new User("bakerBob", "baker", "bob", "password123", "bakerBob@gmail.com");
+        userToDelete.setId(new Long(1));
 
-        mockMvc.perform(delete("/api/users/" + userToAdd.getId()))
+
+        mockMvc.perform(delete("/api/users/" + userToDelete.getId()))
                 .andExpect(status().isAccepted());
 
         verify(usersService).deleteUser(anyLong());
