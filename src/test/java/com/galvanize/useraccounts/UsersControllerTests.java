@@ -96,4 +96,26 @@ public class UsersControllerTests {
 
     }
 
+    @DisplayName("It should successfully update a user's password, returns status of 200 OK")
+    @Test
+    public void updateUserPassword_success() throws Exception{
+        UpdateUserPasswordRequest updateUserPasswordRequest = new UpdateUserPasswordRequest("oldPassword", "newPassword");
+
+        when(usersService.updateUserPassword(anyLong(), anyString(), anyString())).thenReturn(true);
+
+        mockMvc.perform(patch("/api/users/1234/reset").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(updateUserPasswordRequest)))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("It should not update a user's password and return a 202 NO CONTENT")
+    @Test
+    public void updateUserPassword_failure() throws Exception{
+        UpdateUserPasswordRequest updateUserPasswordRequest = new UpdateUserPasswordRequest("oldPassword", "newPassword");
+
+        when(usersService.updateUserPassword(anyLong(), anyString(), anyString())).thenReturn(false);
+
+        mockMvc.perform(patch("/api/users/1234/reset").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(updateUserPasswordRequest)))
+                .andExpect(status().isNoContent());
+    }
+
 }
