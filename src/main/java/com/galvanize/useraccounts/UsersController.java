@@ -3,6 +3,8 @@ package com.galvanize.useraccounts;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api")
 public class UsersController {
@@ -16,7 +18,7 @@ public class UsersController {
     }
 
     @PostMapping("/users")
-    public User createUser(@RequestBody User user) throws InvalidUserException {
+    public User createUser(@Valid @RequestBody User user) throws InvalidUserException {
         return usersService.createUser(user);
     }
 

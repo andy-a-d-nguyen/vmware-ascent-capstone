@@ -7,6 +7,9 @@ public class User {
 
     @Size(max = 20)
     private String username;
+    private String firstName;
+    private String lastName;
+    private String avatar;
     private String password;
     private String email;
     private String address;
@@ -16,12 +19,14 @@ public class User {
     public User() {
     }
 
-    public User(String username, String password, String email) {
-//        if (username.length() <= 20) {
-            this.username = username;
-            this.password = password;
-            this.email = email;
-//        }
+    public User(String username, String firstName, String lastName, String password, String email) {
+
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.email = email;
+
     }
 
     public Long getId() {
