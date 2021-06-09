@@ -1,6 +1,7 @@
 package com.galvanize.useraccounts;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class UsersService {
@@ -17,4 +18,6 @@ public class UsersService {
     public void deleteUser(Long id) {
         return;
     }
+
+    public User updateUser(Long id, UpdateUserRequest updatedUser) { return null; }
 }
