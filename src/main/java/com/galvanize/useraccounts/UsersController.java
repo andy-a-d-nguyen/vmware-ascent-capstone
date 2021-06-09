@@ -22,6 +22,13 @@ public class UsersController {
         return usersService.createUser(user);
     }
 
+    @PatchMapping("/users/{id}")
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody UpdateUserRequest updatedUser) throws InvalidUserException {
+        User user = usersService.updateUser(id, updatedUser);
+
+        return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
+    }
+
     @DeleteMapping("/users/{id}")
     public ResponseEntity deleteUser(@PathVariable Long id) {
         try {
@@ -39,5 +46,23 @@ public class UsersController {
     public void invalidAutoException(InvalidAutoException exception) {
 
     }
+
+
+
+      @RequestMapping("/update")
+  @ResponseBody
+  public String updateUser(long id, String email, String name) {
+    try {
+      User user = userDao.findOne(id);
+      user.setEmail(email);
+      user.setName(name);
+      userDao.save(user);
+    }
+    catch (Exception ex) {
+      return "Error updating the user: " + ex.toString();
+    }
+    return "User successfully updated!";
+  }
+
     */
 }
