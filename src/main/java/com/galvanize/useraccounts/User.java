@@ -7,7 +7,7 @@ public class User {
     private Long id;
 
     @NotBlank
-    @Size(max = 20)
+    @Size(min = 5, max = 20)
     private String username;
     private String firstName;
     private String lastName;

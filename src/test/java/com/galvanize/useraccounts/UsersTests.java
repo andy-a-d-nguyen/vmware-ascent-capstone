@@ -47,6 +47,14 @@ public class UsersTests {
     ObjectMapper mapper = new ObjectMapper();
 
     @Test
+    public void createUser_validatesUsernameHasMin5Chars_returnsTrue() {
+        User user = new User("bak", "baker", "bob", "password123", "bakerBob@gmail.com");
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
     public void createUser_validatesUsernameHasMax20Chars_returnsTrue() {
         User user = new User("bakerBob", "baker", "bob", "password123", "bakerBob@gmail.com");
 
