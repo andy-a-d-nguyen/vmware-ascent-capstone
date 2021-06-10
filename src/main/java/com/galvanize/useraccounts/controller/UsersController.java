@@ -1,5 +1,11 @@
-package com.galvanize.useraccounts;
+package com.galvanize.useraccounts.controller;
 
+import com.galvanize.useraccounts.exception.InvalidUserException;
+import com.galvanize.useraccounts.exception.UserNotFoundException;
+import com.galvanize.useraccounts.service.UsersService;
+import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.request.UpdateUserPasswordRequest;
+import com.galvanize.useraccounts.request.UpdateUserRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

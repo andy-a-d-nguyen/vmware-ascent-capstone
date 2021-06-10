@@ -1,5 +1,6 @@
-package com.galvanize.useraccounts;
+package com.galvanize.useraccounts.request;
 
+import com.galvanize.useraccounts.request.UpdateUserRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 

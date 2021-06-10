@@ -1,4 +1,4 @@
-package com.galvanize.useraccounts;
+package com.galvanize.useraccounts.request;
 
 public class UpdateUserRequest {
 

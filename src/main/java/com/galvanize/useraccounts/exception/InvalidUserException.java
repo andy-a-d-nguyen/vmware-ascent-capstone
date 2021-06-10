@@ -1,4 +1,4 @@
-package com.galvanize.useraccounts;
+package com.galvanize.useraccounts.exception;
 
 public class InvalidUserException extends RuntimeException {
     public InvalidUserException(String message) {

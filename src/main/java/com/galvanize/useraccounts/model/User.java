@@ -1,4 +1,4 @@
-package com.galvanize.useraccounts;
+package com.galvanize.useraccounts.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,6 +1,12 @@
-package com.galvanize.useraccounts;
+package com.galvanize.useraccounts.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.galvanize.useraccounts.exception.InvalidUserException;
+import com.galvanize.useraccounts.exception.UserNotFoundException;
+import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.request.UpdateUserPasswordRequest;
+import com.galvanize.useraccounts.request.UpdateUserRequest;
+import com.galvanize.useraccounts.service.UsersService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
