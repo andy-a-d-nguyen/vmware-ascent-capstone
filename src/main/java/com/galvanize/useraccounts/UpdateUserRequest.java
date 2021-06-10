@@ -10,6 +10,8 @@ public class UpdateUserRequest {
     private String creditCard;
     private boolean verify;
 
+    public UpdateUserRequest() {}
+
     public UpdateUserRequest(String firstName, String lastName, String password, String email, String address, String creditCard, boolean verify) {
         this.firstName = firstName;
         this.lastName = lastName;

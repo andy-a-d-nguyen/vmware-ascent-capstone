@@ -63,7 +63,7 @@ public class UsersTests {
 
     @Test
     public void createUser_validatesFirstNameIsNotBlank() {
-        User user = new User("bakerBob", "", "bob", "password123", "bakerBob@gmail.com");
+        User user = new User("bakerBob", "password123", "", "password123", "bakerBob@gmail.com");
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());

@@ -4,6 +4,8 @@ public class UpdateUserPasswordRequest {
     private String oldPassword;
     private String newPassword;
 
+    public UpdateUserPasswordRequest() {}
+
     public UpdateUserPasswordRequest(String oldPassword, String newPassword) {
         this.oldPassword = oldPassword;
         this.newPassword = newPassword;

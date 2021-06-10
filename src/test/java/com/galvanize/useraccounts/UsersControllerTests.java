@@ -32,14 +32,16 @@ public class UsersControllerTests {
     @DisplayName("It can successfully create a user with valid attributes with a status of 200 OK")
     @Test
     public void createUser() throws Exception {
-        User userToAdd = new User("bakerBob", "baker", "bob","password123", "bakerBob@gmail.com");
+        User userToAdd = new User("bakerBob", "password123", "bob","baker", "bakerBob@gmail.com");
 
         when(usersService.createUser(any(User.class))).thenReturn(userToAdd);
+        //{"id":null,"username":"bakerBob","firstName":"bob","lastName":"baker","avatar":null,"email":"bakerBob@gmail.com",     "address":null,"creditCard":null,"verified":false}
 
-        mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(userToAdd)))
+        mockMvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(userToAdd)))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("username").value("bakerBob"));
+                .andExpect(status().isOk());
     }
 
     @DisplayName("It should not create a user with invalid attributes and return a Bad Request 400")
@@ -91,9 +93,34 @@ public class UsersControllerTests {
 
         when(usersService.updateUser(anyLong(), any(UpdateUserRequest.class))).thenReturn(null);
 
-        mockMvc.perform(patch("/api/users/1234").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(user)))
+        mockMvc.perform(patch("/api/users/1234")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(user)))
                 .andExpect(status().isNoContent());
+    }
 
+    @Test
+    public void showUser_inputID_returnsUsers() throws Exception {
+        User user = new User("bakerBob", "password123", "baker", "bob","bakerBob@gmail.com");
+        user.setId(1L);
+
+        when(usersService.getUser(anyLong())).thenReturn(user);
+
+        mockMvc.perform(get("/api/users/" + user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("username").value(user.getUsername()))
+                .andExpect(jsonPath("firstName").value(user.getFirstName()))
+                .andExpect(jsonPath("lastName").value(user.getLastName()))
+                .andExpect(jsonPath("password").doesNotExist());
+    }
+
+    @Test
+    public void showUser_invalidID_returnsNoContent() throws Exception {
+
+        when(usersService.getUser(anyLong())).thenReturn(null);
+
+        mockMvc.perform(get("/api/users/1234"))
+                .andExpect(status().isNoContent());
     }
 
     @DisplayName("It should successfully update a user's password, returns status of 200 OK")
@@ -103,7 +130,9 @@ public class UsersControllerTests {
 
         when(usersService.updateUserPassword(anyLong(), anyString(), anyString())).thenReturn(true);
 
-        mockMvc.perform(patch("/api/users/1234/reset").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(updateUserPasswordRequest)))
+        mockMvc.perform(patch("/api/users/1234/reset")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(updateUserPasswordRequest)))
                 .andExpect(status().isOk());
     }
 
@@ -117,5 +146,4 @@ public class UsersControllerTests {
         mockMvc.perform(patch("/api/users/1234/reset").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(updateUserPasswordRequest)))
                 .andExpect(status().isNoContent());
     }
-
 }
