@@ -155,8 +155,8 @@ public class UsersControllerTests {
         when(usersService.setAvatar(anyLong(), anyString())).thenReturn(user);
 
         mockMvc.perform(post("/api/users/" + user.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(avatar)))
+                .contentType(MediaType.TEXT_PLAIN)
+                .content(avatar))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("avatar").value(avatar));

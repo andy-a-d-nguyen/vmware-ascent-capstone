@@ -21,14 +21,14 @@ components:
           type: string
         username:
           type: string
-        # password:
-        #   type: string
+        password:
+          type: string
         email:
           type: string
         address:
           type: string
-        # creditCard:
-        #   type: string
+        creditCard:
+          type: string
         verified:
           type: boolean
     userLogin:
@@ -38,6 +38,25 @@ components:
           type: string
         password:
           type: string
+    userReturn:
+      type: object
+      properties:
+        id:
+          type: integer
+        image:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        verified:
+          type: boolean
 
 servers:
   - url: https://localhost:/8080

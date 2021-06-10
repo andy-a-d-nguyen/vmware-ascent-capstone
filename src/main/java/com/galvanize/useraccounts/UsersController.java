@@ -43,20 +43,20 @@ public class UsersController {
         } catch(UserNotFoundException e) {
             return ResponseEntity.noContent().build();
         }
-        
+
         return ResponseEntity.accepted().build();
 
     }
-    
+
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         User user = usersService.getUser(id);
         return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
     }
-    
+
     @PostMapping("/users/{id}")
     public User setAvatar(@PathVariable Long id, @RequestBody String url) {
-        
+
         return usersService.setAvatar(id, url);
     }
 
