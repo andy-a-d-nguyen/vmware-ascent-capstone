@@ -17,8 +17,7 @@ import static org.mockito.Mockito.when;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest
 public class UsersControllerTests {
@@ -35,7 +34,6 @@ public class UsersControllerTests {
         User userToAdd = new User("bakerBob", "password123", "bob","baker", "bakerBob@gmail.com");
 
         when(usersService.createUser(any(User.class))).thenReturn(userToAdd);
-        //{"id":null,"username":"bakerBob","firstName":"bob","lastName":"baker","avatar":null,"email":"bakerBob@gmail.com",     "address":null,"creditCard":null,"verified":false}
 
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -145,5 +143,22 @@ public class UsersControllerTests {
 
         mockMvc.perform(patch("/api/users/1234/reset").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(updateUserPasswordRequest)))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void setAvatar_InputIDAndAvatarURL_ReturnsURL() throws Exception{
+        User user = new User("bakerBob", "password123", "baker", "bob","bakerBob@gmail.com");
+        user.setId(1L);
+        String avatar = "www.avatar.com";
+        user.setAvatar(avatar);
+
+        when(usersService.setAvatar(anyLong(), anyString())).thenReturn(user);
+
+        mockMvc.perform(post("/api/users/" + user.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(avatar)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("avatar").value(avatar));
     }
 }
