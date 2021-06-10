@@ -130,6 +130,23 @@ paths:
           description: Successful operation
         '204':
           description: No content
+    post:
+      tags:
+        - user
+      summary: Sets profile pic for user
+      description: Returns updated user
+      parameters:
+        - name: id
+          in: path
+          description: id of user to return
+          required: true
+        - name: URL
+          in: request body
+          description: string of URL
+          required: true
+      responses:
+        '200':
+          description: Successful operation
     patch:
       tags:
         - user
@@ -144,7 +161,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/userReturn'
       responses:
         '200':
           description: Successful operation
@@ -164,4 +181,3 @@ paths:
           description: Accepted
         '204':
           description: No content
-  
