@@ -1,6 +1,7 @@
 package com.galvanize.useraccounts.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.galvanize.useraccounts.exception.AddressNotFoundException;
 import com.galvanize.useraccounts.exception.InvalidAddressException;
 import com.galvanize.useraccounts.exception.InvalidUserException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
@@ -213,4 +214,58 @@ public class UsersControllerTests {
                 .andExpect(jsonPath("$", hasSize(5)));
     }
 
+    @DisplayName("It should return a 204, no content when there are no addresses associated with a user")
+    @Test
+    public void getAllAddresses_empty() throws Exception {
+        when(addressesService.getAllAddresses(anyLong())).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get(String.format("/api/users/%d/addresses", 1L)))
+                .andExpect(status().isNoContent());
+    }
+
+    @DisplayName("It should successfully edit a user's address, code 200")
+    @Test
+    public void updateAddress_success() throws Exception {
+        Address updatedAddress = new Address("Test Street" , "Test City","Test State", "Test Zipcode", "Test Apartment");
+
+        when(addressesService.updateAddress(anyLong(), any(Address.class))).thenReturn(updatedAddress);
+
+        mockMvc.perform(patch(String.format("/api/users/%d/addresses", 1L))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(updatedAddress)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("city").value("Test City"))
+                .andExpect(jsonPath("state").value("Test State"))
+                .andExpect(jsonPath("zipcode").value("Test Zipcode"))
+                .andExpect(jsonPath("apartment").value("Test Apartment"));
+    }
+    @DisplayName("It fail to edit a user's address, code 400")
+    @Test
+    public void updateAddress_fail() throws Exception {
+
+        Address updatedAddress = new Address("Test Street" , "Test City","Test State", "Test Zipcode", "Test Apartment");
+
+        when(addressesService.updateAddress(anyLong(), any(Address.class))).thenThrow(InvalidAddressException.class);
+
+        mockMvc.perform(patch(String.format("/api/users/%d/addresses", 1L))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("It should return a 202 Accepted when deleting a user's address")
+    @Test
+    public void deleteAddress() throws Exception {
+        mockMvc.perform(delete("/api/users/1/addresses/1"))
+                .andExpect(status().isAccepted());
+        verify(addressesService).deleteAddress(1L, 1L);
+    }
+
+    @DisplayName("It should return a status code of 204 when no address is found in the database")
+    @Test
+    void deleteAddress_notFound() throws Exception {
+        doThrow(new AddressNotFoundException()).when(addressesService).deleteAddress(anyLong(), anyLong());
+        mockMvc.perform(delete("/api/users/1/addresses/1"))
+                .andExpect(status().isNoContent());
+    }
 }

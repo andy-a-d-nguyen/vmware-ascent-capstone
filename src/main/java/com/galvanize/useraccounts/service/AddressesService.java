@@ -22,4 +22,11 @@ public class AddressesService {
     public List<Address> getAllAddresses(Long userId) {
         return null;
     }
+
+    public Address updateAddress(Long userId, Address updatedAddress) {
+        return null;
+    }
+
+    public void deleteAddress(Long userId, Long addressId) {
+    }
 }

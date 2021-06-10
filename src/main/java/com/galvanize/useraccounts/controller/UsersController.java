@@ -1,5 +1,6 @@
 package com.galvanize.useraccounts.controller;
 
+import com.galvanize.useraccounts.exception.AddressNotFoundException;
 import com.galvanize.useraccounts.exception.InvalidAddressException;
 import com.galvanize.useraccounts.exception.InvalidUserException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
@@ -72,32 +73,25 @@ public class UsersController {
     }
 
     @GetMapping("/users/{userId}/addresses")
-    public List<Address> getAddresses(@PathVariable Long userId){
-        return addressesService.getAllAddresses(userId);
-    }
-    /*
-     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public void invalidAutoException(InvalidAutoException exception) {
-
+    public ResponseEntity< List<Address> > getAddresses(@PathVariable Long userId){
+        List<Address> addresses = addressesService.getAllAddresses(userId);
+        return addresses.size() > 0 ?  ResponseEntity.ok(addresses) : ResponseEntity.noContent().build();
     }
 
-
-
-      @RequestMapping("/update")
-  @ResponseBody
-  public String updateUser(long id, String email, String name) {
-    try {
-      User user = userDao.findOne(id);
-      user.setEmail(email);
-      user.setName(name);
-      userDao.save(user);
+    @PatchMapping("/users/{userId}/addresses")
+    public ResponseEntity<Address> updateAddress (@PathVariable Long userId, @Valid @RequestBody Address address){
+        Address updatedAddress = addressesService.updateAddress(userId, address);
+        return updatedAddress == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedAddress);
     }
-    catch (Exception ex) {
-      return "Error updating the user: " + ex.toString();
-    }
-    return "User successfully updated!";
-  }
 
-    */
+    @DeleteMapping("/users/{userId}/addresses/{addressId}")
+    public ResponseEntity deleteAddress(@PathVariable Long userId, @PathVariable Long addressId) {
+        try {
+            addressesService.deleteAddress(userId, addressId);
+        } catch(AddressNotFoundException e) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.accepted().build();
+    }
 }
