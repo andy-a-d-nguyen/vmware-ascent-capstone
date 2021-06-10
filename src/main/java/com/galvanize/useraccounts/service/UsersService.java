@@ -2,7 +2,7 @@ package com.galvanize.useraccounts.service;
 
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.repository.UsersRepository;
-import com.galvanize.useraccounts.request.UpdateUserRequest;
+import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,7 +21,7 @@ public class UsersService {
         return;
     }
 
-    public User updateUser(Long id, UpdateUserRequest updatedUser) { return null; }
+    public User updateUser(Long id, UserRequest updatedUser) { return null; }
 
     public User getUser(Long id) {
         return null;

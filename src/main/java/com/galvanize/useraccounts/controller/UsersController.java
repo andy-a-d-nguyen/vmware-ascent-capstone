@@ -1,15 +1,19 @@
 package com.galvanize.useraccounts.controller;
 
+import com.galvanize.useraccounts.exception.InvalidAddressException;
 import com.galvanize.useraccounts.exception.InvalidUserException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
+import com.galvanize.useraccounts.model.Address;
+import com.galvanize.useraccounts.service.AddressesService;
 import com.galvanize.useraccounts.service.UsersService;
 import com.galvanize.useraccounts.model.User;
-import com.galvanize.useraccounts.request.UpdateUserPasswordRequest;
-import com.galvanize.useraccounts.request.UpdateUserRequest;
+import com.galvanize.useraccounts.request.UserPasswordRequest;
+import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -18,9 +22,11 @@ public class UsersController {
     update, create, show (returns a user), index (return all users)
     */
     UsersService usersService;
+    AddressesService addressesService;
 
-    public UsersController(UsersService usersService) {
+    public UsersController(UsersService usersService, AddressesService addressesService) {
         this.usersService = usersService;
+        this.addressesService = addressesService;
     }
 
     @PostMapping("/users")
@@ -29,14 +35,14 @@ public class UsersController {
     }
 
     @PatchMapping("/users/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody UpdateUserRequest updatedUser) throws InvalidUserException {
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody UserRequest updatedUser) throws InvalidUserException {
         User user = usersService.updateUser(id, updatedUser);
 
         return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
     }
 
     @PatchMapping("/users/{id}/reset")
-    public ResponseEntity<Boolean> update(@PathVariable Long id, @RequestBody UpdateUserPasswordRequest updatedUserPassword) throws InvalidUserException {
+    public ResponseEntity<Boolean> update(@PathVariable Long id, @RequestBody UserPasswordRequest updatedUserPassword) throws InvalidUserException {
         Boolean isUpdated = usersService.updateUserPassword(id, updatedUserPassword.getOldPassword(), updatedUserPassword.getNewPassword());
 
         return isUpdated == false ? ResponseEntity.noContent().build() : ResponseEntity.ok().build();
@@ -60,6 +66,15 @@ public class UsersController {
         return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
     }
 
+    @PostMapping("/users/{userId}/addresses")
+    public Address createAddress(@PathVariable Long userId, @Valid @RequestBody Address address) throws InvalidAddressException {
+       return addressesService.addAddress(userId, address);
+    }
+
+    @GetMapping("/users/{userId}/addresses")
+    public List<Address> getAddresses(@PathVariable Long userId){
+        return addressesService.getAllAddresses(userId);
+    }
     /*
      @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)

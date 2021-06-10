@@ -1,11 +1,14 @@
 package com.galvanize.useraccounts.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.galvanize.useraccounts.exception.InvalidAddressException;
 import com.galvanize.useraccounts.exception.InvalidUserException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
+import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
-import com.galvanize.useraccounts.request.UpdateUserPasswordRequest;
-import com.galvanize.useraccounts.request.UpdateUserRequest;
+import com.galvanize.useraccounts.request.UserPasswordRequest;
+import com.galvanize.useraccounts.request.UserRequest;
+import com.galvanize.useraccounts.service.AddressesService;
 import com.galvanize.useraccounts.service.UsersService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +18,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,6 +41,10 @@ public class UsersControllerTests {
 
     @MockBean
     UsersService usersService;
+
+    @MockBean
+    AddressesService addressesService;
+
     ObjectMapper mapper = new ObjectMapper();
 
     @DisplayName("It can successfully create a user with valid attributes with a status of 200 OK")
@@ -85,7 +97,7 @@ public class UsersControllerTests {
     public void editUser() throws Exception {
         User user = new User("bakerBob", "password123", "baker", "bob","bakerBob@gmail.com");
 
-        when(usersService.updateUser(anyLong(), any(UpdateUserRequest.class))).thenReturn(user);
+        when(usersService.updateUser(anyLong(), any(UserRequest.class))).thenReturn(user);
 
         mockMvc.perform(patch("/api/users/1234").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(user)))
                 .andExpect(status().isOk())
@@ -97,7 +109,7 @@ public class UsersControllerTests {
     public void editUser_fails () throws Exception{
         User user = new User("bakerBob", "password123", "baker", "bob","bakerBob@gmail.com");
 
-        when(usersService.updateUser(anyLong(), any(UpdateUserRequest.class))).thenReturn(null);
+        when(usersService.updateUser(anyLong(), any(UserRequest.class))).thenReturn(null);
 
         mockMvc.perform(patch("/api/users/1234")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -132,24 +144,73 @@ public class UsersControllerTests {
     @DisplayName("It should successfully update a user's password, returns status of 200 OK")
     @Test
     public void updateUserPassword_success() throws Exception{
-        UpdateUserPasswordRequest updateUserPasswordRequest = new UpdateUserPasswordRequest("oldPassword", "newPassword");
+        UserPasswordRequest userPasswordRequest = new UserPasswordRequest("oldPassword", "newPassword");
 
         when(usersService.updateUserPassword(anyLong(), anyString(), anyString())).thenReturn(true);
 
         mockMvc.perform(patch("/api/users/1234/reset")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(updateUserPasswordRequest)))
+                .content(mapper.writeValueAsString(userPasswordRequest)))
                 .andExpect(status().isOk());
     }
 
     @DisplayName("It should not update a user's password and return a 202 NO CONTENT")
     @Test
     public void updateUserPassword_failure() throws Exception{
-        UpdateUserPasswordRequest updateUserPasswordRequest = new UpdateUserPasswordRequest("oldPassword", "newPassword");
+        UserPasswordRequest userPasswordRequest = new UserPasswordRequest("oldPassword", "newPassword");
 
         when(usersService.updateUserPassword(anyLong(), anyString(), anyString())).thenReturn(false);
 
-        mockMvc.perform(patch("/api/users/1234/reset").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(updateUserPasswordRequest)))
+        mockMvc.perform(patch("/api/users/1234/reset").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(userPasswordRequest)))
                 .andExpect(status().isNoContent());
     }
+
+    /********** Address ***********/
+
+    @DisplayName("It should allow user's to add an address and return 200 OK")
+    @Test
+    public void createAddress_validAttr() throws Exception {
+        Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment");
+        newAddress.setUserId(1);
+        when(addressesService.addAddress(anyLong(), any(Address.class))).thenReturn(newAddress);
+        mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(newAddress)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("userId").value("1"))
+                .andExpect(jsonPath("city").value("Test City"))
+                .andExpect(jsonPath("state").value("Test State"))
+                .andExpect(jsonPath("zipcode").value("Test Zipcode"))
+                .andExpect(jsonPath("apartment").value("Test Apartment"));
+    }
+
+    @DisplayName("It should throw an InvalidAddress error, status code 400")
+    @Test
+    public void addAddress_invalidAttr() throws Exception{
+        when(addressesService.addAddress(anyLong(), any(Address.class))).thenThrow(InvalidAddressException.class);
+
+        mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(""))
+            .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("It should return a list of addresses, status code 200")
+    @Test
+    public void getAddresses_success() throws Exception{
+        List<Address> testAddresses = new ArrayList<>();
+
+        IntStream.range(1, 6).forEach(num -> {
+            Address newAddress = new Address("Test Street " + num, "Test City "+ num,"Test State "+ num, "Test Zipcode "+ num, "Test Apartment "+ num);
+            newAddress.setUserId(num);
+            testAddresses.add(newAddress);
+        });
+
+        when(addressesService.getAllAddresses(anyLong())).thenReturn(testAddresses);
+
+        mockMvc.perform(get(String.format("/api/users/%d/addresses", 1L)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(5)));
+    }
+
 }

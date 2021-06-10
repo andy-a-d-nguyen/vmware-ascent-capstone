@@ -30,7 +30,7 @@ public class User {
     @Size(max = 30)
     private String email;
 
-    private String address;
+
     private String creditCard;
     private boolean verified;
 
@@ -106,13 +106,7 @@ public class User {
         this.email = email;
     }
 
-    public String getAddress() {
-        return address;
-    }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
     public String getCreditCard() {
         return creditCard;
