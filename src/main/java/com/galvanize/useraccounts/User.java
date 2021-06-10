@@ -1,6 +1,7 @@
 package com.galvanize.useraccounts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -21,8 +22,7 @@ public class User {
 
     private String avatar;
 
-    @JsonIgnore
-    @NotBlank
+//    @NotBlank
     private String password;
 
     @NotBlank
@@ -34,8 +34,7 @@ public class User {
     private String creditCard;
     private boolean verified;
 
-    public User() {
-    }
+    public User() {}
 
     public User(String username, String password, String firstName, String lastName,  String email) {
         this.username = username;
@@ -85,11 +84,17 @@ public class User {
         this.username = username;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
+        if (password.length() == 0) {
+            throw new NullPointerException("Password cant be empty");
+        }
+
         this.password = password;
     }
 

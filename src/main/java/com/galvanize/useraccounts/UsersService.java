@@ -24,4 +24,8 @@ public class UsersService {
     public User getUser(Long id) {
         return null;
     }
+
+    public Boolean updateUserPassword(Long id, String oldPassword, String newPassword) {
+        return null;
+    }
 }
