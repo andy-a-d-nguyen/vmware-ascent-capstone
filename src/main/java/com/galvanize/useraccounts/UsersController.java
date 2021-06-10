@@ -53,6 +53,12 @@ public class UsersController {
         User user = usersService.getUser(id);
         return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
     }
+    
+    @PostMapping("/users/{id}")
+    public User setAvatar(@PathVariable Long id, @RequestBody String url) {
+        
+        return usersService.setAvatar(id, url);
+    }
 
     /*
      @ExceptionHandler
