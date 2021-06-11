@@ -1,4 +1,4 @@
-package com.galvanize.useraccounts;
+package com.galvanize.useraccounts.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,7 +29,7 @@ public class User {
     @Size(max = 30)
     private String email;
 
-    private String address;
+
     private String creditCard;
     private boolean verified;
 
@@ -105,13 +105,7 @@ public class User {
         this.email = email;
     }
 
-    public String getAddress() {
-        return address;
-    }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
     public String getCreditCard() {
         return creditCard;

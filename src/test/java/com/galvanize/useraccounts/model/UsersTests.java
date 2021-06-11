@@ -1,5 +1,6 @@
-package com.galvanize.useraccounts;
+package com.galvanize.useraccounts.model;
 
+import com.galvanize.useraccounts.model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

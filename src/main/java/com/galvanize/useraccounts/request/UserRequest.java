@@ -1,23 +1,22 @@
-package com.galvanize.useraccounts;
+package com.galvanize.useraccounts.request;
 
-public class UpdateUserRequest {
+public class UserRequest {
 
     private String firstName;
     private String lastName;
     private String password;
     private String email;
-    private String address;
+
     private String creditCard;
     private boolean verify;
 
-    public UpdateUserRequest() {}
+    public UserRequest() {}
 
-    public UpdateUserRequest(String firstName, String lastName, String password, String email, String address, String creditCard, boolean verify) {
+    public UserRequest(String firstName, String lastName, String password, String email, String creditCard, boolean verify) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
-        this.address = address;
         this.creditCard = creditCard;
         this.verify = verify;
     }
@@ -52,14 +51,6 @@ public class UpdateUserRequest {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public String getCreditCard() {
