@@ -1,17 +1,8 @@
 package com.galvanize.useraccounts.model;
 
 public class Address {
-    private long id;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    private long userId;
+    private Long id;
+    private Long userId;
     private String street;
     private String city;
     private String state;
@@ -35,12 +26,18 @@ public class Address {
         this.zipcode = zipcode;
         this.apartment = apartment;
     }
+    public long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public long getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

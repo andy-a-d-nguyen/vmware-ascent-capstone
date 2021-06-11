@@ -78,7 +78,7 @@ public class UsersControllerTests {
     @Test
     public void deleteUser_byId_acceptedStatusCode() throws Exception {
         User userToDelete = new User("bakerBob", "baker", "bob", "password123", "bakerBob@gmail.com");
-        userToDelete.setId(new Long(1));
+        userToDelete.setId(1L);
 
 
         mockMvc.perform(delete("/api/users/" + userToDelete.getId()))
@@ -194,7 +194,7 @@ public class UsersControllerTests {
     @Test
     public void createAddress_validAttr() throws Exception {
         Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment");
-        newAddress.setUserId(1);
+        newAddress.setUserId(1L);
         when(addressesService.addAddress(anyLong(), any(Address.class))).thenReturn(newAddress);
         mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -225,7 +225,7 @@ public class UsersControllerTests {
 
         IntStream.range(1, 6).forEach(num -> {
             Address newAddress = new Address("Test Street " + num, "Test City "+ num,"Test State "+ num, "Test Zipcode "+ num, "Test Apartment "+ num);
-            newAddress.setUserId(num);
+            newAddress.setUserId((long) num);
             testAddresses.add(newAddress);
         });
 
@@ -264,9 +264,6 @@ public class UsersControllerTests {
     @DisplayName("It fail to edit a user's address, status code 400 bad request")
     @Test
     public void updateAddress_fail() throws Exception {
-
-        Address updatedAddress = new Address("Test Street" , "Test City","Test State", "Test Zipcode", "Test Apartment");
-
         when(addressesService.updateAddress(anyLong(), any(Address.class))).thenThrow(InvalidAddressException.class);
 
         mockMvc.perform(patch(String.format("/api/users/%d/addresses", 1L))

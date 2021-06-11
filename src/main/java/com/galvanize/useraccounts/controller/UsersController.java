@@ -57,12 +57,18 @@ public class UsersController {
         return ResponseEntity.accepted().build();
 
     }
-    
+    @PostMapping("/users/{id}")
+    public User setAvatar(@PathVariable Long id, @RequestBody String url) {
+        return usersService.setAvatar(id, url);
+    }
+
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         User user = usersService.getUser(id);
         return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
     }
+
+    /*Addresses*/
 
     @PostMapping("/users/{userId}/addresses")
     public Address createAddress(@PathVariable Long userId, @Valid @RequestBody Address address) throws InvalidAddressException {
@@ -92,9 +98,5 @@ public class UsersController {
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping("/users/{id}")
-    public User setAvatar(@PathVariable Long id, @RequestBody String url) {
-        return usersService.setAvatar(id, url);
-    }
 
 }
