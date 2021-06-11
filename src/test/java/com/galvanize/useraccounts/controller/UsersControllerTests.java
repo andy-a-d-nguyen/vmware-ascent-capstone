@@ -190,11 +190,12 @@ public class UsersControllerTests {
 
     /********** Address ***********/
 
-    @DisplayName("It should allow user's to add an address, status code 200 ok")
+    @DisplayName("It should allow users to add an address, status code 200 ok")
     @Test
     public void createAddress_validAttr() throws Exception {
         Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment");
         newAddress.setUserId(1L);
+        newAddress.setId(1L);
         when(addressesService.addAddress(anyLong(), any(Address.class))).thenReturn(newAddress);
         mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -226,6 +227,7 @@ public class UsersControllerTests {
         IntStream.range(1, 6).forEach(num -> {
             Address newAddress = new Address("Test Street " + num, "Test City "+ num,"Test State "+ num, "Test Zipcode "+ num, "Test Apartment "+ num);
             newAddress.setUserId((long) num);
+            newAddress.setId((long) num);
             testAddresses.add(newAddress);
         });
 
@@ -249,7 +251,8 @@ public class UsersControllerTests {
     @Test
     public void updateAddress_success() throws Exception {
         Address updatedAddress = new Address("Test Street" , "Test City","Test State", "Test Zipcode", "Test Apartment");
-
+        updatedAddress.setUserId(1L);
+        updatedAddress.setId(1L);
         when(addressesService.updateAddress(anyLong(), any(Address.class))).thenReturn(updatedAddress);
 
         mockMvc.perform(patch(String.format("/api/users/%d/addresses", 1L))
