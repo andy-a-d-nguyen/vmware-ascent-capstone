@@ -30,4 +30,8 @@ public class UsersService {
     public Boolean updateUserPassword(Long id, String oldPassword, String newPassword) {
         return null;
     }
+
+    public User setAvatar(Long id, String url) {
+        return null;
+    }
 }

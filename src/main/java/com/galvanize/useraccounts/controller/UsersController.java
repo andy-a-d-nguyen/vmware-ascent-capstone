@@ -19,9 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class UsersController {
-    /*
-    update, create, show (returns a user), index (return all users)
-    */
     UsersService usersService;
     AddressesService addressesService;
 
@@ -94,4 +91,10 @@ public class UsersController {
 
         return ResponseEntity.accepted().build();
     }
+
+    @PostMapping("/users/{id}")
+    public User setAvatar(@PathVariable Long id, @RequestBody String url) {
+        return usersService.setAvatar(id, url);
+    }
+
 }
