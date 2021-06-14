@@ -1,19 +1,22 @@
 package com.galvanize.useraccounts.service;
 
+import com.galvanize.useraccounts.exception.DuplicateUserException;
 import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.service.UsersService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.galvanize.useraccounts.UsersRepository;
 import com.galvanize.useraccounts.UsersList;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +70,28 @@ public class UsersServiceTests {
         com.galvanize.useraccounts.UsersList actual = usersService.searchUsers(username);
 
         assertNull(actual);
+    }
+
+    @Test
+    void createUser_withDuplicateUsername_throwsError() {
+        User user4 = new User("bob", "password123", "bob", "smith","bakerBob2@gmail.com");
+
+        when(usersRepository.save(any(User.class))).thenThrow(DuplicateUserException.class);
+
+        assertThatExceptionOfType(DuplicateUserException.class).isThrownBy( () -> {
+            usersService.createUser(user4);
+        });
+    }
+
+    @Test
+    void createUser_withDuplicateEmail_throwsError() {
+        User user4 = new User("bob", "password123", "bob", "smith","bakerBob2@gmail.com");
+
+        when(usersRepository.save(any(User.class))).thenThrow(DuplicateUserException.class);
+
+        assertThatExceptionOfType(DuplicateUserException.class).isThrownBy( () -> {
+            usersService.createUser(user4);
+        });
     }
 
 }
