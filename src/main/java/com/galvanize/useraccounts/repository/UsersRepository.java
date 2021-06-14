@@ -19,4 +19,7 @@ public interface UsersRepository extends JpaRepository<User, Long> {
 
     @Query(nativeQuery=true, value="SELECT * FROM users WHERE email = ?")
     Optional<User> findByEmailExactMatch(String email);
+
+    @Query(nativeQuery=true, value="SELECT * FROM users WHERE id = ?")
+    Optional<User> findById(Long id);
 }

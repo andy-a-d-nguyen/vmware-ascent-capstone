@@ -101,4 +101,17 @@ class UserAccountsApplicationTests {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
+    @Test
+    void deleteUser_withID_returnsNoContent() {
+        User user = users.get(0);
+        Long id = user.getId();
+        String uri = "/api/users/" + id;
+
+        ResponseEntity<User> response = restTemplate.getForEntity(uri, User.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        restTemplate.delete(uri);
+
+        ResponseEntity<User> responseTwo = restTemplate.getForEntity(uri, User.class);
+        assertEquals(HttpStatus.NO_CONTENT, responseTwo.getStatusCode());
+    }
 }

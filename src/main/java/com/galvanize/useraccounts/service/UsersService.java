@@ -2,12 +2,14 @@ package com.galvanize.useraccounts.service;
 
 import com.galvanize.useraccounts.UsersList;
 import com.galvanize.useraccounts.exception.DuplicateUserException;
+import com.galvanize.useraccounts.exception.UserNotFoundException;
 import com.galvanize.useraccounts.model.User;
 
 import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -31,13 +33,19 @@ public class UsersService {
     }
 
     public void deleteUser(Long id) {
-        return;
+        Optional<User> user = usersRepository.findById(id);
+
+        if (user.isPresent()) {
+            usersRepository.delete(user.get());
+        } else {
+            throw new UserNotFoundException();
+        }
     }
 
     public User updateUser(Long id, UserRequest updatedUser) { return null; }
 
     public User getUser(Long id) {
-        return null;
+        return usersRepository.findById(id).orElse(null);
     }
 
     public Boolean updateUserPassword(Long id, String oldPassword, String newPassword) {

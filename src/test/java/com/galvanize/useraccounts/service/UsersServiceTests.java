@@ -1,6 +1,7 @@
 package com.galvanize.useraccounts.service;
 
 import com.galvanize.useraccounts.exception.DuplicateUserException;
+import com.galvanize.useraccounts.exception.UserNotFoundException;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.service.UsersService;
@@ -13,11 +14,12 @@ import com.galvanize.useraccounts.UsersList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -92,6 +94,26 @@ public class UsersServiceTests {
         assertThatExceptionOfType(DuplicateUserException.class).isThrownBy( () -> {
             usersService.createUser(user4);
         });
+    }
+
+    @Test
+    void deleteUser_withID_returnsAccepted() {
+        User user = users.get(0);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        usersService.deleteUser(user.getId());
+
+        verify(usersRepository).delete(any(User.class));
+    }
+
+    @Test
+    void deleteUser_withID_throwsException() {
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(UserNotFoundException.class)
+                .isThrownBy(() -> {
+                    usersService.deleteUser(1231823L);
+                });
     }
 
 }
