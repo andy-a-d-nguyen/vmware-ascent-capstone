@@ -3,6 +3,7 @@ package com.galvanize.useraccounts.service;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.repository.AddressRepository;
+import com.galvanize.useraccounts.repository.UsersRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,24 +11,32 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AddressesServiceTests {
     private AddressesService addressesService;
+    private UsersService usersService;
+
     private User user;
 
     @Mock
     AddressRepository addressRepository;
 
+    @Mock
+    UsersRepository usersRepository;
+
     @BeforeEach
     void setup() {
-        addressesService = new AddressesService(addressRepository);
+        addressesService = new AddressesService(addressRepository, usersRepository);
+        usersService = new UsersService(usersRepository);
         user = new User("bakerBob", "password123", "bob","baker", "bakerBob@gmail.com");
         user.setId(1L);
     }
@@ -48,5 +57,18 @@ public class AddressesServiceTests {
         assertEquals(newAddress.getUserId(), user.getId());
     }
 
+    @DisplayName("It should delete an address belonging to a user so it does not come back")
+    @Test
+    public void deleteAddress() {
+        Address address = new Address("street", "city", "state", "00000");
+        address.setUserId(user.getId());
+        address.setId(123L);
+        //doNothing() never calls delete
+        doNothing().when(addressRepository).delete(address);
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(addressRepository.findById(anyLong())).thenReturn(Optional.of(address));
 
+        addressesService.deleteAddress(user.getId(), address.getId());
+        verify(addressRepository).delete(address);
+    }
 }
