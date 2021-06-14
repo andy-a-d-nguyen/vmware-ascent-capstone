@@ -1,10 +1,7 @@
 package com.galvanize.useraccounts.controller;
 
 import com.galvanize.useraccounts.UsersList;
-import com.galvanize.useraccounts.exception.AddressNotFoundException;
-import com.galvanize.useraccounts.exception.InvalidAddressException;
-import com.galvanize.useraccounts.exception.InvalidUserException;
-import com.galvanize.useraccounts.exception.UserNotFoundException;
+import com.galvanize.useraccounts.exception.*;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.service.AddressesService;
 import com.galvanize.useraccounts.service.UsersService;
@@ -29,7 +26,7 @@ public class UsersController {
     }
 
     @PostMapping("/users")
-    public User createUser(@Valid @RequestBody User user) throws InvalidUserException {
+    public User createUser(@Valid @RequestBody User user) throws InvalidUserException, DuplicateUserException {
         return usersService.createUser(user);
     }
 

@@ -1,11 +1,14 @@
 package com.galvanize.useraccounts.service;
 
 import com.galvanize.useraccounts.UsersList;
-import com.galvanize.useraccounts.UsersRepository;
+import com.galvanize.useraccounts.exception.DuplicateUserException;
 import com.galvanize.useraccounts.model.User;
 
+import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UsersService {
@@ -16,7 +19,15 @@ public class UsersService {
     }
 
     public User createUser(User user) {
-       return null;
+        Optional<User> foundUser = usersRepository.findByUsernameExactMath(user.getUsername());
+        Optional<User> foundUserEmail = usersRepository.findByEmailExactMath(user.getEmail());
+
+        if (foundUser.isPresent() || foundUserEmail.isPresent()) {
+            throw new DuplicateUserException();
+        }
+
+        return usersRepository.save(user);
+
     }
 
     public void deleteUser(Long id) {
