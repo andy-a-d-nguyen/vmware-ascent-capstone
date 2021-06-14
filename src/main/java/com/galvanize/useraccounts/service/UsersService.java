@@ -1,7 +1,9 @@
 package com.galvanize.useraccounts.service;
 
+import com.galvanize.useraccounts.UsersList;
+import com.galvanize.useraccounts.UsersRepository;
 import com.galvanize.useraccounts.model.User;
-import com.galvanize.useraccounts.repository.UsersRepository;
+
 import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.stereotype.Service;
 
@@ -34,4 +36,13 @@ public class UsersService {
     public User setAvatar(Long id, String url) {
         return null;
     }
+
+    public UsersList searchUsers(String username) {
+        if (username == null) username = "";
+
+        UsersList users = new UsersList(usersRepository.findByUsername("%" + username + "%"));
+
+        return users.isEmpty() ? null : users;
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.galvanize.useraccounts.controller;
 
+import com.galvanize.useraccounts.UsersList;
 import com.galvanize.useraccounts.exception.AddressNotFoundException;
 import com.galvanize.useraccounts.exception.InvalidAddressException;
 import com.galvanize.useraccounts.exception.InvalidUserException;
@@ -98,5 +99,11 @@ public class UsersController {
         return ResponseEntity.accepted().build();
     }
 
+    @GetMapping("/users")
+    public ResponseEntity<UsersList> searchUsers(@RequestParam(required = false) String username) {
+        UsersList users = usersService.searchUsers(username);
+
+        return users == null || users.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(users);
+    }
 
 }
