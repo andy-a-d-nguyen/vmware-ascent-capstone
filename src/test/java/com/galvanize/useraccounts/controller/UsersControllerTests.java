@@ -2,10 +2,7 @@ package com.galvanize.useraccounts.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.useraccounts.UsersList;
-import com.galvanize.useraccounts.exception.AddressNotFoundException;
-import com.galvanize.useraccounts.exception.InvalidAddressException;
-import com.galvanize.useraccounts.exception.InvalidUserException;
-import com.galvanize.useraccounts.exception.UserNotFoundException;
+import com.galvanize.useraccounts.exception.*;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
@@ -324,4 +321,15 @@ public class UsersControllerTests {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    public void createUser_withDuplicateUsernameAndEmail_returnsError() throws Exception {
+        User user = new User("bob", "password123", "bob", "smith","bakerBob2@gmail.com");
+
+        when(usersService.createUser(any(User.class))).thenThrow(DuplicateUserException.class);
+
+        mockMvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(user)))
+                .andExpect(status().isBadRequest());
+    }
 }

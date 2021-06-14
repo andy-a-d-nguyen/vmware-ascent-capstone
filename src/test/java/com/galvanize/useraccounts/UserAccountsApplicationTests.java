@@ -1,17 +1,18 @@
 package com.galvanize.useraccounts;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.repository.UsersRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.TestPropertySource;
 
-import com.galvanize.useraccounts.UsersRepository;
 import com.galvanize.useraccounts.UsersList;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,8 @@ class UserAccountsApplicationTests {
     UsersRepository usersRepository;
 
     List<User> users;
-
+    ObjectMapper mapper = new ObjectMapper();
+    
     @BeforeEach
     void setup() {
         users = new ArrayList<>();
@@ -67,6 +69,36 @@ class UserAccountsApplicationTests {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertFalse(response.getBody().isEmpty());
         assertEquals(3, response.getBody().size());
+    }
+
+    @Test
+    void createUser_withDupUsername_returnsBadRequest() throws JsonProcessingException {
+        User user5 = new User("bakerBob", "password123", "baker", "bob","bakerBob12345@gmail.com");
+        String uri = "/api/users";
+
+        String body = mapper.writeValueAsString(user5);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<?> request = new HttpEntity<>(body, headers);
+        ResponseEntity<User> response = restTemplate.postForEntity(uri, request, User.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void createUser_withDupEmail_returnsBadRequest() throws JsonProcessingException {
+        User user5 = new User("bakerBob", "password123", "baker", "bob","bakerBob1@gmail.com");
+        String uri = "/api/users";
+
+        String body = mapper.writeValueAsString(user5);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<?> request = new HttpEntity<>(body, headers);
+        ResponseEntity<User> response = restTemplate.postForEntity(uri, request, User.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
 }
