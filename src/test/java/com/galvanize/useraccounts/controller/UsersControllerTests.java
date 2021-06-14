@@ -1,6 +1,7 @@
 package com.galvanize.useraccounts.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.galvanize.useraccounts.UsersList;
 import com.galvanize.useraccounts.exception.AddressNotFoundException;
 import com.galvanize.useraccounts.exception.InvalidAddressException;
 import com.galvanize.useraccounts.exception.InvalidUserException;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -35,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@WebMvcTest(UsersController.class)
 public class UsersControllerTests {
     @Autowired
     MockMvc mockMvc;
@@ -290,4 +292,36 @@ public class UsersControllerTests {
         mockMvc.perform(delete("/api/users/1/addresses/1"))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    public void searchUsername_byString_returnsFoundUsers() throws Exception {
+        String username = "bob";
+
+        User user1 = new User("bakerBob", "password123", "baker", "bob","bakerBob1@gmail.com");
+        User user2 = new User("bob", "password123", "bob", "smith","bakerBob2@gmail.com");
+        User user3 = new User("bobBob", "password123", "bob", "bob","bakerBob3@gmail.com");
+
+        user1.setId(1L);
+        user2.setId(2L);
+        user3.setId(3L);
+
+        when(usersService.searchUsers(anyString())).thenReturn(new UsersList(Arrays.asList(user1, user2, user3)));
+
+        mockMvc.perform(get("/api/users?username=" + username))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("users", hasSize(3)));
+    }
+
+    @Test
+    public void searchUsername_byString_returnsNoContent() throws Exception {
+        String username = "bob";
+
+        when(usersService.searchUsers(anyString())).thenReturn(new UsersList(Arrays.asList()));
+
+        mockMvc.perform(get("/api/users?username=" + username))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
 }
