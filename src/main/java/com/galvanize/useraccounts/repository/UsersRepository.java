@@ -22,8 +22,4 @@ public interface UsersRepository extends JpaRepository<User, Long> {
 
     @Query(nativeQuery=true, value="SELECT * FROM users WHERE id = ?")
     Optional<User> findById(Long id);
-
-//    @Query(nativeQuery=true, value="SELECT * FROM users WHERE id = ?")
-////    @Query(nativeQuery=true, value="UPDATE users SET avatar = ? WHERE id = ? ")
-//    Optional<User> updateAvatar(String url, Long id);
 }
