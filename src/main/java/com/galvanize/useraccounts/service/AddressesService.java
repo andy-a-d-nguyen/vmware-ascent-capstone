@@ -16,7 +16,8 @@ public class AddressesService {
     }
 
     public Address addAddress(Long userId, Address address) {
-        return null;
+        address.setUserId(userId);
+        return addressRepository.save(address);
     }
 
     public List<Address> getAllAddresses(Long userId) {
