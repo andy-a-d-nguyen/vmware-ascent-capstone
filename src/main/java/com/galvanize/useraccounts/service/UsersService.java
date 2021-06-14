@@ -53,6 +53,13 @@ public class UsersService {
     }
 
     public User setAvatar(Long id, String url) {
+        User user = getUser(id);
+
+        if (user != null) {
+            user.setAvatar(url);
+            return usersRepository.save(user);
+        }
+
         return null;
     }
 

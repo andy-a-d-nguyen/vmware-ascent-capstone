@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.repository.UsersRepository;
+import com.galvanize.useraccounts.request.UserAvatarRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -113,5 +114,42 @@ class UserAccountsApplicationTests {
 
         ResponseEntity<User> responseTwo = restTemplate.getForEntity(uri, User.class);
         assertEquals(HttpStatus.NO_CONTENT, responseTwo.getStatusCode());
+    }
+
+    @Test
+    void setAvatar_withIDAndURL_returnsUser() throws JsonProcessingException {
+        User user = users.get(0);
+        Long id = user.getId();
+        String uri = "/api/users/" + id;
+        String avatar = "https://myavatar.com";
+
+        UserAvatarRequest request = new UserAvatarRequest(avatar);
+
+        String body = mapper.writeValueAsString(request);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<?> requestTwo = new HttpEntity<>(body, headers);
+        ResponseEntity<User> response = restTemplate.postForEntity(uri, requestTwo, User.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(avatar, response.getBody().getAvatar());
+    }
+
+    @Test
+    void setAvatar_withIDAndURL_returnsNoContent() throws JsonProcessingException {
+        String uri = "/api/users/" + 12345L;
+        String avatar = "https://myavatar.com";
+
+        UserAvatarRequest request = new UserAvatarRequest(avatar);
+
+        String body = mapper.writeValueAsString(request);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<?> requestTwo = new HttpEntity<>(body, headers);
+        ResponseEntity<User> response = restTemplate.postForEntity(uri, requestTwo, User.class);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 }

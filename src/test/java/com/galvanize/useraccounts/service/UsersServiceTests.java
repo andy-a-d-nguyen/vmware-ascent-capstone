@@ -116,4 +116,29 @@ public class UsersServiceTests {
                 });
     }
 
+    @Test
+    void setAvatar_withIDAndURL_returnsUser() {
+        User user = users.get(0);
+        String url = "https://myavatar.com";
+        user.setAvatar(url);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(usersRepository.save(any(User.class))).thenReturn(user);
+
+        User updatedUser = usersService.setAvatar(user.getId(), url);
+
+        assertEquals(url, updatedUser.getAvatar());
+    }
+
+    @Test
+    void setAvatar_withIDAndURL_returnsNoContent() {
+        String url = "https://myavatar.com";
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        User updatedUser = usersService.setAvatar(12345L, url);
+
+        assertNull(updatedUser);
+    }
+
 }
