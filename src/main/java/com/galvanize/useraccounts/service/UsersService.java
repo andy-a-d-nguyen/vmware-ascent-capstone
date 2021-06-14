@@ -19,8 +19,8 @@ public class UsersService {
     }
 
     public User createUser(User user) {
-        Optional<User> foundUser = usersRepository.findByUsernameExactMath(user.getUsername());
-        Optional<User> foundUserEmail = usersRepository.findByEmailExactMath(user.getEmail());
+        Optional<User> foundUser = usersRepository.findByUsernameExactMatch(user.getUsername());
+        Optional<User> foundUserEmail = usersRepository.findByEmailExactMatch(user.getEmail());
 
         if (foundUser.isPresent() || foundUserEmail.isPresent()) {
             throw new DuplicateUserException();
