@@ -1,5 +1,7 @@
 package com.galvanize.useraccounts.service;
 
+import com.galvanize.useraccounts.exception.AddressNotFoundException;
+import com.galvanize.useraccounts.exception.UserNotFoundException;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.repository.AddressRepository;
@@ -33,7 +35,7 @@ public class AddressesService {
         return null;
     }
 
-    public void deleteAddress(Long userId, Long addressId) {
+    public void deleteAddress(Long userId, Long addressId) throws UserNotFoundException, AddressNotFoundException{
         //make sure that address belongs to userId
         Optional <User> oUser = usersRepository.findById(userId);
         Optional <Address> oAddress = addressRepository.findById(addressId);
@@ -41,6 +43,10 @@ public class AddressesService {
         //refactor this if statement in future :3
         if (oUser.isPresent() && oAddress.isPresent() && oUser.get().getId() == oAddress.get().getUserId()) {
             addressRepository.delete(oAddress.get());
+        } else if (oUser.isEmpty()) {
+            throw new UserNotFoundException();
+        } else {
+            throw new AddressNotFoundException();
         }
     }
 }
