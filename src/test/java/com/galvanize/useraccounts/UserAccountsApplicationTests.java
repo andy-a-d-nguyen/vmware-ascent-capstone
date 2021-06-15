@@ -201,4 +201,23 @@ class UserAccountsApplicationTests {
         assertThat(response.getBody().getCreditCard()).isEqualTo(request.getCreditCard());
         assertThat(response.getBody().isVerified()).isEqualTo(request.isVerify());
     }
+
+    @Test
+    void updateUser_withIDAndBody_returnsNoContent() {
+        User user = users.get(0);
+
+        String uri = "/api/users/" + 1234L;
+
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+
+        HttpEntity<UserRequest> patchRequest = new HttpEntity<>(request, headers);
+
+        ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertNull(response.getBody());
+    }
 }
