@@ -170,7 +170,6 @@ public class UsersServiceTests {
         user.setLastName("Nguyen");
         user.setEmail("andynguyen@gmail.com");
 
-
         UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
 
         when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
@@ -184,5 +183,16 @@ public class UsersServiceTests {
         assertEquals(user.isVerified(), updatedUser.isVerified());
     }
 
+    @Test
+    void updateUser_withIDAndBody_returnsNoContent() {
+        User user = users.get(0);
 
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        User updatedUser = usersService.updateUser(1234L, request);
+
+        assertNull(updatedUser);
+    }
 }
