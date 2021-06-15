@@ -151,4 +151,14 @@ public class UsersServiceTests {
 
         assertEquals(user, foundUser);
     }
+
+    @Test
+    void getUser_withID_returnsNoContent() {
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        User foundUser = usersService.getUser(12345L);
+
+        assertNull(foundUser);
+    }
 }
