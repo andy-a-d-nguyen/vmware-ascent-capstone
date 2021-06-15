@@ -7,6 +7,8 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -29,11 +31,13 @@ public class User {
 
     private String password;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+    private List<Address> addresses = new ArrayList<>();
+
     @NotBlank
     @Email
     @Size(max = 30)
     private String email;
-
 
     private String creditCard;
     private boolean verified;
@@ -46,6 +50,20 @@ public class User {
         this.lastName = lastName;
         this.password = password;
         this.email = email;
+    }
+
+    public User(String username, String password, String firstName, String lastName,  String email, List<Address> addresses) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.email = email;
+        this.addresses = addresses;
+    }
+
+    public void addAddress(Address address){
+        this.addresses.add(address);
+        address.setUser(this);
     }
 
     public String getFirstName() {
@@ -127,4 +145,13 @@ public class User {
     public void setVerified(boolean verified) {
         this.verified = verified;
     }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
 }

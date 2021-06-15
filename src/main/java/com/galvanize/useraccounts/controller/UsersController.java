@@ -76,8 +76,8 @@ public class UsersController {
     /*Addresses*/
 
     @PostMapping("/users/{userId}/addresses")
-    public Address createAddress(@PathVariable Long userId, @Valid @RequestBody Address address) throws InvalidAddressException {
-       return addressesService.addAddress(userId, address);
+    public User createAddress(@PathVariable Long userId, @Valid @RequestBody List<Address> address) throws InvalidAddressException {
+       return usersService.addAddress(userId, address);
     }
 
     @GetMapping("/users/{userId}/addresses")
@@ -95,7 +95,7 @@ public class UsersController {
     @DeleteMapping("/users/{userId}/addresses/{addressId}")
     public ResponseEntity deleteAddress(@PathVariable Long userId, @PathVariable Long addressId) {
         try {
-            addressesService.deleteAddress(userId, addressId);
+            //addressesService.deleteAddress(userId, addressId);
         } catch(AddressNotFoundException e) {
             return ResponseEntity.noContent().build();
         }
