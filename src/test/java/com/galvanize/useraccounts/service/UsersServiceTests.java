@@ -141,4 +141,14 @@ public class UsersServiceTests {
         assertNull(updatedUser);
     }
 
+    @Test
+    void getUser_withID_returnsUser() {
+        User user = users.get(0);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        User foundUser = usersService.getUser(user.getId());
+
+        assertEquals(user, foundUser);
+    }
 }
