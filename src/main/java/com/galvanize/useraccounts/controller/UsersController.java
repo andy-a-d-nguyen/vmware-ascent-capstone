@@ -3,6 +3,7 @@ package com.galvanize.useraccounts.controller;
 import com.galvanize.useraccounts.UsersList;
 import com.galvanize.useraccounts.exception.*;
 import com.galvanize.useraccounts.model.Address;
+import com.galvanize.useraccounts.request.UserAvatarRequest;
 import com.galvanize.useraccounts.service.AddressesService;
 import com.galvanize.useraccounts.service.UsersService;
 import com.galvanize.useraccounts.model.User;
@@ -56,8 +57,14 @@ public class UsersController {
 
     }
     @PostMapping("/users/{id}")
-    public User setAvatar(@PathVariable Long id, @RequestBody String url) {
-        return usersService.setAvatar(id, url);
+    public ResponseEntity<User> setAvatar(@PathVariable Long id, @RequestBody UserAvatarRequest userAvatarRequest) {
+        User user =  usersService.setAvatar(id, userAvatarRequest.getUrl());
+        
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
 
     @GetMapping("/users/{id}")

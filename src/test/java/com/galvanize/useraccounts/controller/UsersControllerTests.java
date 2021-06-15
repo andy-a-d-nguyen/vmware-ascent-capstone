@@ -5,6 +5,7 @@ import com.galvanize.useraccounts.UsersList;
 import com.galvanize.useraccounts.exception.*;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.request.UserAvatarRequest;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
 import com.galvanize.useraccounts.service.AddressesService;
@@ -174,14 +175,17 @@ public class UsersControllerTests {
     public void setAvatar_InputIDAndAvatarURL_ReturnsURL() throws Exception{
         User user = new User("bakerBob", "password123", "baker", "bob","bakerBob@gmail.com");
         user.setId(1L);
+
         String avatar = "www.avatar.com";
+
+        UserAvatarRequest request = new UserAvatarRequest(avatar);
         user.setAvatar(avatar);
 
         when(usersService.setAvatar(anyLong(), anyString())).thenReturn(user);
 
         mockMvc.perform(post("/api/users/" + user.getId())
-                .contentType(MediaType.TEXT_PLAIN)
-                .content(avatar))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("avatar").value(avatar));
