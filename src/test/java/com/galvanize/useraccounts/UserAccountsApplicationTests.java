@@ -15,9 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.test.context.TestPropertySource;
 
-import com.galvanize.useraccounts.UsersList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -200,7 +198,7 @@ class UserAccountsApplicationTests {
         assertThat(response.getBody().getLastName()).isEqualTo(request.getLastName());
         assertThat(response.getBody().getEmail()).isEqualTo(request.getEmail());
         assertThat(response.getBody().getCreditCard()).isEqualTo(request.getCreditCard());
-        assertThat(response.getBody().isVerified()).isEqualTo(request.isVerify());
+        assertThat(response.getBody().isVerified()).isEqualTo(request.isVerified());
     }
 
     @Test

@@ -18,14 +18,14 @@ public class UserRequestTest {
         userRequest.setPassword("121password");
         userRequest.setEmail("ajskfdl@gmail.com");
         userRequest.setCreditCard("asdfjk12123");
-        userRequest.setVerify(false);
+        userRequest.setVerified(false);
 
         assertEquals("Sally", userRequest.getFirstName());
         assertEquals("Smith", userRequest.getLastName());
         assertEquals("121password", userRequest.getPassword());
         assertEquals("ajskfdl@gmail.com", userRequest.getEmail());
         assertEquals("asdfjk12123", userRequest.getCreditCard());
-        assertEquals(false, userRequest.isVerify());
+        assertEquals(false, userRequest.isVerified());
 
 
     }

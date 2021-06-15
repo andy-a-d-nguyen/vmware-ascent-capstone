@@ -9,7 +9,6 @@ import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -50,7 +49,7 @@ public class UsersService {
             user.setLastName(updatedUser.getLastName());
             user.setEmail(updatedUser.getEmail());
             user.setCreditCard(updatedUser.getCreditCard());
-            user.setVerified(updatedUser.isVerify());
+            user.setVerified(updatedUser.isVerified());
             return usersRepository.save(user);
         }
         return null; 
