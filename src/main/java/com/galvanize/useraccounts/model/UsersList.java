@@ -1,5 +1,6 @@
 package com.galvanize.useraccounts;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.galvanize.useraccounts.model.User;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class UsersList {
         this.users = users;
     }
 
+    @JsonIgnore
     public boolean isEmpty() {
         return users.isEmpty();
     }
