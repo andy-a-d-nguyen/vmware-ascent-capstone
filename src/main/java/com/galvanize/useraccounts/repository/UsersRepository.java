@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface UsersRepository extends JpaRepository<User, Long> {
 
-    @Query(nativeQuery=true, value="SELECT * FROM users WHERE LOWER(username) LIKE ?")
+    @Query(nativeQuery=true, value="SELECT * FROM users WHERE LOWER(username) LIKE LOWER(?)")
     List<User> findByUsername(String username);
 
     @Query(nativeQuery=true, value="SELECT * FROM users WHERE username = ?")

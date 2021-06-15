@@ -152,4 +152,25 @@ class UserAccountsApplicationTests {
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
+
+    @Test
+    void getUser_withID_returnsUser() {
+        User user = users.get(0);
+
+        String uri = "/api/users/" + user.getId();
+
+        ResponseEntity<User> response = restTemplate.getForEntity(uri, User.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(user.getUsername(), response.getBody().getUsername());
+    }
+
+    @Test
+    void getUser_withID_returnsNoContent() {
+        String uri = "/api/users/" + 1234L;
+
+        ResponseEntity<User> response = restTemplate.getForEntity(uri, User.class);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
 }
