@@ -1,36 +1,53 @@
 openapi: 3.0.1
 info:
   title: User Accounts
-  description: 'This is an API for user accounts'
+  description: 'This is an API for user accounts and their associated addresses'
   version: 0.0.1
 tags:
   - name: user
     description: Everything about user accounts
+  - name: address
+    description: Everything about user addresses
 components:
   schemas:
     user:
       type: object
       properties:
         id:
-          type: integer
-        image:
+          type: long
+        username:
           type: string
         firstName:
           type: string
         lastName:
           type: string
-        username:
+        avatar:
           type: string
         password:
           type: string
         email:
           type: string
-        address:
-          type: string
         creditCard:
           type: string
         verified:
           type: boolean
+    address:
+      type: object
+      properties:
+        id:
+          type: long
+        userid:
+          type: long
+        street:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zipcode:
+          type: string
+        apartment:
+          type: string
     userLogin:
       type: object
       properties:
@@ -43,13 +60,13 @@ components:
       properties:
         id:
           type: integer
-        image:
+        username:
           type: string
         firstName:
           type: string
         lastName:
           type: string
-        username:
+        image:
           type: string
         email:
           type: string
@@ -175,6 +192,74 @@ paths:
         - name: id
           in: path
           description: id of user to delete
+          required: true
+      responses:
+        '202':
+          description: Accepted
+        '204':
+          description: No content
+  /api/users/{userId}/addresses:
+    get:
+      tags:
+        - address
+      summary: Fetch all of a user's shipping addresses
+      parameters:
+        -name: userId
+        in: path
+        description: id of a user whose shipping addresses are being fetched
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '204':
+          description: No content
+    post:
+      tags:
+        - address
+      summary: Posts a user's shipping address
+      parameters:
+        - name: userId
+          in: path
+          description: userId of user whose address to delete
+        - name: address
+          in: request body
+          description: shipping address of user to add
+          required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+    patch:
+      tags:
+        - address
+      summary: Edit's a user's shipping address
+      parameters:
+        - name: userId
+          in: path
+          description: userId of user whose address to edit
+
+        - name: address
+          in: request body
+          description: shipping address of user to add
+          required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+  /api/users/{userId}/addresses/{addressId}:
+    delete:
+      tags:
+        - address
+      summary: Deletes a user's shipping address
+      parameters:
+        - name: userId
+          in: path
+          description: userId of user whose address to delete
+        - name: address
+          in: request body
+          description: shipping address of user to delete
           required: true
       responses:
         '202':
