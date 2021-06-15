@@ -4,6 +4,7 @@ import com.galvanize.useraccounts.exception.DuplicateUserException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.repository.UsersRepository;
+import com.galvanize.useraccounts.request.UserRequest;
 import com.galvanize.useraccounts.service.UsersService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -160,5 +161,38 @@ public class UsersServiceTests {
         User foundUser = usersService.getUser(12345L);
 
         assertNull(foundUser);
+    }
+
+    @Test
+    void updateUser_withIDAndBody_returnsUpdatedUser() {
+        User user = users.get(0);
+        user.setFirstName("Andy");
+        user.setLastName("Nguyen");
+        user.setEmail("andynguyen@gmail.com");
+
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(usersRepository.save(any(User.class))).thenReturn(user);
+
+        User updatedUser = usersService.updateUser(user.getId(), request);
+
+        assertEquals(user.getFirstName(), updatedUser.getFirstName());
+        assertEquals(user.getLastName(), updatedUser.getLastName());
+        assertEquals(user.getEmail(), updatedUser.getEmail());
+        assertEquals(user.isVerified(), updatedUser.isVerified());
+    }
+
+    @Test
+    void updateUser_withIDAndBody_returnsNoContent() {
+        User user = users.get(0);
+
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        User updatedUser = usersService.updateUser(1234L, request);
+
+        assertNull(updatedUser);
     }
 }

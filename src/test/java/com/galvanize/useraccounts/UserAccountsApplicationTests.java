@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserAvatarRequest;
+import com.galvanize.useraccounts.request.UserRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,12 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.TestPropertySource;
 
 import com.galvanize.useraccounts.UsersList;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 //@TestPropertySource(locations= "classpath:application-test.properties")
@@ -172,5 +175,49 @@ class UserAccountsApplicationTests {
         ResponseEntity<User> response = restTemplate.getForEntity(uri, User.class);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+
+    @Test
+    void updateUser_withIDAndBody_returnsUser() {
+        restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+
+        User user = users.get(0);
+
+        String uri = "/api/users/" + user.getId();
+
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+
+        HttpEntity<UserRequest> patchRequest = new HttpEntity<>(request, headers);
+
+        ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getFirstName()).isEqualTo(request.getFirstName());
+        assertThat(response.getBody().getLastName()).isEqualTo(request.getLastName());
+        assertThat(response.getBody().getEmail()).isEqualTo(request.getEmail());
+        assertThat(response.getBody().getCreditCard()).isEqualTo(request.getCreditCard());
+        assertThat(response.getBody().isVerified()).isEqualTo(request.isVerify());
+    }
+
+    @Test
+    void updateUser_withIDAndBody_returnsNoContent() {
+        User user = users.get(0);
+
+        String uri = "/api/users/" + 1234L;
+
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+
+        HttpEntity<UserRequest> patchRequest = new HttpEntity<>(request, headers);
+
+        ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertNull(response.getBody());
     }
 }
