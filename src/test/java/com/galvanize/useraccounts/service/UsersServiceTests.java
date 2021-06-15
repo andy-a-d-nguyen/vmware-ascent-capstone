@@ -209,4 +209,15 @@ public class UsersServiceTests {
 
         assertTrue(updatedPassword);
     }
+
+    @Test
+    void updatePassword_withIDAndRequestBody_returnsFalse() {
+        UserPasswordRequest passwordRequest = new UserPasswordRequest("password123", "newpassword");
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Boolean updatedPassword = usersService.updateUserPassword(1234L, passwordRequest.getOldPassword(), passwordRequest.getNewPassword());
+
+        assertFalse(updatedPassword);
+    }
 }
