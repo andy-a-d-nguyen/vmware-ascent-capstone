@@ -61,7 +61,15 @@ public class UsersService {
     }
 
     public Boolean updateUserPassword(Long id, String oldPassword, String newPassword) {
-        return null;
+        User user = getUser(id);
+        
+        if (user != null && user.getPassword().equals(oldPassword)) {
+            user.setPassword(newPassword);
+            usersRepository.save(user);
+            return true;
+        }
+        
+        return false;
     }
 
     public User setAvatar(Long id, String url) {

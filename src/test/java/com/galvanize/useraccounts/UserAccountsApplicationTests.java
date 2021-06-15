@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserAvatarRequest;
+import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -219,5 +220,57 @@ class UserAccountsApplicationTests {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertNull(response.getBody());
+    }
+
+    @Test
+    void updatePassword_withIDAndRequestBody_returnsSuccessStatus() {
+        User user = users.get(0);
+
+        String uri = "/api/users/" + user.getId() + "/reset";
+
+        UserPasswordRequest passwordRequest = new UserPasswordRequest("password123", "newpassword");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+
+        HttpEntity<?> patchRequest = new HttpEntity<>(passwordRequest, headers);
+
+        ResponseEntity<Boolean> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, Boolean.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void updatePassword_withIDAndBadPassword_returnsNoContent() {
+        User user = users.get(0);
+
+        String uri = "/api/users/" + user.getId() + "/reset";
+
+        UserPasswordRequest passwordRequest = new UserPasswordRequest("password", "newpassword");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+
+        HttpEntity<?> patchRequest = new HttpEntity<>(passwordRequest, headers);
+
+        ResponseEntity<Boolean> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, Boolean.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void updatePassword_withInvalidID_returnsNoContent() {
+        String uri = "/api/users/" + 1234L + "/reset";
+
+        UserPasswordRequest passwordRequest = new UserPasswordRequest("password123", "newpassword");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+
+        HttpEntity<?> patchRequest = new HttpEntity<>(passwordRequest, headers);
+
+        ResponseEntity<Boolean> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, Boolean.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 }
