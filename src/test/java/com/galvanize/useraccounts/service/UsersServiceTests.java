@@ -4,6 +4,7 @@ import com.galvanize.useraccounts.exception.DuplicateUserException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.repository.UsersRepository;
+import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
 import com.galvanize.useraccounts.service.UsersService;
 import org.junit.jupiter.api.BeforeEach;
@@ -194,5 +195,18 @@ public class UsersServiceTests {
         User updatedUser = usersService.updateUser(1234L, request);
 
         assertNull(updatedUser);
+    }
+
+    @Test
+    void updatePassword_withIDAndRequestBody_returnsTrue() {
+        User user = users.get(0);
+
+        UserPasswordRequest passwordRequest = new UserPasswordRequest("password123", "newpassword");
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        Boolean updatedPassword = usersService.updateUserPassword(user.getId(), passwordRequest.getOldPassword(), passwordRequest.getNewPassword());
+
+        assertTrue(updatedPassword);
     }
 }

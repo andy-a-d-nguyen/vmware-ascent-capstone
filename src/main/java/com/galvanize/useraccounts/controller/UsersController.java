@@ -42,7 +42,7 @@ public class UsersController {
     public ResponseEntity<Boolean> update(@PathVariable Long id, @RequestBody UserPasswordRequest updatedUserPassword) throws InvalidUserException {
         Boolean isUpdated = usersService.updateUserPassword(id, updatedUserPassword.getOldPassword(), updatedUserPassword.getNewPassword());
 
-        return isUpdated == false ? ResponseEntity.noContent().build() : ResponseEntity.ok().build();
+        return !isUpdated ? ResponseEntity.noContent().build() : ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/users/{id}")
