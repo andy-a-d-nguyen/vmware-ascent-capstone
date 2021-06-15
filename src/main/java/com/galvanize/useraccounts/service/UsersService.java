@@ -45,14 +45,34 @@ public class UsersService {
         }
     }
 
-    public User updateUser(Long id, UserRequest updatedUser) { return null; }
+    public User updateUser(Long id, UserRequest updatedUser) {
+        User user = getUser(id);
+        
+        if (user != null) {
+            user.setFirstName(updatedUser.getFirstName());
+            user.setLastName(updatedUser.getLastName());
+            user.setEmail(updatedUser.getEmail());
+            user.setCreditCard(updatedUser.getCreditCard());
+            user.setVerified(updatedUser.isVerify());
+            return usersRepository.save(user);
+        }
+        return null; 
+    }
 
     public User getUser(Long id) {
         return usersRepository.findById(id).orElse(null);
     }
 
     public Boolean updateUserPassword(Long id, String oldPassword, String newPassword) {
-        return null;
+        User user = getUser(id);
+        
+        if (user != null && user.getPassword().equals(oldPassword)) {
+            user.setPassword(newPassword);
+            usersRepository.save(user);
+            return true;
+        }
+        
+        return false;
     }
 
     public User setAvatar(Long id, String url) {
