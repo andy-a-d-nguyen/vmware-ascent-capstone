@@ -10,11 +10,15 @@ stages:
 build:
   stage: build
   script:
-    ./gradlew assemble
+    - ./gradlew bootJar
+  cache:
+    key: GRADLE-BUILD-FILES
+    paths:
+      - build/
   artifacts:
     paths:
+      - build/classes/java/
       - build/libs/*.jar
-
 test:
   stage: test
   script:
