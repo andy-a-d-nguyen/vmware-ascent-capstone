@@ -7,6 +7,8 @@ import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserAvatarRequest;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
+import com.galvanize.useraccounts.UsersList;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

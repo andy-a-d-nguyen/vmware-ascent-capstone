@@ -3,18 +3,22 @@ image: adoptopenjdk:11
 stages:
   - build
   - test
-#  - docker
+  - docker
   - codeCoverage
 #  - deploy
 
 build:
   stage: build
   script:
-    ./gradlew assemble
+    - ./gradlew bootJar
+  cache:
+    key: GRADLE-BUILD-FILES
+    paths:
+      - build/
   artifacts:
     paths:
+      - build/classes/java/
       - build/libs/*.jar
-
 test:
   stage: test
   script:
@@ -23,21 +27,21 @@ test:
     paths:
       - build/test-results/test/TEST*.xml
 
-#docker:
-#  stage: docker
-#  image: docker:latest
-#  needs:
-#    - build
-#  services:
-#    - docker:dind
-#  before_script:
-#    - echo "$MY_NAME"
-#    - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-#  script:
-#    - docker build --pull -t "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" .
-#    - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
-#    - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
-#    - docker push "$CI_REGISTRY_IMAGE":"latest"
+docker:
+  stage: docker
+  image: docker:latest
+  needs:
+    - build
+  services:
+    - docker:dind
+  before_script:
+    - echo "$MY_NAME"
+    - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" .
+    - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
+    - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
+    - docker push "$CI_REGISTRY_IMAGE":"latest"
 
 codeCoverage:
   image: adoptopenjdk:11
