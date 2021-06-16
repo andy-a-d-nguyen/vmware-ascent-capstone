@@ -3,6 +3,7 @@ package com.galvanize.useraccounts.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "address")
@@ -95,5 +96,18 @@ public class Address {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Address)) return false;
+        Address address = (Address) o;
+        return id.equals(address.id) && user.equals(address.user) && street.equals(address.street) && city.equals(address.city) && state.equals(address.state) && zipcode.equals(address.zipcode) && Objects.equals(apartment, address.apartment);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, user, street, city, state, zipcode);
     }
 }

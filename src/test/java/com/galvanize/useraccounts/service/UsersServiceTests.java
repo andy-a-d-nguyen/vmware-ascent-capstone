@@ -2,12 +2,15 @@ package com.galvanize.useraccounts.service;
 
 import com.galvanize.useraccounts.exception.DuplicateUserException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
+import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.repository.AddressRepository;
 import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
 import com.galvanize.useraccounts.service.UsersService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -28,6 +31,8 @@ import static org.mockito.Mockito.when;
 public class UsersServiceTests {
     @Mock
     UsersRepository usersRepository;
+    @Mock
+    AddressRepository addressRepository;
 
     private UsersService usersService;
 
@@ -35,7 +40,7 @@ public class UsersServiceTests {
 
     @BeforeEach
     void setup() {
-        usersService = new UsersService(usersRepository);
+        usersService = new UsersService(usersRepository, addressRepository);
 
         users = new ArrayList<>();
 
@@ -219,5 +224,77 @@ public class UsersServiceTests {
         Boolean updatedPassword = usersService.updateUserPassword(1234L, passwordRequest.getOldPassword(), passwordRequest.getNewPassword());
 
         assertFalse(updatedPassword);
+    }
+
+    @DisplayName("It should save a user's address and returns updated user")
+    @Test
+    void addAddress_to_User(){
+        User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        expected.setId(1L);
+        expected.addAddress(address);
+
+        List<Address> addressList = new ArrayList<>();
+        addressList.add(address);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(expected));
+        when(usersRepository.save(any(User.class))).thenReturn(expected);
+
+        User actual = usersService.addAddress(1L, addressList);
+        assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
+    }
+
+    @DisplayName("It should throw UserNotFoundException when adding an address to non existing user")
+    @Test
+    void addAddresses_to_NonExistingUser(){
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(UserNotFoundException.class)
+                .isThrownBy(() -> {
+                    usersService.addAddress(1L, new ArrayList<>());
+                });
+    }
+
+    @DisplayName("It should save addresses to a user during creation and return user")
+    @Test
+    void addAddresses_to_User(){
+        User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+
+        expected.addAddress(address);
+
+        List<Address> addressList = new ArrayList<>();
+        addressList.add(address);
+
+        when(usersRepository.save(any(User.class))).thenReturn(expected);
+
+        User aUser = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
+        aUser.addAddress(address);
+        User actual = usersService.createUser(aUser);
+
+        assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
+    }
+
+    @DisplayName("It should update the address of an user that exists")
+    @Test
+    void updateAddress_success(){
+        User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
+        expected.setId(1L);
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        address.setId(1L);
+        expected.addAddress(address);
+
+        List<Address> addressList = new ArrayList<>();
+        addressList.add(address);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(expected));
+        when(addressRepository.findById(anyLong())).thenReturn(Optional.of(address));
+        when(usersRepository.save(any(User.class))).thenReturn(expected);
+
+
+        User actual = usersService.updateAddress(1L, 1L, address);
+
+        assertEquals(expected.getAddresses().get(0), actual.getAddresses().get(0));
+
     }
 }

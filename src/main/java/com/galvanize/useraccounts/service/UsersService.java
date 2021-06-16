@@ -1,30 +1,29 @@
 package com.galvanize.useraccounts.service;
 
 import com.galvanize.useraccounts.UsersList;
-import com.galvanize.useraccounts.exception.DuplicateUserException;
-import com.galvanize.useraccounts.exception.InvalidAddressException;
-import com.galvanize.useraccounts.exception.InvalidUserException;
-import com.galvanize.useraccounts.exception.UserNotFoundException;
+import com.galvanize.useraccounts.exception.*;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
 
+import com.galvanize.useraccounts.repository.AddressRepository;
 import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.stereotype.Service;
 
-<<<<<<< HEAD
+
 import javax.swing.text.html.Option;
 import java.util.List;
-=======
->>>>>>> 1cf2a4097676cf6a07cacb13c001a078339f006d
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @Service
 public class UsersService {
     private final UsersRepository usersRepository;
+    private final AddressRepository addressRepository;
 
-    public UsersService(UsersRepository usersRepository) {
+    public UsersService(UsersRepository usersRepository, AddressRepository addressRepository) {
         this.usersRepository = usersRepository;
+        this.addressRepository = addressRepository;
     }
 
     public User createUser(User user) {
@@ -52,7 +51,7 @@ public class UsersService {
 
     public User updateUser(Long id, UserRequest updatedUser) {
         User user = getUser(id);
-        
+
         if (user != null) {
             user.setFirstName(updatedUser.getFirstName());
             user.setLastName(updatedUser.getLastName());
@@ -61,7 +60,7 @@ public class UsersService {
             user.setVerified(updatedUser.isVerified());
             return usersRepository.save(user);
         }
-        return null; 
+        return null;
     }
 
     public User getUser(Long id) {
@@ -70,13 +69,13 @@ public class UsersService {
 
     public Boolean updateUserPassword(Long id, String oldPassword, String newPassword) {
         User user = getUser(id);
-        
+
         if (user != null && user.getPassword().equals(oldPassword)) {
             user.setPassword(newPassword);
             usersRepository.save(user);
             return true;
         }
-        
+
         return false;
     }
 
@@ -102,16 +101,38 @@ public class UsersService {
     public User addAddress(Long userId, List<Address> addresses) {
         Optional<User> user = usersRepository.findById(userId);
 
-        user.ifPresent(value -> addresses.forEach(value::addAddress));
+        user.ifPresent(value -> addresses.forEach(address -> address.setUser(user.get())));
 
-        return user.orElseThrow(UserNotFoundException::new);
+        if (user.isPresent()) {
+            return usersRepository.save(user.get());
+
+        } else {
+            throw new UserNotFoundException();
+        }
     }
 
     public User updateAddress(Long userId, Long addressId, Address address) {
-        return null;
+        Optional<User> oUser = usersRepository.findById(userId);
+        Optional<Address> oAddress = addressRepository.findById(addressId);
+
+        if (oUser.isPresent()) {
+            //int doesNotWork = oUser.get().getAddresses().indexOf(oAddress);
+            int oAddressIndex = IntStream.range(0, oUser.get().getAddresses().size())
+                    .filter(i -> oUser.get().getAddresses().get(i).getId() == addressId)
+                    .findFirst().orElse(-1);
+            if (oAddressIndex != -1) {
+                oUser.get().getAddresses().set(oAddressIndex, address);
+                return usersRepository.save(oUser.get());
+            } else {
+                throw new AddressNotFoundException();
+            }
+        } else {
+            throw new UserNotFoundException();
+        }
     }
 
     public void deleteAddress(Long userId, Long addressId) {
 
     }
+
 }

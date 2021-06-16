@@ -39,7 +39,7 @@ public class AddressesServiceTests {
     @BeforeEach
     void setup() {
         addressesService = new AddressesService(addressRepository);
-        usersService = new UsersService(usersRepository);
+        usersService = new UsersService(usersRepository, addressRepository);
         user = new User("bakerBob", "password123", "bob","baker", "bakerBob@gmail.com");
         user.setId(1L);
     }
