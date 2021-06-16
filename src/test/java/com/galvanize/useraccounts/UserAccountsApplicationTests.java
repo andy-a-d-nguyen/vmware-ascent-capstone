@@ -7,6 +7,8 @@ import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserAvatarRequest;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
+import com.galvanize.useraccounts.UsersList;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,14 +19,13 @@ import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.TestPropertySource;
 
-import com.galvanize.useraccounts.UsersList;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-//@TestPropertySource(locations= "classpath:application-test.properties")
+@TestPropertySource(locations= "classpath:application-test.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserAccountsApplicationTests {
 
@@ -200,7 +201,7 @@ class UserAccountsApplicationTests {
         assertThat(response.getBody().getLastName()).isEqualTo(request.getLastName());
         assertThat(response.getBody().getEmail()).isEqualTo(request.getEmail());
         assertThat(response.getBody().getCreditCard()).isEqualTo(request.getCreditCard());
-        assertThat(response.getBody().isVerified()).isEqualTo(request.isVerify());
+        assertThat(response.getBody().isVerified()).isEqualTo(request.isVerified());
     }
 
     @Test

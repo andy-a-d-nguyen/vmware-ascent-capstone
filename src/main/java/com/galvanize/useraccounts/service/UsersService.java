@@ -12,8 +12,11 @@ import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 import javax.swing.text.html.Option;
 import java.util.List;
+=======
+>>>>>>> 1cf2a4097676cf6a07cacb13c001a078339f006d
 import java.util.Optional;
 
 @Service
@@ -55,7 +58,7 @@ public class UsersService {
             user.setLastName(updatedUser.getLastName());
             user.setEmail(updatedUser.getEmail());
             user.setCreditCard(updatedUser.getCreditCard());
-            user.setVerified(updatedUser.isVerify());
+            user.setVerified(updatedUser.isVerified());
             return usersRepository.save(user);
         }
         return null; 
