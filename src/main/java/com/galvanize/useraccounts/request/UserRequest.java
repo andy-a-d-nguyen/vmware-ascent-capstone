@@ -8,17 +8,17 @@ public class UserRequest {
     private String email;
 
     private String creditCard;
-    private boolean verify;
+    private boolean verified;
 
     public UserRequest() {}
 
-    public UserRequest(String firstName, String lastName, String password, String email, String creditCard, boolean verify) {
+    public UserRequest(String firstName, String lastName, String password, String email, String creditCard, boolean verified) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
         this.creditCard = creditCard;
-        this.verify = verify;
+        this.verified = verified;
     }
 
     public String getFirstName() {
@@ -61,11 +61,11 @@ public class UserRequest {
         this.creditCard = creditCard;
     }
 
-    public boolean isVerify() {
-        return verify;
+    public boolean isVerified() {
+        return verified;
     }
 
-    public void setVerify(boolean verify) {
-        this.verify = verify;
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
 }
