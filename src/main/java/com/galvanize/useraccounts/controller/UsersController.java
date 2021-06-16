@@ -80,22 +80,23 @@ public class UsersController {
        return usersService.addAddress(userId, address);
     }
 
-    @GetMapping("/users/{userId}/addresses")
-    public ResponseEntity< List<Address> > getAddresses(@PathVariable Long userId){
-        List<Address> addresses = addressesService.getAllAddresses(userId);
-        return addresses.size() > 0 ?  ResponseEntity.ok(addresses) : ResponseEntity.noContent().build();
-    }
+//    @GetMapping("/users/{userId}/addresses")
+//    public ResponseEntity< List<Address> > getAddresses(@PathVariable Long userId){
+//        List<Address> addresses = addressesService.getAllAddresses(userId);
+//        return addresses.size() > 0 ?  ResponseEntity.ok(addresses) : ResponseEntity.noContent().build();
+//    }
 
-    @PatchMapping("/users/{userId}/addresses")
-    public ResponseEntity<Address> updateAddress (@PathVariable Long userId, @Valid @RequestBody Address address){
-        Address updatedAddress = addressesService.updateAddress(userId, address);
-        return updatedAddress == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedAddress);
+    @PatchMapping("/users/{userId}/addresses/{addressId}")
+    public ResponseEntity<User> updateAddress (@PathVariable Long userId, @PathVariable Long addressId, @Valid @RequestBody Address address) throws UserNotFoundException, InvalidAddressException {
+        User updatedUser = usersService.updateAddress(userId, addressId, address);
+        return updatedUser == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/users/{userId}/addresses/{addressId}")
     public ResponseEntity deleteAddress(@PathVariable Long userId, @PathVariable Long addressId) {
         try {
             //addressesService.deleteAddress(userId, addressId);
+            usersService.deleteAddress(userId, addressId);
         } catch(AddressNotFoundException e) {
             return ResponseEntity.noContent().build();
         }

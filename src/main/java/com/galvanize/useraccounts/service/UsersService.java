@@ -2,6 +2,8 @@ package com.galvanize.useraccounts.service;
 
 import com.galvanize.useraccounts.UsersList;
 import com.galvanize.useraccounts.exception.DuplicateUserException;
+import com.galvanize.useraccounts.exception.InvalidAddressException;
+import com.galvanize.useraccounts.exception.InvalidUserException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
@@ -102,4 +104,11 @@ public class UsersService {
         return user.orElseThrow(UserNotFoundException::new);
     }
 
+    public User updateAddress(Long userId, Long addressId, Address address) {
+        return null;
+    }
+
+    public void deleteAddress(Long userId, Long addressId) {
+
+    }
 }
