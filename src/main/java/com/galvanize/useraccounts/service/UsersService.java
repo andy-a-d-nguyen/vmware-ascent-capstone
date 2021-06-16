@@ -114,7 +114,6 @@ public class UsersService {
     public User updateAddress(Long userId, Long addressId, Address address) {
         Optional<User> oUser = usersRepository.findById(userId);
         Optional<Address> oAddress = addressRepository.findById(addressId);
-
         if (oUser.isPresent()) {
             //int doesNotWork = oUser.get().getAddresses().indexOf(oAddress);
             int oAddressIndex = IntStream.range(0, oUser.get().getAddresses().size())
@@ -132,7 +131,21 @@ public class UsersService {
     }
 
     public void deleteAddress(Long userId, Long addressId) {
-
+        Optional<User> oUser = usersRepository.findById(userId);
+        Optional<Address> oAddress = addressRepository.findById(addressId);
+        if (oUser.isPresent()) {
+            int oAddressIndex = IntStream.range(0, oUser.get().getAddresses().size())
+                    .filter(i -> oUser.get().getAddresses().get(i).getId() == addressId)
+                    .findFirst().orElse(-1);
+            if (oAddressIndex != -1) {
+                oUser.get().getAddresses().remove(oAddressIndex);
+                oAddress.ifPresent(addressRepository::delete);
+            } else {
+                throw new AddressNotFoundException();
+            }
+        } else {
+            throw new UserNotFoundException();
+        }
     }
 
 }
