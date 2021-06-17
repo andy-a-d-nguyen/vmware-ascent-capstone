@@ -1,85 +1,85 @@
 image: adoptopenjdk:11
 
 stages:
-  # - build
-  # - test
-  # - coverage
-  # - docker
-  - deploy
+  - build
+  - test
+  - coverage
+  - docker
+#  - deploy
 
-# build:
-#   stage: build
-#   script:
-#     - ./gradlew bootJar
-#   cache:
-#     key: GRADLE-BUILD-FILES
-#     paths:
-#       - build/
-#   artifacts:
-#     paths:
-#       - build/classes/java/
-#       - build/libs/*.jar
+ build:
+   stage: build
+   script:
+     - ./gradlew bootJar
+   cache:
+     key: GRADLE-BUILD-FILES
+     paths:
+       - build/
+   artifacts:
+     paths:
+       - build/classes/java/
+       - build/libs/*.jar
       
-# test:
-#   stage: test
-#   needs:
-#     - build
-#   script:
-#     ./gradlew test
-#   artifacts:
-#     paths:
-#       - build/test-results/test/TEST*.xml
+ test:
+   stage: test
+   needs:
+     - build
+   script:
+     ./gradlew test
+   artifacts:
+     paths:
+       - build/test-results/test/TEST*.xml
 
-# coverage:
-#   image: adoptopenjdk:11
-#   needs:
-#     - build
-#     - test
-#   stage: coverage
-#   script:
-#     - ./gradlew jacocoTestReport
-#     - ./gradlew jacocoTestCoverageVerification
-#   allow_failure: true
-#   artifacts:
-#     when: always
-#     paths:
-#       - build/reports/jacoco/
+ coverage:
+   image: adoptopenjdk:11
+   needs:
+     - build
+     - test
+   stage: coverage
+   script:
+     - ./gradlew jacocoTestReport
+     - ./gradlew jacocoTestCoverageVerification
+   allow_failure: true
+   artifacts:
+     when: always
+     paths:
+       - build/reports/jacoco/
 
-# docker:
+ docker:
+   needs:
+     - build
+     - test
+     - coverage
+   stage: docker
+   image: docker:latest
+   services:
+     - docker:dind
+   before_script:
+     - echo "$MY_NAME"
+     - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+   script:
+     - docker build --pull -t "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" .
+     - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
+     - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
+     - docker push "$CI_REGISTRY_IMAGE":"latest"
+
+#deploy:
+#  stage: deploy
 #   needs:
 #     - build
 #     - test
 #     - coverage
-#   stage: docker
-#   image: docker:latest
-#   services:
-#     - docker:dind
-#   before_script:
-#     - echo "$MY_NAME"
-#     - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-#   script:
-#     - docker build --pull -t "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" .
-#     - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
-#     - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
-#     - docker push "$CI_REGISTRY_IMAGE":"latest"
-
-deploy:
-  stage: deploy
-  # needs:
-  #   - build
-  #   - test
-  #   - coverage
-  #   - docker
-  image: registry.gitlab.com/galv-vmw-apr-2021/capstone/strawberry-cheescake-crust/user-accounts-feature
-  before_script:
-    - export IMAGE="$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
-    - aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
-    - aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
-    - aws configure set region us-west-2
-    - aws configure set output json
-    - aws eks update-kubeconfig --name "$TEST_CLUSTER_NAME"
-    - aws sts get-caller-identity
-
-  script:
-    - envsubst < deploy.yaml | kubectl apply -f -
-    - kubectl apply -f service.yaml
+#     - docker
+#  image: registry.gitlab.com/galv-vmw-apr-2021/capstone/strawberry-cheescake-crust/user-accounts-feature
+#  before_script:
+#    - export IMAGE="$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
+#    - aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+#    - aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+#    - aws configure set region us-west-2
+#    - aws configure set output json
+#    - aws eks update-kubeconfig --name "$TEST_CLUSTER_NAME"
+#    - aws sts get-caller-identity
+#
+#  script:
+#    - envsubst < deploy.yaml | kubectl apply -f -
+#    - kubectl apply -f service.yaml
