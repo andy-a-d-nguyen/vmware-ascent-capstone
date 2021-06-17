@@ -3,8 +3,8 @@ image: adoptopenjdk:11
 stages:
   - build
   - test
-  - docker
   - coverage
+  - docker
   - deploy
 
 build:
@@ -30,12 +30,12 @@ test:
       - build/test-results/test/TEST*.xml
 
 docker:
-  stage: docker
-  image: docker:latest
   needs:
     - build
     - test
     - coverage
+  stage: docker
+  image: docker:latest
   services:
     - docker:dind
   before_script:
