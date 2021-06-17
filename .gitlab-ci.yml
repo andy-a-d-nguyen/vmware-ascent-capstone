@@ -3,8 +3,8 @@ image: adoptopenjdk:11
 stages:
   - build
   - test
+  - coverage
   - docker
-  - codeCoverage
 #  - deploy
 
 build:
@@ -19,19 +19,39 @@ build:
     paths:
       - build/classes/java/
       - build/libs/*.jar
+
 test:
   stage: test
+  needs:
+    - build
   script:
     ./gradlew test
   artifacts:
     paths:
       - build/test-results/test/TEST*.xml
 
-docker:
-  stage: docker
-  image: docker:latest
+coverage:
+  image: adoptopenjdk:11
   needs:
     - build
+    - test
+  stage: coverage
+  script:
+    - ./gradlew jacocoTestReport
+    - ./gradlew jacocoTestCoverageVerification
+  allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - build/reports/jacoco/
+
+docker:
+  needs:
+    - build
+    - test
+    - coverage
+  stage: docker
+  image: docker:latest
   services:
     - docker:dind
   before_script:
@@ -43,30 +63,23 @@ docker:
     - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
     - docker push "$CI_REGISTRY_IMAGE":"latest"
 
-codeCoverage:
-  image: adoptopenjdk:11
-  needs:
-    - build
-    - test
-  stage: codeCoverage
-  script:
-    - ./gradlew jacocoTestReport
-    - ./gradlew jacocoTestCoverageVerification
-  allow_failure: true
-  artifacts:
-    when: always
-    paths:
-      - build/reports/jacoco/
-
-
 #deploy:
 #  stage: deploy
-#  image: ruby:latest
+#   needs:
+#     - build
+#     - test
+#     - coverage
+#     - docker
+#  image: registry.gitlab.com/galv-vmw-apr-2021/capstone/strawberry-cheescake-crust/user-accounts-feature
+#  before_script:
+#    - export IMAGE="$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
+#    - aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+#    - aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+#    - aws configure set region us-west-2
+#    - aws configure set output json
+#    - aws eks update-kubeconfig --name "$TEST_CLUSTER_NAME"
+#    - aws sts get-caller-identity
+#
 #  script:
-#    - apt-get update -qy
-#    - apt-get install -y ruby-dev
-#    - gem install dpl
-#    #                        App name from prev step  Key from your heroku account
-#    - dpl --provider=heroku --app=am-autos-api --api-key=$HEROKU_API_KEY
-#  only: # Heroku will ONLY deploy from main or master branch!
-#    - main
+#    - envsubst < deploy.yaml | kubectl apply -f -
+#    - kubectl apply -f service.yaml

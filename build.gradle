@@ -11,6 +11,12 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+	maven { url 'https://repo.spring.io/snapshot' }
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+ext {
+	set('springCloudVersion', "2020.0.3-SNAPSHOT")
 }
 
 dependencies {
@@ -21,6 +27,15 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+	implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-fabric8-all'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+}
+
+dependencyManagement {
+	imports {
+		// Imports the proper dependencies for your spring cloud version
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 test {
