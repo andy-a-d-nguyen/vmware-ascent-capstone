@@ -19,6 +19,7 @@ build:
     paths:
       - build/classes/java/
       - build/libs/*.jar
+      
 test:
   stage: test
   needs:
@@ -28,6 +29,21 @@ test:
   artifacts:
     paths:
       - build/test-results/test/TEST*.xml
+
+coverage:
+  image: adoptopenjdk:11
+  needs:
+    - build
+    - test
+  stage: coverage
+  script:
+    - ./gradlew jacocoTestReport
+    - ./gradlew jacocoTestCoverageVerification
+  allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - build/reports/jacoco/
 
 docker:
   needs:
@@ -46,21 +62,6 @@ docker:
     - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
     - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
     - docker push "$CI_REGISTRY_IMAGE":"latest"
-
-coverage:
-  image: adoptopenjdk:11
-  needs:
-    - build
-    - test
-  stage: codeCoverage
-  script:
-    - ./gradlew jacocoTestReport
-    - ./gradlew jacocoTestCoverageVerification
-  allow_failure: true
-  artifacts:
-    when: always
-    paths:
-      - build/reports/jacoco/
 
 deploy:
   stage: deploy
