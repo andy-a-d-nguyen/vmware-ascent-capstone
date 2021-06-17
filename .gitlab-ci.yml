@@ -4,7 +4,7 @@ stages:
   - build
   - test
   - docker
-  - codeCoverage
+  - coverage
   - deploy
 
 build:
@@ -21,6 +21,8 @@ build:
       - build/libs/*.jar
 test:
   stage: test
+  needs:
+    - build
   script:
     ./gradlew test
   artifacts:
@@ -32,6 +34,8 @@ docker:
   image: docker:latest
   needs:
     - build
+    - test
+    - coverage
   services:
     - docker:dind
   before_script:
@@ -43,7 +47,7 @@ docker:
     - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
     - docker push "$CI_REGISTRY_IMAGE":"latest"
 
-codeCoverage:
+coverage:
   image: adoptopenjdk:11
   needs:
     - build
@@ -60,6 +64,11 @@ codeCoverage:
 
 deploy:
   stage: deploy
+  needs:
+    - build
+    - test
+    - coverage
+    - docker
   image: registry.gitlab.com/galv-vmw-apr-2021/capstone/strawberry-cheescake-crust/user-accounts-feature
   before_script:
     - export IMAGE="$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
@@ -70,4 +79,4 @@ deploy:
 
   script:
     - envsubst < deploy.yaml | kubectl apply -f -
-    - kubectl apply -f deploy.yaml
+    - kubectl apply -f service.yaml
