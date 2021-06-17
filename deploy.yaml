@@ -49,10 +49,10 @@ spec:
                 secretKeyRef:
                   name: bakery-db-secrets
                   key: DB_USER
-            - name: DB_PASSWORD
+            - name: DB_PWD
               valueFrom:
                 secretKeyRef:
                   name: bakery-db-secrets
-                  key: DB_PASSWORD
+                  key: DB_PWD
       imagePullSecrets: # Be sure the token name matches what you created on K8s
         - name: user-accounts-feature-deploy-token # change to user-accouts-deploy token
