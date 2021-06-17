@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-accounts-feature
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-accounts-feature
+  template:
+    metadata:
+      labels:
+        app: user-accounts-feature
+    spec:
+      containers:
+        - image: registry.gitlab.com/galv-vmw-apr-2021/capstone/strawberry-cheescake-crust/user-accounts-feature
+          name: user-accounts-feature
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+#          env:
+#            - name: DB_HOST
+#              value: 44.231.24.58
+#            - name: DB_NAME
+#              value: la_patisserie
+#            - name: DB_USER
+#              value: bakery_user
+#            - name: DB_PWD
+#              value: djZ8LS9tDi
+#
+#          command: [ "/bin/sh", "-c", "env" ]
+#          envFrom:
+#            - secretRef:
+#                name: bakery-db-secrets
+#
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: bakery-db-secrets
+                  key: DB_HOST
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: bakery-db-secrets
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: bakery-db-secrets
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bakery-db-secrets
+                  key: DB_PASSWORD
+      imagePullSecrets: # Be sure the token name matches what you created on K8s
+        - name: user-accounts-feature-deploy-token # change to user-accouts-deploy token
