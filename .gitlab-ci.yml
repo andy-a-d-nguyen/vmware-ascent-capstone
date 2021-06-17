@@ -7,61 +7,61 @@ stages:
   - docker
 #  - deploy
 
- build:
-   stage: build
-   script:
-     - ./gradlew bootJar
-   cache:
-     key: GRADLE-BUILD-FILES
-     paths:
-       - build/
-   artifacts:
-     paths:
-       - build/classes/java/
-       - build/libs/*.jar
-      
- test:
-   stage: test
-   needs:
-     - build
-   script:
-     ./gradlew test
-   artifacts:
-     paths:
-       - build/test-results/test/TEST*.xml
+build:
+  stage: build
+  script:
+    - ./gradlew bootJar
+  cache:
+    key: GRADLE-BUILD-FILES
+    paths:
+      - build/
+  artifacts:
+    paths:
+      - build/classes/java/
+      - build/libs/*.jar
 
- coverage:
-   image: adoptopenjdk:11
-   needs:
-     - build
-     - test
-   stage: coverage
-   script:
-     - ./gradlew jacocoTestReport
-     - ./gradlew jacocoTestCoverageVerification
-   allow_failure: true
-   artifacts:
-     when: always
-     paths:
-       - build/reports/jacoco/
+test:
+  stage: test
+  needs:
+    - build
+  script:
+    ./gradlew test
+  artifacts:
+    paths:
+      - build/test-results/test/TEST*.xml
 
- docker:
-   needs:
-     - build
-     - test
-     - coverage
-   stage: docker
-   image: docker:latest
-   services:
-     - docker:dind
-   before_script:
-     - echo "$MY_NAME"
-     - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-   script:
-     - docker build --pull -t "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" .
-     - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
-     - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
-     - docker push "$CI_REGISTRY_IMAGE":"latest"
+coverage:
+  image: adoptopenjdk:11
+  needs:
+    - build
+    - test
+  stage: coverage
+  script:
+    - ./gradlew jacocoTestReport
+    - ./gradlew jacocoTestCoverageVerification
+  allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - build/reports/jacoco/
+
+docker:
+  needs:
+    - build
+    - test
+    - coverage
+  stage: docker
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - echo "$MY_NAME"
+    - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" .
+    - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
+    - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
+    - docker push "$CI_REGISTRY_IMAGE":"latest"
 
 #deploy:
 #  stage: deploy
