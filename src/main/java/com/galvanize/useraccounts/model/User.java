@@ -58,6 +58,7 @@ public class User {
         this.lastName = lastName;
         this.password = password;
         this.email = email;
+      //  addresses.forEach(address -> this.addAddress(address));
         this.addresses = addresses;
     }
 

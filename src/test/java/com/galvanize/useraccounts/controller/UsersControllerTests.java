@@ -215,9 +215,11 @@ public class UsersControllerTests {
         user.addAddress(newAddress);
         newAddress.setId(1L);
         when(usersService.createUser(any(User.class))).thenReturn(user);
+
+        String content = "{\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"password\":\"password\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\"}]}";
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(user)))
+                .content(content))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("addresses", hasSize(1)));
     }

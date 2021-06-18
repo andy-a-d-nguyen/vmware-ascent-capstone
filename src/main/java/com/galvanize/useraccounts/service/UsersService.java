@@ -120,7 +120,12 @@ public class UsersService {
                     .filter(i -> oUser.get().getAddresses().get(i).getId() == addressId)
                     .findFirst().orElse(-1);
             if (oAddressIndex != -1) {
-                oUser.get().getAddresses().set(oAddressIndex, address);
+                Address updatedAddress = oUser.get().getAddresses().get(oAddressIndex);
+                updatedAddress.setStreet(address.getStreet());
+                updatedAddress.setCity(address.getCity());
+                updatedAddress.setState(address.getState());
+                updatedAddress.setZipcode(address.getZipcode());
+                updatedAddress.setApartment(address.getApartment());
                 return usersRepository.save(oUser.get());
             } else {
                 throw new AddressNotFoundException();
@@ -138,7 +143,11 @@ public class UsersService {
                     .filter(i -> oUser.get().getAddresses().get(i).getId() == addressId)
                     .findFirst().orElse(-1);
             if (oAddressIndex != -1) {
+
                 oUser.get().getAddresses().remove(oAddressIndex);
+                oAddress.get().setUser(null);
+
+                oUser.ifPresent(usersRepository::save);
                 oAddress.ifPresent(addressRepository::delete);
             } else {
                 throw new AddressNotFoundException();
