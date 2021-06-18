@@ -58,6 +58,17 @@ public class UsersServiceTests {
     }
 
     @Test
+    void createUser_returnsUser() {
+        when(usersRepository.save(any(User.class))).thenReturn(users.get(0));
+
+        User actualUser = usersService.createUser(users.get(0));
+
+        assertNotNull(actualUser);
+        assertEquals(users.get(0), actualUser);
+        assertEquals(users.get(0).getCreatedAt(), actualUser.getCreatedAt());
+    }
+
+    @Test
     void searchUsers_withString_returnsFoundUsers() {
         String username = "bob";
 
@@ -157,6 +168,7 @@ public class UsersServiceTests {
         User foundUser = usersService.getUser(user.getId());
 
         assertEquals(user, foundUser);
+        assertEquals(user.getCreatedAt(), foundUser.getCreatedAt());
     }
 
     @Test
@@ -187,6 +199,7 @@ public class UsersServiceTests {
         assertEquals(user.getLastName(), updatedUser.getLastName());
         assertEquals(user.getEmail(), updatedUser.getEmail());
         assertEquals(user.isVerified(), updatedUser.isVerified());
+        assertEquals(user.getCreatedAt(), updatedUser.getCreatedAt());
     }
 
     @Test

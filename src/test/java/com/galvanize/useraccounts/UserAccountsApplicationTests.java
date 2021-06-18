@@ -25,6 +25,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -109,6 +110,42 @@ class UserAccountsApplicationTests {
     }
 
 
+    @Test
+    void createUser_returnsStatusOK() throws JsonProcessingException {
+        String uri = "/api/users";
+
+        User user5 = new User("andynguyen", "password123", "Andy", "Nguyen","andynguyen@gmail.com");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<?> request = new HttpEntity<>(user5, headers);
+        ResponseEntity<User> response = restTemplate.postForEntity(uri, request, User.class);
+
+        String actualTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(response.getBody().getCreatedAt());
+
+        String expectedTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(user5.getCreatedAt());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(user5.getUsername(), response.getBody().getUsername());
+        assertEquals(expectedTimeCreatedAt, actualTimeCreatedAt);
+    }
+
+    @Test
+    void createUser_withDupUsername_returnsBadRequest() throws JsonProcessingException {
+        User user10 = new User("bakerBob", "password123", "baker", "bob","bakerBob12345@gmail.com");
+        String uri = "/api/users";
+
+        String body = mapper.writeValueAsString(user10);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<?> request = new HttpEntity<>(body, headers);
+        ResponseEntity<User> response = restTemplate.postForEntity(uri, request, User.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
 
     @Test
     void createUser_withDupEmail_returnsBadRequest() throws JsonProcessingException {
@@ -184,8 +221,13 @@ class UserAccountsApplicationTests {
 
         ResponseEntity<User> response = restTemplate.getForEntity(uri, User.class);
 
+        String actualTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(response.getBody().getCreatedAt());
+
+        String expectedTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(user.getCreatedAt());
+
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(user.getUsername(), response.getBody().getUsername());
+        assertEquals(expectedTimeCreatedAt, actualTimeCreatedAt);
     }
 
     @Test
@@ -213,12 +255,17 @@ class UserAccountsApplicationTests {
 
         ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
 
+        String actualTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(response.getBody().getCreatedAt());
+
+        String expectedTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(user.getCreatedAt());
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().getFirstName()).isEqualTo(request.getFirstName());
         assertThat(response.getBody().getLastName()).isEqualTo(request.getLastName());
         assertThat(response.getBody().getEmail()).isEqualTo(request.getEmail());
         assertThat(response.getBody().getCreditCard()).isEqualTo(request.getCreditCard());
         assertThat(response.getBody().isVerified()).isEqualTo(request.isVerified());
+        assertThat(expectedTimeCreatedAt).isEqualTo(actualTimeCreatedAt);
     }
     @Test
     void updateUser_withIDAndBody_returnsNoContent() {
@@ -344,21 +391,6 @@ class UserAccountsApplicationTests {
         assertEquals(Objects.requireNonNull(patchResponse.getBody()).getLastName(), "updatedLast");
         assertEquals(Objects.requireNonNull(patchResponse.getBody()).getEmail(), "updated@email.com");
         assertEquals(HttpStatus.OK,patchResponse.getStatusCode());
-    }
-
-    @Test
-    void createUser_withDupUsername_returnsBadRequest() throws JsonProcessingException {
-        User user10 = new User("bakerBob", "password123", "baker", "bob","bakerBob12345@gmail.com");
-        String uri = "/api/users";
-
-        String body = mapper.writeValueAsString(user10);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<?> request = new HttpEntity<>(body, headers);
-        ResponseEntity<User> response = restTemplate.postForEntity(uri, request, User.class);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test

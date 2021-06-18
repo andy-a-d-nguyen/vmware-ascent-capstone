@@ -1,6 +1,5 @@
 package com.galvanize.useraccounts.model;
 
-import com.galvanize.useraccounts.model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -108,5 +107,12 @@ public class UsersTests {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void createUser_LocalDateTimeFieldExists() {
+        User user = new User("bakerBob", "baker", "bob", "password123", "bakerBobHasMoreThan20Characters@gmail.com");
+        
+        assertNotNull(user.getCreatedAt());
     }
 }
