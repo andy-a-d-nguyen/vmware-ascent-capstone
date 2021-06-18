@@ -19,6 +19,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.TestPropertySource;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,6 +76,27 @@ class UserAccountsApplicationTests {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertFalse(response.getBody().isEmpty());
         assertEquals(3, response.getBody().size());
+    }
+
+    @Test
+    void createUser_returnsStatusOK() throws JsonProcessingException {
+        String uri = "/api/users";
+
+        User user5 = new User("andynguyen", "password123", "Andy", "Nguyen","andynguyen@gmail.com");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<?> request = new HttpEntity<>(user5, headers);
+        ResponseEntity<User> response = restTemplate.postForEntity(uri, request, User.class);
+
+        String actualTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(response.getBody().getCreatedAt());
+
+        String expectedTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(user5.getCreatedAt());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(user5.getUsername(), response.getBody().getUsername());
+        assertEquals(expectedTimeCreatedAt, actualTimeCreatedAt);
     }
 
     @Test
@@ -166,8 +188,13 @@ class UserAccountsApplicationTests {
 
         ResponseEntity<User> response = restTemplate.getForEntity(uri, User.class);
 
+        String actualTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(response.getBody().getCreatedAt());
+
+        String expectedTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(user.getCreatedAt());
+
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(user.getUsername(), response.getBody().getUsername());
+        assertEquals(expectedTimeCreatedAt, actualTimeCreatedAt);
     }
 
     @Test
@@ -196,12 +223,17 @@ class UserAccountsApplicationTests {
 
         ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
 
+        String actualTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(response.getBody().getCreatedAt());
+
+        String expectedTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(user.getCreatedAt());
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().getFirstName()).isEqualTo(request.getFirstName());
         assertThat(response.getBody().getLastName()).isEqualTo(request.getLastName());
         assertThat(response.getBody().getEmail()).isEqualTo(request.getEmail());
         assertThat(response.getBody().getCreditCard()).isEqualTo(request.getCreditCard());
         assertThat(response.getBody().isVerified()).isEqualTo(request.isVerified());
+        assertThat(expectedTimeCreatedAt).isEqualTo(actualTimeCreatedAt);
     }
 
     @Test
