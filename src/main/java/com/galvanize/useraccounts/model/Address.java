@@ -1,6 +1,9 @@
 package com.galvanize.useraccounts.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "address")
@@ -8,7 +11,13 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long userId;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="user_id", nullable = false)
+    @JsonIgnore
+    private User user;
+    // private Long userId;
+
     private String street;
     private String city;
     private String state;
@@ -32,19 +41,13 @@ public class Address {
         this.zipcode = zipcode;
         this.apartment = apartment;
     }
+
     public long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getStreet() {
@@ -86,4 +89,13 @@ public class Address {
     public void setApartment(String apartment) {
         this.apartment = apartment;
     }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
 }

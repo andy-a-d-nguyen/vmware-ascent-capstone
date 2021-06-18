@@ -1,13 +1,17 @@
 package com.galvanize.useraccounts.service;
 
+import com.galvanize.useraccounts.exception.AddressNotFoundException;
 import com.galvanize.useraccounts.exception.DuplicateUserException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
+import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.repository.AddressRepository;
 import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
 import com.galvanize.useraccounts.service.UsersService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -21,13 +25,14 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UsersServiceTests {
     @Mock
     UsersRepository usersRepository;
+    @Mock
+    AddressRepository addressRepository;
 
     private UsersService usersService;
 
@@ -35,7 +40,7 @@ public class UsersServiceTests {
 
     @BeforeEach
     void setup() {
-        usersService = new UsersService(usersRepository);
+        usersService = new UsersService(usersRepository, addressRepository);
 
         users = new ArrayList<>();
 
@@ -233,4 +238,157 @@ public class UsersServiceTests {
 
         assertFalse(updatedPassword);
     }
+
+    @DisplayName("It should save a user's address and returns updated user")
+    @Test
+    void addAddress_to_User(){
+        User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        expected.setId(1L);
+        expected.addAddress(address);
+
+        List<Address> addressList = new ArrayList<>();
+        addressList.add(address);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(expected));
+        when(usersRepository.save(any(User.class))).thenReturn(expected);
+
+        User actual = usersService.addAddress(1L, addressList);
+        assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
+    }
+
+    @DisplayName("It should throw UserNotFoundException when adding an address to non existing user")
+    @Test
+    void addAddresses_to_NonExistingUser(){
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(UserNotFoundException.class)
+                .isThrownBy(() -> {
+                    usersService.addAddress(1L, new ArrayList<>());
+                });
+    }
+
+    @DisplayName("It should save addresses to a user during creation and return user")
+    @Test
+    void addAddresses_to_User(){
+        User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+
+        expected.addAddress(address);
+
+        List<Address> addressList = new ArrayList<>();
+        addressList.add(address);
+
+        when(usersRepository.save(any(User.class))).thenReturn(expected);
+
+        User aUser = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
+        aUser.addAddress(address);
+        User actual = usersService.createUser(aUser);
+
+        assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
+    }
+
+    @DisplayName("It should update the address of an user that exists")
+    @Test
+    void updateAddress_success(){
+        User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
+        expected.setId(1L);
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        address.setId(1L);
+        expected.addAddress(address);
+
+        List<Address> addressList = new ArrayList<>();
+        addressList.add(address);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(expected));
+        when(addressRepository.findById(anyLong())).thenReturn(Optional.of(address));
+        when(usersRepository.save(any(User.class))).thenReturn(expected);
+
+
+        User actual = usersService.updateAddress(1L, 1L, address);
+
+        assertEquals(expected.getAddresses().get(0), actual.getAddresses().get(0));
+
+    }
+
+    @DisplayName("It fail to update the address of an user that does not exist")
+    @Test
+    void updateAddress_fails_noUserFound(){
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        address.setId(1L);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(UserNotFoundException.class)
+                .isThrownBy(() -> {
+                    usersService.updateAddress(1L, 1L, address);
+                });
+    }
+
+    @DisplayName("It fail to update the address of an user when the aforementioned address does not exist")
+    @Test
+    void updateAddress_fails_noAddressFound(){
+        User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
+        expected.setId(1L);
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        address.setId(1L);
+        expected.addAddress(address);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(expected));
+        when(addressRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(AddressNotFoundException.class)
+                .isThrownBy(() -> {
+                    usersService.updateAddress(1L, 18L, address);
+                });
+    }
+
+    @DisplayName("It should delete the address of an user that exists")
+    @Test
+    void deleteAddress_success(){
+        User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
+        expected.setId(1L);
+
+        User actual = new User("actual", "password123", "John", "Smith", "jsmith@gmail.com");
+        actual.setId(2L);
+
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        address.setId(1L);
+        actual.addAddress(address);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(actual));
+        when(addressRepository.findById(anyLong())).thenReturn(Optional.of(address));
+        doNothing().when(addressRepository).delete(address);
+        usersService.deleteAddress(2L, 1L);
+
+        assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
+        verify(addressRepository).delete(address);
+    }
+
+    @DisplayName("It should fail to delete the address of an user that does not exist")
+    @Test
+    void deleteAddress_fail_noUser(){
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(UserNotFoundException.class)
+                .isThrownBy(() -> {
+                    usersService.deleteAddress(1L, 18L);
+                });
+    }
+
+    @DisplayName("It should fail to delete an address that doesn't exist of an user")
+    @Test
+    void deleteAddress_fail_noAddress(){
+        User user = new User("user", "password123", "John", "Smith", "jsmith@gmail.com");
+        user.setId(2L);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(addressRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(AddressNotFoundException.class)
+                .isThrownBy(() -> {
+                    usersService.deleteAddress(1L, 18L);
+                });
+        }
 }

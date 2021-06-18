@@ -15,38 +15,9 @@ import java.util.Optional;
 @Service
 public class AddressesService {
     private final AddressRepository addressRepository;
-    private final UsersRepository usersRepository;
 
-    public AddressesService(AddressRepository addressRepository, UsersRepository usersRepository) {
+    public AddressesService(AddressRepository addressRepository) {
         this.addressRepository = addressRepository;
-        this.usersRepository = usersRepository;
-    }
 
-    public Address addAddress(Long userId, Address address) {
-        address.setUserId(userId);
-        return addressRepository.save(address);
-    }
-
-    public List<Address> getAllAddresses(Long userId) {
-        return null;
-    }
-
-    public Address updateAddress(Long userId, Address updatedAddress) {
-        return null;
-    }
-
-    public void deleteAddress(Long userId, Long addressId) throws UserNotFoundException, AddressNotFoundException{
-        //make sure that address belongs to userId
-        Optional <User> oUser = usersRepository.findById(userId);
-        Optional <Address> oAddress = addressRepository.findById(addressId);
-
-        //refactor this if statement in future :3
-        if (oUser.isPresent() && oAddress.isPresent() && oUser.get().getId() == oAddress.get().getUserId()) {
-            addressRepository.delete(oAddress.get());
-        } else if (oUser.isEmpty()) {
-            throw new UserNotFoundException();
-        } else {
-            throw new AddressNotFoundException();
-        }
     }
 }

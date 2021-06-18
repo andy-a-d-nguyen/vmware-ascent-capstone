@@ -8,8 +8,13 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "users")
@@ -32,11 +37,13 @@ public class User {
 
     private String password;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+    private List<Address> addresses = new ArrayList<>();
+
     @NotBlank
     @Email
     @Size(max = 30)
     private String email;
-
 
     private String creditCard;
     private boolean verified;
@@ -53,6 +60,21 @@ public class User {
         this.password = password;
         this.email = email;
         this.createdAt = Timestamp.valueOf(LocalDateTime.now());
+    }
+
+    public User(String username, String password, String firstName, String lastName,  String email, List<Address> addresses) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.email = email;
+        this.addresses = addresses;
+        this.createdAt = Timestamp.valueOf(LocalDateTime.now());
+    }
+
+    public void addAddress(Address address){
+        this.addresses.add(address);
+        address.setUser(this);
     }
 
     public String getFirstName() {
@@ -135,6 +157,16 @@ public class User {
         this.verified = verified;
     }
 
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+
     public Timestamp getCreatedAt() {
         return createdAt;
     }
@@ -142,4 +174,5 @@ public class User {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+
 }

@@ -9,8 +9,10 @@ import com.galvanize.useraccounts.service.UsersService;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -76,30 +78,30 @@ public class UsersController {
     /*Addresses*/
 
     @PostMapping("/users/{userId}/addresses")
-    public Address createAddress(@PathVariable Long userId, @Valid @RequestBody Address address) throws InvalidAddressException {
-       return addressesService.addAddress(userId, address);
+    public User createAddress(@PathVariable Long userId, @Valid @RequestBody List<Address> address) throws InvalidAddressException {
+       return usersService.addAddress(userId, address);
     }
 
-    @GetMapping("/users/{userId}/addresses")
-    public ResponseEntity< List<Address> > getAddresses(@PathVariable Long userId){
-        List<Address> addresses = addressesService.getAllAddresses(userId);
-        return addresses.size() > 0 ?  ResponseEntity.ok(addresses) : ResponseEntity.noContent().build();
-    }
+//    @GetMapping("/users/{userId}/addresses")
+//    public ResponseEntity< List<Address> > getAddresses(@PathVariable Long userId){
+//        List<Address> addresses = addressesService.getAllAddresses(userId);
+//        return addresses.size() > 0 ?  ResponseEntity.ok(addresses) : ResponseEntity.noContent().build();
+//    }
 
-    @PatchMapping("/users/{userId}/addresses")
-    public ResponseEntity<Address> updateAddress (@PathVariable Long userId, @Valid @RequestBody Address address){
-        Address updatedAddress = addressesService.updateAddress(userId, address);
-        return updatedAddress == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedAddress);
+
+    @PatchMapping("/users/{userId}/addresses/{addressId}")
+    public ResponseEntity<User> updateAddress (@PathVariable Long userId, @PathVariable Long addressId, @Valid @RequestBody Address address) throws UserNotFoundException, InvalidAddressException {
+        User updatedUser = usersService.updateAddress(userId, addressId, address);
+        return updatedUser == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/users/{userId}/addresses/{addressId}")
     public ResponseEntity deleteAddress(@PathVariable Long userId, @PathVariable Long addressId) {
         try {
-            addressesService.deleteAddress(userId, addressId);
+          usersService.deleteAddress(userId, addressId);
         } catch(AddressNotFoundException e) {
             return ResponseEntity.noContent().build();
         }
-
         return ResponseEntity.accepted().build();
     }
 
@@ -108,6 +110,22 @@ public class UsersController {
         UsersList users = usersService.searchUsers(username);
 
         return users == null || users.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(users);
+    }
+
+
+    @ExceptionHandler()
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void userNotFoundException(UserNotFoundException exception) {
+    }
+
+    @ExceptionHandler()
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addressNotFoundException(AddressNotFoundException exception) {
+    }
+
+    @ExceptionHandler()
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public void invalidAddressException(InvalidAddressException exception) {
     }
 
 }
