@@ -10,6 +10,7 @@ import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
 import com.galvanize.useraccounts.service.AddressesService;
 import com.galvanize.useraccounts.service.UsersService;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -291,8 +292,10 @@ public class UsersControllerTests {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        assertEquals(result.getResponse().getContentAsString(), mapper.writeValueAsString(user));
+        //String id = JsonPath.read(result.getResponse().getContentAsString(), "$.id")
+        String street = JsonPath.read(result.getResponse().getContentAsString(), "$.addresses[0].street");
 
+        assertEquals(updatedAddress.getStreet(), street);
     }
 
     //FIX THIS TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
