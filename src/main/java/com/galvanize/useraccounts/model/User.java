@@ -7,8 +7,13 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "users")
@@ -41,6 +46,8 @@ public class User {
 
     private String creditCard;
     private boolean verified;
+    
+    private Timestamp createdAt;
 
     public User() {}
 
@@ -50,6 +57,7 @@ public class User {
         this.lastName = lastName;
         this.password = password;
         this.email = email;
+        this.createdAt = Timestamp.valueOf(LocalDateTime.now());
     }
 
     public User(String username, String password, String firstName, String lastName,  String email, List<Address> addresses) {
@@ -146,12 +154,22 @@ public class User {
         this.verified = verified;
     }
 
+
     public List<Address> getAddresses() {
         return addresses;
     }
 
     public void setAddresses(List<Address> addresses) {
         this.addresses = addresses;
+    }
+
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 
 }

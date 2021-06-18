@@ -69,7 +69,8 @@ public class UsersControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(userToAdd)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("createdAt").exists());
     }
 
     @DisplayName("It should not create a user with invalid attributes, status code 400 bad request")
@@ -142,7 +143,8 @@ public class UsersControllerTests {
                 .andExpect(jsonPath("username").value(user.getUsername()))
                 .andExpect(jsonPath("firstName").value(user.getFirstName()))
                 .andExpect(jsonPath("lastName").value(user.getLastName()))
-                .andExpect(jsonPath("password").doesNotExist());
+                .andExpect(jsonPath("password").doesNotExist())
+                .andExpect(jsonPath("createdAt").exists());
     }
 
     @DisplayName("It should not show a shower with an invalid id, status code 204 no content")
@@ -379,4 +381,5 @@ public class UsersControllerTests {
                 .content(mapper.writeValueAsString(user)))
                 .andExpect(status().isBadRequest());
     }
+
 }
