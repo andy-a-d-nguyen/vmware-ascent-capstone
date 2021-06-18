@@ -2,6 +2,7 @@ package com.galvanize.useraccounts.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -39,7 +40,8 @@ public class User {
 
     private String creditCard;
     private boolean verified;
-    
+
+    @CreationTimestamp
     private Timestamp createdAt;
 
     public User() {}
