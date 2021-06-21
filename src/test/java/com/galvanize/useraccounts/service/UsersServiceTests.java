@@ -2,6 +2,7 @@ package com.galvanize.useraccounts.service;
 
 import com.galvanize.useraccounts.exception.AddressNotFoundException;
 import com.galvanize.useraccounts.exception.DuplicateUserException;
+import com.galvanize.useraccounts.exception.InvalidAddressException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
@@ -247,13 +248,13 @@ public class UsersServiceTests {
         expected.setId(1L);
         expected.addAddress(address);
 
-        List<Address> addressList = new ArrayList<>();
-        addressList.add(address);
+//        List<Address> addressList = new ArrayList<>();
+//        addressList.add(address);
 
         when(usersRepository.findById(anyLong())).thenReturn(Optional.of(expected));
         when(usersRepository.save(any(User.class))).thenReturn(expected);
 
-        User actual = usersService.addAddress(1L, addressList);
+        User actual = usersService.addAddress(1L, address);
         assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
     }
 
@@ -264,7 +265,7 @@ public class UsersServiceTests {
 
         assertThatExceptionOfType(UserNotFoundException.class)
                 .isThrownBy(() -> {
-                    usersService.addAddress(1L, new ArrayList<>());
+                    usersService.addAddress(1L, new Address());
                 });
     }
 

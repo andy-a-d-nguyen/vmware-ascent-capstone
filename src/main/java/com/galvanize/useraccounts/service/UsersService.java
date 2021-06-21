@@ -33,10 +33,9 @@ public class UsersService {
         if (foundUser.isPresent() || foundUserEmail.isPresent()) {
             throw new DuplicateUserException();
         }
-
-        //this sets up the one to many relationship between user and addresses
-        user.getAddresses().forEach( address -> address.setUser(user));
-        return usersRepository.save(user);
+            //this sets up the one to many relationship between user and addresses
+            user.getAddresses().forEach( address -> address.setUser(user));
+            return usersRepository.save(user);
     }
 
     public void deleteUser(Long id) {
@@ -98,10 +97,10 @@ public class UsersService {
         return users.isEmpty() ? null : users;
     }
 
-    public User addAddress(Long userId, List<Address> addresses) {
+    public User addAddress(Long userId, Address address) {
         Optional<User> user = usersRepository.findById(userId);
 
-        user.ifPresent(value -> addresses.forEach(address -> address.setUser(user.get())));
+        user.ifPresent(u -> u.addAddress(address));
 
         if (user.isPresent()) {
             return usersRepository.save(user.get());

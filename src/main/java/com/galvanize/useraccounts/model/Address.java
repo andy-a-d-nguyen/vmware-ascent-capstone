@@ -2,8 +2,12 @@ package com.galvanize.useraccounts.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.Hibernate;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
@@ -18,10 +22,13 @@ public class Address {
     @JsonIgnore
     private User user;
     // private Long userId;
-
+    @NotBlank
     private String street;
+    @NotBlank
     private String city;
+    @NotBlank
     private String state;
+    @NotBlank
     private String zipcode;
     private String apartment;
     private String label;
@@ -101,4 +108,5 @@ public class Address {
     public void setLabel(String label) {
         this.label = label;
     }
+
 }
