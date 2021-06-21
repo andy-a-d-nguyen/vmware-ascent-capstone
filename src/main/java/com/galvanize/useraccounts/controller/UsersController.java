@@ -11,7 +11,9 @@ import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -29,7 +31,7 @@ public class UsersController {
     }
 
     @PostMapping("/users")
-    public User createUser(@Valid @RequestBody User user) throws InvalidUserException, DuplicateUserException {
+    public User createUser(@Valid @RequestBody User user) throws InvalidUserException, DuplicateUserException, InvalidAddressException {
         return usersService.createUser(user);
     }
 
@@ -78,8 +80,8 @@ public class UsersController {
     /*Addresses*/
 
     @PostMapping("/users/{userId}/addresses")
-    public User createAddress(@PathVariable Long userId, @Valid @RequestBody List<Address> address) throws InvalidAddressException {
-       return usersService.addAddress(userId, address);
+    public User createAddress(@PathVariable Long userId, @Validated @RequestBody Address address) {
+           return usersService.addAddress(userId, address);
     }
 
 //    @GetMapping("/users/{userId}/addresses")
