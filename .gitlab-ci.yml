@@ -71,9 +71,9 @@ deploy:
   before_script:
     - export IMAGE="$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
     - echo "$AWS_ACCESS_KEY_ID"
-    - aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+    - aws configure set aws_access_key_id "AKIAZ74PB43URF3YH35X"
     - echo "$AWS_SECRET_ACCESS_KEY"
-    - aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+    - aws configure set aws_secret_access_key "iTpW1+4PZSyPqCifIyfoyRA29kWVgOIMedUZeawr"
     - aws configure set region us-west-2
     - aws configure set output json
     - aws sts get-caller-identity
