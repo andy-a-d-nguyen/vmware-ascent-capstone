@@ -10,6 +10,8 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,5 +116,51 @@ public class UsersTests {
         User user = new User("bakerBob", "baker", "bob", "password123", "bakerBobHasMoreThan20Characters@gmail.com");
         
         assertNotNull(user.getCreatedAt());
+    }
+    @Test
+    void createUser_validatesStreetNotBlank() {
+        List<Address> addressList = new ArrayList<>();
+        Address address = new Address("", "city", "state", "zipcode", "", "");
+        addressList.add(address);
+
+        User user = new User("bakerBob", "password123", "bob", "lastName", "Characters@gmail.com", addressList);
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(violations.size(), 1);
+    }
+    @Test
+    void createUser_validatesCityNotBlank() {
+        List<Address> addressList = new ArrayList<>();
+        Address address = new Address("street", "", "state", "zipcode", "", "");
+        addressList.add(address);
+
+        User user = new User("bakerBob", "password123", "bob", "lastName", "Characters@gmail.com", addressList);
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(violations.size(), 1);
+    }
+
+    @Test
+    void createUser_validatesStateNotBlank() {
+        List<Address> addressList = new ArrayList<>();
+        Address address = new Address("Test", "Test", "", "Test", "", "");
+        addressList.add(address);
+
+        User user = new User("bakerBob", "password123", "bob", "lastName", "Characters@gmail.com", addressList);
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(violations.size(), 1);
+    }
+
+    @Test
+    void createUser_validatesZipcodeNotBlank() {
+        List<Address> addressList = new ArrayList<>();
+        Address address = new Address("Test", "Test", "Test", "", "", "");
+        addressList.add(address);
+
+        User user = new User("bakerBob", "password123", "bob", "lastName", "Characters@gmail.com", addressList);
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(violations.size(), 1);
     }
 }

@@ -232,40 +232,20 @@ public class UsersControllerTests {
         Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", null);
         user.addAddress(newAddress);
         newAddress.setId(1L);
-        List <Address> addressList = new ArrayList<>();
-        addressList.add(newAddress);
-        when(usersService.addAddress(anyLong(), anyList())).thenReturn(user);
+        when(usersService.addAddress(anyLong(), any(Address.class))).thenReturn(user);
         mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(addressList)))
+                .content(mapper.writeValueAsString(newAddress)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("addresses", hasSize(1)));
     }
 
-    @DisplayName("It should allow existing users to add multiple addresses , status code 200 ok")
-    @Test
-    public void createAddressesForExistingUser() throws Exception {
-        Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", null);
-        Address newAddress2 = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", null);
-        user.addAddress(newAddress);
-        user.addAddress(newAddress2);
-        newAddress.setId(1L);
-        newAddress2.setId(2L);
-        List <Address> addressList = new ArrayList<>();
-        addressList.add(newAddress);
-        addressList.add(newAddress2);
-        when(usersService.addAddress(anyLong(), anyList())).thenReturn(user);
-        mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(addressList)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("addresses", hasSize(2)));
-    }
+
 
     @DisplayName("It should throw an InvalidAddress error, status code 400 bad request")
     @Test
     public void addAddress_invalidAttr() throws Exception{
-        when(usersService.addAddress(anyLong(), anyList())).thenThrow(InvalidAddressException.class);
+        when(usersService.addAddress(anyLong(), any(Address.class))).thenThrow(InvalidAddressException.class);
 
         mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L))
             .contentType(MediaType.APPLICATION_JSON)
