@@ -65,7 +65,7 @@ docker:
 
 deploy:
   stage: deploy
-   needs:
+  needs:
 #     - build
 #     - test
 #     - coverage
