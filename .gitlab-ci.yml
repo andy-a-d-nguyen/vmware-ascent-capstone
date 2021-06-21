@@ -66,9 +66,6 @@ docker:
 deploy:
   stage: deploy
   needs:
-#     - build
-#     - test
-#     - coverage
      - docker
   image: registry.gitlab.com/galv-vmw-apr-2021/capstone/strawberry-cheescake-crust/user-accounts-feature
   before_script:
