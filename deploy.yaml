@@ -13,8 +13,8 @@ spec:
         app: user-accounts-feature
     spec:
       containers:
-        # - image: registry.gitlab.com/galv-vmw-apr-2021/capstone/strawberry-cheescake-crust/user-accounts-feature
-        - image: $IMAGE
+        - image: registry.gitlab.com/galv-vmw-apr-2021/capstone/strawberry-cheescake-crust/user-accounts-feature
+#        - image: $IMAGE
           name: user-accounts-feature
           imagePullPolicy: Always
           ports:
