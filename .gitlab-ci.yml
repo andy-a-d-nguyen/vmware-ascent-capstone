@@ -1,25 +1,25 @@
 image: adoptopenjdk:11
 
 stages:
-#  - build
+  - build
 #  - test
 #  - coverage
   - docker
   - deploy
 
-#build:
-#  stage: build
-#  script:
-#    - ./gradlew bootJar
-#  cache:
-#    key: GRADLE-BUILD-FILES
-#    paths:
-#      - build/
-#  artifacts:
-#    paths:
-#      - build/classes/java/
-#      - build/libs/*.jar
-#
+build:
+  stage: build
+  script:
+    - ./gradlew bootJar
+  cache:
+    key: GRADLE-BUILD-FILES
+    paths:
+      - build/
+  artifacts:
+    paths:
+      - build/classes/java/
+      - build/libs/*.jar
+
 #test:
 #  stage: test
 #  needs:
