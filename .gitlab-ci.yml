@@ -67,6 +67,8 @@ deploy:
   stage: deploy
   needs:
      - docker
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
   image: registry.gitlab.com/galv-vmw-apr-2021/capstone/base-aws-eks-image:latest
   before_script:
     - export IMAGE="$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
@@ -78,7 +80,6 @@ deploy:
     - aws configure set output json
     - aws sts get-caller-identity
     - aws eks update-kubeconfig --name "$CLUSTER_NAME"
-
   script:
     - envsubst < deploy.yaml | kubectl apply -f -
     - kubectl apply -f service.yaml
