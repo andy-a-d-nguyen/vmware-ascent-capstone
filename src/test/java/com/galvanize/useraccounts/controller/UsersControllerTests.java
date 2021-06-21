@@ -26,8 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -214,7 +213,7 @@ public class UsersControllerTests {
     @DisplayName("It should allow users to add addresses when creating an account , status code 200 ok")
     @Test
     public void createUserWithAddresses() throws Exception {
-        Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment");
+        Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", null);
         user.addAddress(newAddress);
         newAddress.setId(1L);
         when(usersService.createUser(any(User.class))).thenReturn(user);
@@ -230,7 +229,7 @@ public class UsersControllerTests {
     @DisplayName("It should allow existing users to add an address , status code 200 ok")
     @Test
     public void createAddressForExistingUser() throws Exception {
-        Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment");
+        Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", null);
         user.addAddress(newAddress);
         newAddress.setId(1L);
         List <Address> addressList = new ArrayList<>();
@@ -246,8 +245,8 @@ public class UsersControllerTests {
     @DisplayName("It should allow existing users to add multiple addresses , status code 200 ok")
     @Test
     public void createAddressesForExistingUser() throws Exception {
-        Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment");
-        Address newAddress2 = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment");
+        Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", null);
+        Address newAddress2 = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", null);
         user.addAddress(newAddress);
         user.addAddress(newAddress2);
         newAddress.setId(1L);
@@ -279,7 +278,7 @@ public class UsersControllerTests {
     @DisplayName("It should successfully edit a user's address, status code 200 ok")
     @Test
     public void updateAddress_success() throws Exception {
-        Address updatedAddress = new Address("Test Street" , "Test City","Test State", "Test Zipcode", "Test Apartment");
+        Address updatedAddress = new Address("Test Street" , "Test City","Test State", "Test Zipcode", "Test Apartment", null);
         updatedAddress.setId(1L);
         user.addAddress(updatedAddress);
 
@@ -367,4 +366,19 @@ public class UsersControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+    @DisplayName("It should be able to create an address with a label")
+    @Test
+    public void createAddress_withLabel() throws Exception {
+        Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", "home");
+        user.addAddress(newAddress);
+        newAddress.setId(1L);
+        when(usersService.createUser(any(User.class))).thenReturn(user);
+
+        String content = "{\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"password\":\"password\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\",\"label\":\"home\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\",\"label\":\"work\"}]}";
+        mockMvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("addresses[0].label", is("home")));
+   }
 }

@@ -1,6 +1,7 @@
 package com.galvanize.useraccounts.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -23,23 +24,18 @@ public class Address {
     private String state;
     private String zipcode;
     private String apartment;
+    private String label;
 
     public Address() {
     }
 
-    public Address(String street, String city, String state, String zipcode) {
-        this.street = street;
-        this.city = city;
-        this.state = state;
-        this.zipcode = zipcode;
-    }
-
-    public Address( String street, String city, String state, String zipcode, String apartment) {
+    public Address( String street, String city, String state, String zipcode, String apartment, String label) {
         this.street = street;
         this.city = city;
         this.state = state;
         this.zipcode = zipcode;
         this.apartment = apartment;
+        this.label = label;
     }
 
     public long getId() {
@@ -98,4 +94,11 @@ public class Address {
         this.user = user;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
 }
