@@ -56,10 +56,10 @@ class UserAccountsApplicationTests {
     void setup() {
         users = new ArrayList<>();
         addresses = new ArrayList<>();
-        Address address1 = new Address("street1", "city1", "state1", "zipcode1");
-        Address address2 = new Address("street2", "city2", "state2", "zipcode2");
-        Address address3 = new Address("street3", "city3", "state3", "zipcode3");
-        Address address4 = new Address("street4", "city4", "state4", "zipcode4", "apt4");
+        Address address1 = new Address("street1", "city1", "state1", "zipcode1", null, null);
+        Address address2 = new Address("street2", "city2", "state2", "zipcode2", null, null);
+        Address address3 = new Address("street3", "city3", "state3", "zipcode3", null, null);
+        Address address4 = new Address("street4", "city4", "state4", "zipcode4", "apt4", null);
 
         addresses.add(address1);
         addresses.add(address2);

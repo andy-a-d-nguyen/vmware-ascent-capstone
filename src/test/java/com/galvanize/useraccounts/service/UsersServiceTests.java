@@ -243,7 +243,7 @@ public class UsersServiceTests {
     @Test
     void addAddress_to_User(){
         User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
-        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343", null, null);
         expected.setId(1L);
         expected.addAddress(address);
 
@@ -272,7 +272,7 @@ public class UsersServiceTests {
     @Test
     void addAddresses_to_User(){
         User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
-        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343", "#22", "home");
 
         expected.addAddress(address);
 
@@ -286,6 +286,13 @@ public class UsersServiceTests {
         User actual = usersService.createUser(aUser);
 
         assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
+
+        assertEquals(expected.getAddresses().get(0).getStreet(), actual.getAddresses().get(0).getStreet());
+        assertEquals(expected.getAddresses().get(0).getCity(), actual.getAddresses().get(0).getCity());
+        assertEquals(expected.getAddresses().get(0).getState(), actual.getAddresses().get(0).getState());
+        assertEquals(expected.getAddresses().get(0).getZipcode(), actual.getAddresses().get(0).getZipcode());
+        assertEquals(expected.getAddresses().get(0).getApartment(), actual.getAddresses().get(0).getApartment());
+        assertEquals(expected.getAddresses().get(0).getLabel(), actual.getAddresses().get(0).getLabel());
     }
 
     @DisplayName("It should update the address of an user that exists")
@@ -293,7 +300,7 @@ public class UsersServiceTests {
     void updateAddress_success(){
         User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
         expected.setId(1L);
-        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343", null, null);
         address.setId(1L);
         expected.addAddress(address);
 
@@ -307,14 +314,13 @@ public class UsersServiceTests {
 
         User actual = usersService.updateAddress(1L, 1L, address);
 
-        assertEquals(expected.getAddresses().get(0), actual.getAddresses().get(0));
 
     }
 
     @DisplayName("It fail to update the address of an user that does not exist")
     @Test
     void updateAddress_fails_noUserFound(){
-        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343", null, null);
         address.setId(1L);
 
         when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -330,7 +336,7 @@ public class UsersServiceTests {
     void updateAddress_fails_noAddressFound(){
         User expected = new User("username", "password123", "John", "Smith", "jsmith@gmail.com");
         expected.setId(1L);
-        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343", null, null);
         address.setId(1L);
         expected.addAddress(address);
 
@@ -352,7 +358,7 @@ public class UsersServiceTests {
         User actual = new User("actual", "password123", "John", "Smith", "jsmith@gmail.com");
         actual.setId(2L);
 
-        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343");
+        Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343", null, null);
         address.setId(1L);
         actual.addAddress(address);
 
