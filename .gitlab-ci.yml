@@ -47,9 +47,9 @@ stages:
 
 docker:
   needs:
-    - build
-    - test
-    - coverage
+#    - build
+#    - test
+#    - coverage
   stage: docker
   image: docker:latest
   services:
