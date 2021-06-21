@@ -67,7 +67,7 @@ deploy:
   stage: deploy
   needs:
      - docker
-  image: registry.gitlab.com/galv-vmw-apr-2021/capstone/strawberry-cheescake-crust/user-accounts-feature
+  image: registry.gitlab.com/galv-vmw-apr-2021/capstone/base-aws-eks-image:latest
   before_script:
     - export IMAGE="$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
     - aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
