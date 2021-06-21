@@ -74,7 +74,7 @@ deploy:
     - aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
     - aws configure set region us-west-2
     - aws configure set output json
-    - aws eks update-kubeconfig --name "$TEST_CLUSTER_NAME"
+    - aws eks update-kubeconfig --name "$CLUSTER_NAME"
     - aws sts get-caller-identity
 
   script:
