@@ -21,6 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,6 +66,8 @@ public class UsersControllerTests {
     @Test
     public void createUser() throws Exception {
         User userToAdd = new User("bakerBob", "password123", "bob","baker", "bakerBob@gmail.com");
+        userToAdd.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        userToAdd.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
         when(usersService.createUser(any(User.class))).thenReturn(userToAdd);
         //{"id":null,"username":"bakerBob","firstName":"bob","lastName":"baker","avatar":null,"email":"bakerBob@gmail.com",     "address":null,"creditCard":null,"verified":false}
@@ -73,7 +77,8 @@ public class UsersControllerTests {
                 .content(mapper.writeValueAsString(userToAdd)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("createdAt").exists());
+                .andExpect(jsonPath("createdAt").exists())
+                .andExpect(jsonPath("updatedAt").exists());
     }
 
     @DisplayName("It should not create a user with invalid attributes, status code 400 bad request")
@@ -112,12 +117,16 @@ public class UsersControllerTests {
     @Test
     public void editUser() throws Exception {
         User user = new User("bakerBob", "password123", "baker", "bob","bakerBob@gmail.com");
+        user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
         when(usersService.updateUser(anyLong(), any(UserRequest.class))).thenReturn(user);
 
         mockMvc.perform(patch("/api/users/1234").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(user)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("username").value("bakerBob"));
+                .andExpect(jsonPath("username").value("bakerBob"))
+                .andExpect(jsonPath("createdAt").exists())
+                .andExpect(jsonPath("updatedAt").exists());
     }
 
     @DisplayName("It does not edit a user with invalid attributes, status 202 no content")
@@ -138,6 +147,8 @@ public class UsersControllerTests {
     public void showUser_inputID_returnsUsers() throws Exception {
         User user = new User("bakerBob", "password123", "baker", "bob","bakerBob@gmail.com");
         user.setId(1L);
+        user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
         when(usersService.getUser(anyLong())).thenReturn(user);
 
@@ -147,7 +158,8 @@ public class UsersControllerTests {
                 .andExpect(jsonPath("firstName").value(user.getFirstName()))
                 .andExpect(jsonPath("lastName").value(user.getLastName()))
                 .andExpect(jsonPath("password").doesNotExist())
-                .andExpect(jsonPath("createdAt").exists());
+                .andExpect(jsonPath("createdAt").exists())
+                .andExpect(jsonPath("updatedAt").exists());
     }
 
     @DisplayName("It should not show a shower with an invalid id, status code 204 no content")
@@ -189,6 +201,8 @@ public class UsersControllerTests {
     public void setAvatar_InputIDAndAvatarURL_ReturnsURL() throws Exception{
         User user = new User("bakerBob", "password123", "baker", "bob","bakerBob@gmail.com");
         user.setId(1L);
+        user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
         String avatar = "www.avatar.com";
 
@@ -202,7 +216,9 @@ public class UsersControllerTests {
                 .content(mapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("avatar").value(avatar));
+                .andExpect(jsonPath("avatar").value(avatar))
+                .andExpect(jsonPath("createdAt").exists())
+                .andExpect(jsonPath("updatedAt").exists());
     }
 
     /********** Address ***********/
@@ -215,6 +231,9 @@ public class UsersControllerTests {
     public void createUserWithAddresses() throws Exception {
         Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", null);
         user.addAddress(newAddress);
+        user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
         newAddress.setId(1L);
         when(usersService.createUser(any(User.class))).thenReturn(user);
 
@@ -223,7 +242,9 @@ public class UsersControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("addresses", hasSize(1)));
+                .andExpect(jsonPath("addresses", hasSize(1)))
+                .andExpect(jsonPath("createdAt").exists())
+                .andExpect(jsonPath("updatedAt").exists());
     }
 
     @DisplayName("It should allow existing users to add an address , status code 200 ok")
@@ -231,13 +252,18 @@ public class UsersControllerTests {
     public void createAddressForExistingUser() throws Exception {
         Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", null);
         user.addAddress(newAddress);
+        user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
         newAddress.setId(1L);
         when(usersService.addAddress(anyLong(), any(Address.class))).thenReturn(user);
         mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(newAddress)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("addresses", hasSize(1)));
+                .andExpect(jsonPath("addresses", hasSize(1)))
+                .andExpect(jsonPath("createdAt").exists())
+                .andExpect(jsonPath("updatedAt").exists());
     }
 
 
@@ -261,6 +287,8 @@ public class UsersControllerTests {
         Address updatedAddress = new Address("Test Street" , "Test City","Test State", "Test Zipcode", "Test Apartment", null);
         updatedAddress.setId(1L);
         user.addAddress(updatedAddress);
+        user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
         when(usersService.getUser(anyLong())).thenReturn(user);
         when(usersService.updateAddress(anyLong(), anyLong(), any(Address.class))).thenReturn(user);
@@ -269,6 +297,8 @@ public class UsersControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(updatedAddress)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("createdAt").exists())
+                .andExpect(jsonPath("updatedAt").exists())
                 .andReturn();
 
         //String id = JsonPath.read(result.getResponse().getContentAsString(), "$.id")
@@ -352,6 +382,10 @@ public class UsersControllerTests {
         Address newAddress = new Address("Test Street", "Test City","Test State", "Test Zipcode", "Test Apartment", "home");
         user.addAddress(newAddress);
         newAddress.setId(1L);
+
+        user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
         when(usersService.createUser(any(User.class))).thenReturn(user);
 
         String content = "{\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"password\":\"password\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\",\"label\":\"home\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\",\"label\":\"work\"}]}";
@@ -359,6 +393,8 @@ public class UsersControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("addresses[0].label", is("home")));
+                .andExpect(jsonPath("addresses[0].label", is("home")))
+                .andExpect(jsonPath("createdAt").exists())
+                .andExpect(jsonPath("updatedAt").exists());
    }
 }

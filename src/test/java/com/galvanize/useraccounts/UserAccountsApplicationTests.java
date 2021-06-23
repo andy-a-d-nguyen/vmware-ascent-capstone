@@ -25,7 +25,10 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -33,6 +36,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource(locations= "classpath:application-test.properties")
@@ -122,13 +126,11 @@ class UserAccountsApplicationTests {
         HttpEntity<?> request = new HttpEntity<>(user5, headers);
         ResponseEntity<User> response = restTemplate.postForEntity(uri, request, User.class);
 
-        String actualTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(response.getBody().getCreatedAt());
-
-        String expectedTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(user5.getCreatedAt());
-
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(user5.getUsername(), response.getBody().getUsername());
-        assertEquals(expectedTimeCreatedAt, actualTimeCreatedAt);
+
+        assertEquals(usersRepository.findByUsernameExactMatch(user5.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
+        assertEquals(response.getBody().getCreatedAt(), response.getBody().getUpdatedAt());
     }
 
     @Test
@@ -194,6 +196,10 @@ class UserAccountsApplicationTests {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(avatar, response.getBody().getAvatar());
+
+        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
+        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
+        assertTrue(response.getBody().getCreatedAt().before(response.getBody().getUpdatedAt()));
     }
 
     @Test
@@ -221,13 +227,11 @@ class UserAccountsApplicationTests {
 
         ResponseEntity<User> response = restTemplate.getForEntity(uri, User.class);
 
-        String actualTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(response.getBody().getCreatedAt());
-
-        String expectedTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(user.getCreatedAt());
-
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(user.getUsername(), response.getBody().getUsername());
-        assertEquals(expectedTimeCreatedAt, actualTimeCreatedAt);
+
+        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
+        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
     }
 
     @Test
@@ -255,17 +259,16 @@ class UserAccountsApplicationTests {
 
         ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
 
-        String actualTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(response.getBody().getCreatedAt());
-
-        String expectedTimeCreatedAt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(user.getCreatedAt());
-
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().getFirstName()).isEqualTo(request.getFirstName());
         assertThat(response.getBody().getLastName()).isEqualTo(request.getLastName());
         assertThat(response.getBody().getEmail()).isEqualTo(request.getEmail());
         assertThat(response.getBody().getCreditCard()).isEqualTo(request.getCreditCard());
         assertThat(response.getBody().isVerified()).isEqualTo(request.isVerified());
-        assertThat(expectedTimeCreatedAt).isEqualTo(actualTimeCreatedAt);
+
+        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
+        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
+        assertTrue(response.getBody().getCreatedAt().before(response.getBody().getUpdatedAt()));
     }
     @Test
     void updateUser_withIDAndBody_returnsNoContent() {
@@ -292,7 +295,7 @@ class UserAccountsApplicationTests {
 
         String uri = "/api/users/" + user.getId() + "/reset";
 
-        UserPasswordRequest passwordRequest = new UserPasswordRequest("password123", "newpassword");
+        UserPasswordRequest passwordRequest = new UserPasswordRequest("password123", "newPassword");
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
@@ -302,6 +305,11 @@ class UserAccountsApplicationTests {
         ResponseEntity<Boolean> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, Boolean.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        Timestamp created = usersRepository.findByUsernameExactMatch(user.getUsername()).get().getCreatedAt();
+        Timestamp updated = usersRepository.findByUsernameExactMatch(user.getUsername()).get().getUpdatedAt();
+
+        assertNotEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getCreatedAt(), usersRepository.findByUsernameExactMatch(user.getUsername()).get().getUpdatedAt());
     }
 
     @Test
@@ -351,6 +359,9 @@ class UserAccountsApplicationTests {
         ResponseEntity<User> response = restTemplate.postForEntity(uri, postRequest, User.class);
 
         assertEquals(HttpStatus.OK,response.getStatusCode());
+
+        assertEquals(response.getBody().getCreatedAt(), response.getBody().getUpdatedAt());
+
     }
 
     @Test
@@ -366,6 +377,8 @@ class UserAccountsApplicationTests {
         ResponseEntity<User> response = restTemplate.postForEntity(uri, postRequest, User.class);
 
         assertEquals(HttpStatus.OK,response.getStatusCode());
+
+        assertEquals(response.getBody().getCreatedAt(), response.getBody().getUpdatedAt());
     }
 
     @Test
@@ -391,6 +404,10 @@ class UserAccountsApplicationTests {
         assertEquals(Objects.requireNonNull(patchResponse.getBody()).getLastName(), "updatedLast");
         assertEquals(Objects.requireNonNull(patchResponse.getBody()).getEmail(), "updated@email.com");
         assertEquals(HttpStatus.OK,patchResponse.getStatusCode());
+
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt(), patchResponse.getBody().getCreatedAt());
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt(), patchResponse.getBody().getUpdatedAt());
+        assertTrue(patchResponse.getBody().getCreatedAt().before(patchResponse.getBody().getUpdatedAt()));
     }
 
     @Test
@@ -420,6 +437,10 @@ class UserAccountsApplicationTests {
         assertEquals(Objects.requireNonNull(response.getBody()).getAddresses().get(0).getStreet(), "updatedStreet");
         assertEquals(Objects.requireNonNull(response.getBody()).getAddresses().get(0).getCity(), "updatedCity");
         assertEquals(Objects.requireNonNull(response.getBody()).getAddresses().get(0).getState(), "updatedState");
+
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
+        assertTrue(response.getBody().getCreatedAt().before(response.getBody().getUpdatedAt()));
     }
 
     @Test
@@ -476,6 +497,10 @@ class UserAccountsApplicationTests {
         int actual = Objects.requireNonNull(response.getBody()).getAddresses().size();
 
         assertEquals(3, actual);
+
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
+        assertTrue(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt().before(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt()));
     }
     @Test
     void deleteUserAddress_failure_addressNotFound() throws JsonProcessingException {

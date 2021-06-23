@@ -9,6 +9,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.List;
@@ -114,7 +116,8 @@ public class UsersTests {
     @Test
     void createUser_LocalDateTimeFieldExists() {
         User user = new User("bakerBob", "baker", "bob", "password123", "bakerBobHasMoreThan20Characters@gmail.com");
-        
+        user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
         assertNotNull(user.getCreatedAt());
     }
     @Test
