@@ -231,6 +231,7 @@ class UserAccountsApplicationTests {
         assertEquals(user.getUsername(), response.getBody().getUsername());
 
         assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
+        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
     }
 
     @Test
@@ -404,45 +405,43 @@ class UserAccountsApplicationTests {
         assertEquals(Objects.requireNonNull(patchResponse.getBody()).getEmail(), "updated@email.com");
         assertEquals(HttpStatus.OK,patchResponse.getStatusCode());
 
-        assertThat(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt().compareTo(patchResponse.getBody().getCreatedAt()));
-        assertThat(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt().compareTo(patchResponse.getBody().getUpdatedAt()));
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt(), patchResponse.getBody().getCreatedAt());
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt(), patchResponse.getBody().getUpdatedAt());
         assertTrue(patchResponse.getBody().getCreatedAt().before(patchResponse.getBody().getUpdatedAt()));
     }
 
-//    @Test
-//    void editUserAddress_success() throws JsonProcessingException {
-//        String searchParams = "buddydoggo";
-//        String getUri = "/api/users?username=" + searchParams;
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-//
-//        //This section grabs the id because the id of buddydoggo seems to be changing...
-//        ResponseEntity<UsersList> getResponse = restTemplate.getForEntity(getUri, UsersList.class);
-//        User getUser = Objects.requireNonNull(getResponse.getBody().getUsers().get(0));
-//        Long getUserId = getUser.getId();
-//        Address getAddress = getUser.getAddresses().get(0);
-//        Long getAddressId = getAddress.getId();
-//        getAddress.setStreet("updatedStreet");
-//        getAddress.setCity("updatedCity");
-//        getAddress.setState("updatedState");
-//
-//        String uri = String.format("/api/users/%d/addresses/%d", getUserId, getAddressId);
-//        HttpEntity<?> patchRequest = new HttpEntity<>(getAddress, headers);
-//
-//        ResponseEntity <User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
-//
-//        assertEquals(HttpStatus.OK,response.getStatusCode());
-//        assertEquals(Objects.requireNonNull(response.getBody()).getAddresses().get(0).getStreet(), "updatedStreet");
-//        assertEquals(Objects.requireNonNull(response.getBody()).getAddresses().get(0).getCity(), "updatedCity");
-//        assertEquals(Objects.requireNonNull(response.getBody()).getAddresses().get(0).getState(), "updatedState");
-//
-//
-//        // UPDATEDAT NOT BEING UPDATED
-////        assertThat(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt().compareTo(response.getBody().getCreatedAt()));
-////        assertThat(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt().compareTo(response.getBody().getUpdatedAt()));
-////        assertTrue(response.getBody().getCreatedAt().before(response.getBody().getUpdatedAt()));
-//    }
+    @Test
+    void editUserAddress_success() throws JsonProcessingException {
+        String searchParams = "buddydoggo";
+        String getUri = "/api/users?username=" + searchParams;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+
+        //This section grabs the id because the id of buddydoggo seems to be changing...
+        ResponseEntity<UsersList> getResponse = restTemplate.getForEntity(getUri, UsersList.class);
+        User getUser = Objects.requireNonNull(getResponse.getBody().getUsers().get(0));
+        Long getUserId = getUser.getId();
+        Address getAddress = getUser.getAddresses().get(0);
+        Long getAddressId = getAddress.getId();
+        getAddress.setStreet("updatedStreet");
+        getAddress.setCity("updatedCity");
+        getAddress.setState("updatedState");
+
+        String uri = String.format("/api/users/%d/addresses/%d", getUserId, getAddressId);
+        HttpEntity<?> patchRequest = new HttpEntity<>(getAddress, headers);
+
+        ResponseEntity <User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
+
+        assertEquals(HttpStatus.OK,response.getStatusCode());
+        assertEquals(Objects.requireNonNull(response.getBody()).getAddresses().get(0).getStreet(), "updatedStreet");
+        assertEquals(Objects.requireNonNull(response.getBody()).getAddresses().get(0).getCity(), "updatedCity");
+        assertEquals(Objects.requireNonNull(response.getBody()).getAddresses().get(0).getState(), "updatedState");
+
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
+        assertTrue(response.getBody().getCreatedAt().before(response.getBody().getUpdatedAt()));
+    }
 
     @Test
     void editUserAddress_fails_userNotFound() throws JsonProcessingException {
@@ -499,10 +498,9 @@ class UserAccountsApplicationTests {
 
         assertEquals(3, actual);
 
-        //THE WAY ITS CURRENTLY SET UP HAS SAME CREATEDAT AND UPDATEDAT. NO WAY TO TEST AT THE MOMENT
-//        assertThat(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt().compareTo(getResponse.getBody().getUsers().get(0).getCreatedAt()));
-//        assertThat(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt().compareTo(response.getBody().getUpdatedAt()));
-//        assertTrue(getResponse.getBody().getUsers().get(0).getCreatedAt().before(response.getBody().getUpdatedAt()));
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
+        assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
+        assertTrue(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt().before(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt()));
     }
     @Test
     void deleteUserAddress_failure_addressNotFound() throws JsonProcessingException {

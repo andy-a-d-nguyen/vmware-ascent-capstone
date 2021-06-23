@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 
 import javax.swing.text.html.Option;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -125,6 +127,7 @@ public class UsersService {
                 updatedAddress.setState(address.getState());
                 updatedAddress.setZipcode(address.getZipcode());
                 updatedAddress.setApartment(address.getApartment());
+                oUser.get().setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
                 return usersRepository.save(oUser.get());
             } else {
                 throw new AddressNotFoundException();
@@ -145,7 +148,7 @@ public class UsersService {
 
                 oUser.get().getAddresses().remove(oAddressIndex);
                 oAddress.get().setUser(null);
-
+                oUser.get().setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
                 oUser.ifPresent(usersRepository::save);
                 oAddress.ifPresent(addressRepository::delete);
             } else {

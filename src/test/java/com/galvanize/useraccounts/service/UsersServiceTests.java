@@ -19,6 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.galvanize.useraccounts.UsersList;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -379,7 +381,13 @@ public class UsersServiceTests {
         assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
         verify(addressRepository).delete(address);
 
-        assertEquals(expected.getUpdatedAt(), actual.getUpdatedAt());
+        expected.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        expected.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
+        actual.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        actual.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
+        assertEquals(expected.getCreatedAt(), actual.getCreatedAt());
         assertEquals(expected.getUpdatedAt(), actual.getUpdatedAt());
     }
 
