@@ -22,13 +22,13 @@ public class Address {
     @JsonIgnore
     private User user;
     // private Long userId;
-    @NotBlank
+    @NotBlank(message="Street cannot be null and trimmed length must be greater than zero.")
     private String street;
-    @NotBlank
+    @NotBlank(message="City cannot be null and trimmed length must be greater than zero.")
     private String city;
-    @NotBlank
+    @NotBlank (message="State cannot be null and trimmed length must be greater than zero.")
     private String state;
-    @NotBlank
+    @NotBlank(message="Zipcode cannot be null and trimmed length must be greater than zero.")
     private String zipcode;
     private String apartment;
     private String label;
