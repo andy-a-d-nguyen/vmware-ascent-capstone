@@ -308,13 +308,20 @@ public class UsersServiceTests {
         List<Address> addressList = new ArrayList<>();
         addressList.add(address);
 
+        Address updatedAddress = new Address("Updated", "Miami", "Ohio", "dk3j4323", null, null);
         when(usersRepository.findById(anyLong())).thenReturn(Optional.of(expected));
-        when(addressRepository.findById(anyLong())).thenReturn(Optional.of(address));
         when(usersRepository.save(any(User.class))).thenReturn(expected);
 
 
-        User actual = usersService.updateAddress(1L, 1L, address);
-
+        User actual = usersService.updateAddress(1L, 1L, updatedAddress);
+        assertEquals(expected.getAddresses().get(0).getStreet(), actual.getAddresses().get(0).getStreet());
+        assertEquals(expected.getAddresses().get(0).getState(), actual.getAddresses().get(0).getState());
+        assertEquals(expected.getAddresses().get(0).getCity(), actual.getAddresses().get(0).getCity());
+        assertEquals(expected.getAddresses().get(0).getZipcode(), actual.getAddresses().get(0).getZipcode());
+        assertNotEquals(expected.getAddresses().get(0).getStreet(), "StreetName");
+        assertNotEquals(expected.getAddresses().get(0).getState(), "Honolulu");
+        assertNotEquals(expected.getAddresses().get(0).getCity(), "Hawaii");
+        assertNotEquals(expected.getAddresses().get(0).getZipcode(), "21343-343");
 
     }
 
@@ -397,5 +404,5 @@ public class UsersServiceTests {
                 .isThrownBy(() -> {
                     usersService.deleteAddress(1L, 18L);
                 });
-        }
+    }
 }
