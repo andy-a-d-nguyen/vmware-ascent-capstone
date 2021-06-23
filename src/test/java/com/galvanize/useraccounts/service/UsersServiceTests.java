@@ -384,8 +384,8 @@ public class UsersServiceTests {
         expected.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
         expected.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
-        actual.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
-        actual.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        actual.setCreatedAt(expected.getCreatedAt());
+        actual.setUpdatedAt(expected.getUpdatedAt());
 
         assertEquals(expected.getCreatedAt(), actual.getCreatedAt());
         assertEquals(expected.getUpdatedAt(), actual.getUpdatedAt());
