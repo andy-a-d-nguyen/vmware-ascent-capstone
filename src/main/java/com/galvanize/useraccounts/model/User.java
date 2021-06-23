@@ -23,14 +23,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(min = 5, max = 20)
+    @NotBlank(message="Username cannot be null and trimmed length must be greater than zero.")
+    @Size(min = 5, max = 20, message="Username must have between 5-20 characters.")
     private String username;
 
-    @NotBlank
+    @NotBlank(message="First name cannot be null and trimmed length must be greater than zero.")
     private String firstName;
 
-    @NotBlank
+    @NotBlank(message="Last name cannot be null and trimmed length must be greater than zero.")
     private String lastName;
 
     private String avatar;
@@ -42,9 +42,9 @@ public class User {
     @Valid
     private List<Address> addresses = new ArrayList<>();
 
-    @NotBlank
-    @Email
-    @Size(max = 30)
+    @NotBlank(message="Email cannot be null and trimmed length must be greater than zero.")
+    @Email(message="Email should be valid.")
+    @Size(max = 30, message="Email should not be greater than 30.")
     private String email;
 
     private String creditCard;
@@ -186,3 +186,4 @@ public class User {
         this.updatedAt = updatedAt;
     }
 }
+

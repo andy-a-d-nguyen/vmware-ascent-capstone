@@ -84,13 +84,6 @@ public class UsersController {
            return usersService.addAddress(userId, address);
     }
 
-//    @GetMapping("/users/{userId}/addresses")
-//    public ResponseEntity< List<Address> > getAddresses(@PathVariable Long userId){
-//        List<Address> addresses = addressesService.getAllAddresses(userId);
-//        return addresses.size() > 0 ?  ResponseEntity.ok(addresses) : ResponseEntity.noContent().build();
-//    }
-
-
     @PatchMapping("/users/{userId}/addresses/{addressId}")
     public ResponseEntity<User> updateAddress (@PathVariable Long userId, @PathVariable Long addressId, @Valid @RequestBody Address address) throws UserNotFoundException, InvalidAddressException {
         User updatedUser = usersService.updateAddress(userId, addressId, address);
