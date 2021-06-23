@@ -67,6 +67,7 @@ public class UsersServiceTests {
         assertNotNull(actualUser);
         assertEquals(users.get(0), actualUser);
         assertEquals(users.get(0).getCreatedAt(), actualUser.getCreatedAt());
+        assertEquals(users.get(0).getUpdatedAt(), actualUser.getUpdatedAt());
     }
 
     @Test
@@ -147,6 +148,7 @@ public class UsersServiceTests {
         User updatedUser = usersService.setAvatar(user.getId(), url);
 
         assertEquals(url, updatedUser.getAvatar());
+        assertEquals(user.getUpdatedAt(), updatedUser.getUpdatedAt());
     }
 
     @Test
@@ -170,6 +172,7 @@ public class UsersServiceTests {
 
         assertEquals(user, foundUser);
         assertEquals(user.getCreatedAt(), foundUser.getCreatedAt());
+        assertEquals(user.getUpdatedAt(), foundUser.getUpdatedAt());
     }
 
     @Test
@@ -201,6 +204,7 @@ public class UsersServiceTests {
         assertEquals(user.getEmail(), updatedUser.getEmail());
         assertEquals(user.isVerified(), updatedUser.isVerified());
         assertEquals(user.getCreatedAt(), updatedUser.getCreatedAt());
+        assertEquals(user.getUpdatedAt(), updatedUser.getUpdatedAt());
     }
 
     @Test
@@ -256,6 +260,7 @@ public class UsersServiceTests {
 
         User actual = usersService.addAddress(1L, address);
         assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
+        assertEquals(users.get(0).getUpdatedAt(), actual.getUpdatedAt());
     }
 
     @DisplayName("It should throw UserNotFoundException when adding an address to non existing user")
@@ -294,6 +299,8 @@ public class UsersServiceTests {
         assertEquals(expected.getAddresses().get(0).getZipcode(), actual.getAddresses().get(0).getZipcode());
         assertEquals(expected.getAddresses().get(0).getApartment(), actual.getAddresses().get(0).getApartment());
         assertEquals(expected.getAddresses().get(0).getLabel(), actual.getAddresses().get(0).getLabel());
+        assertEquals(expected.getCreatedAt(), actual.getCreatedAt());
+        assertEquals(expected.getUpdatedAt(), actual.getUpdatedAt());
     }
 
     @DisplayName("It should update the address of an user that exists")
@@ -315,7 +322,8 @@ public class UsersServiceTests {
 
         User actual = usersService.updateAddress(1L, 1L, address);
 
-
+        assertEquals(expected.getCreatedAt(), actual.getCreatedAt());
+        assertEquals(expected.getUpdatedAt(), actual.getUpdatedAt());
     }
 
     @DisplayName("It fail to update the address of an user that does not exist")
@@ -370,6 +378,9 @@ public class UsersServiceTests {
 
         assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
         verify(addressRepository).delete(address);
+
+        assertEquals(expected.getUpdatedAt(), actual.getUpdatedAt());
+        assertEquals(expected.getUpdatedAt(), actual.getUpdatedAt());
     }
 
     @DisplayName("It should fail to delete the address of an user that does not exist")

@@ -3,6 +3,7 @@ package com.galvanize.useraccounts.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -14,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
 
 @Entity
 @Table(name = "users")
@@ -54,6 +53,9 @@ public class User {
     @CreationTimestamp
     private Timestamp createdAt;
 
+    @UpdateTimestamp
+    private Timestamp updatedAt;
+
     public User() {}
 
     public User(String username, String password, String firstName, String lastName,  String email) {
@@ -62,7 +64,6 @@ public class User {
         this.lastName = lastName;
         this.password = password;
         this.email = email;
-        this.createdAt = Timestamp.valueOf(LocalDateTime.now());
     }
 
     public User(String username, String password, String firstName, String lastName,  String email, List<Address> addresses) {
@@ -72,7 +73,6 @@ public class User {
         this.password = password;
         this.email = email;
         this.addresses = addresses;
-        this.createdAt = Timestamp.valueOf(LocalDateTime.now());
     }
 
     public void addAddress(Address address){
@@ -178,4 +178,11 @@ public class User {
         this.createdAt = createdAt;
     }
 
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
