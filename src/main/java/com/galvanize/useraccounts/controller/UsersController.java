@@ -66,17 +66,17 @@ public class UsersController {
 
     }
 
-    @PreAuthorize("hasAuthority('ROLE_USER')")
-    @PostMapping("/users/{id}")
-    public ResponseEntity<User> setAvatar(@PathVariable Long id, @RequestBody UserAvatarRequest userAvatarRequest) {
-        User user =  usersService.setAvatar(id, userAvatarRequest.getUrl());
-        
-        if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.noContent().build();
-        }
-    }
+//    @PreAuthorize("hasAuthority('ROLE_USER')")
+//    @PatchMapping("/users/{id}")
+//    public ResponseEntity<User> setAvatar(@PathVariable Long id, @RequestBody UserAvatarRequest userAvatarRequest) {
+//        User user =  usersService.setAvatar(id, userAvatarRequest.getUrl());
+//
+//        if (user != null) {
+//            return ResponseEntity.ok(user);
+//        } else {
+//            return ResponseEntity.noContent().build();
+//        }
+//    }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/users/{id}")

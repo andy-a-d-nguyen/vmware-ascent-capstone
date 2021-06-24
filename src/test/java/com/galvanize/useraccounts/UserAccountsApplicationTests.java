@@ -112,19 +112,6 @@ class UserAccountsApplicationTests {
     void contextLoads() {
     }
 
-//    @Test
-//    void searchUser_withString_returnsFoundUsers() {
-//        String searchParams = "bob";
-//        String uri = "/api/users?username=" + searchParams;
-//
-//        ResponseEntity<UsersList> response = restTemplate.getForEntity(uri, UsersList.class);
-//
-//        assertNotNull(response);
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertFalse(response.getBody().isEmpty());
-//        assertEquals(3, response.getBody().size());
-//    }
-
     @Test
     void createUser_returnsStatusOK() throws JsonProcessingException {
         String uri = "/api/users";
@@ -198,49 +185,6 @@ class UserAccountsApplicationTests {
     }
 
     @Test
-    void setAvatar_withIDAndURL_returnsUser() throws JsonProcessingException {
-        User user = users.get(0);
-        Long id = user.getId();
-        String uri = "/api/users/" + id;
-        String avatar = "https://myavatar.com";
-
-        UserAvatarRequest request = new UserAvatarRequest(avatar);
-
-        String body = mapper.writeValueAsString(request);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<?> requestTwo = new HttpEntity<>(body, headers);
-        ResponseEntity<User> response = restTemplate.postForEntity(uri, requestTwo, User.class);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(avatar, response.getBody().getAvatar());
-
-        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
-        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
-        assertTrue(response.getBody().getCreatedAt().before(response.getBody().getUpdatedAt()));
-    }
-
-    @Test
-    void setAvatar_withIDAndURL_returnsNoContent() throws JsonProcessingException {
-        String uri = "/api/users/" + 12345L;
-        String avatar = "https://myavatar.com";
-
-        UserAvatarRequest request = new UserAvatarRequest(avatar);
-
-        String body = mapper.writeValueAsString(request);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token);
-
-        HttpEntity<?> requestTwo = new HttpEntity<>(body, headers);
-        ResponseEntity<User> response = restTemplate.postForEntity(uri, requestTwo, User.class);
-
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-    }
-
-    @Test
     void getUser_withID_returnsUser() {
         User user = users.get(0);
 
@@ -281,7 +225,7 @@ class UserAccountsApplicationTests {
 
         String uri = "/api/users/" + user.getId();
 
-        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified(), user.getAvatar());
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
@@ -297,6 +241,7 @@ class UserAccountsApplicationTests {
         assertThat(response.getBody().getEmail()).isEqualTo(request.getEmail());
         assertThat(response.getBody().getCreditCard()).isEqualTo(request.getCreditCard());
         assertThat(response.getBody().isVerified()).isEqualTo(request.isVerified());
+        assertThat(response.getBody().getAvatar()).isEqualTo(request.getAvatar());
 
         assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
         assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
@@ -308,7 +253,7 @@ class UserAccountsApplicationTests {
 
         String uri = "/api/users/" + 1234L;
 
-        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified(), user.getAvatar());
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);

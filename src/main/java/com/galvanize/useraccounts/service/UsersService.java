@@ -60,6 +60,7 @@ public class UsersService {
             user.setEmail(updatedUser.getEmail());
             user.setCreditCard(updatedUser.getCreditCard());
             user.setVerified(updatedUser.isVerified());
+            user.setAvatar(updatedUser.getAvatar());
             return usersRepository.save(user);
         }
         return null;
@@ -81,16 +82,16 @@ public class UsersService {
         return false;
     }
 
-    public User setAvatar(Long id, String url) {
-        User user = getUser(id);
-
-        if (user != null) {
-            user.setAvatar(url);
-            return usersRepository.save(user);
-        }
-
-        return null;
-    }
+//    public User setAvatar(Long id, String url) {
+//        User user = getUser(id);
+//
+//        if (user != null) {
+//            user.setAvatar(url);
+//            return usersRepository.save(user);
+//        }
+//
+//        return null;
+//    }
 
     public UsersList searchUsers(String username) {
         if (username == null) username = "";

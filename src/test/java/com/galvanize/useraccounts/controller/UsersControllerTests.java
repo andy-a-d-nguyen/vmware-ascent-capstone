@@ -226,31 +226,6 @@ public class UsersControllerTests {
                 .andExpect(status().isNoContent());
     }
 
-    @DisplayName("It should set avatar and return url, status code 200 ok")
-    @Test
-    public void setAvatar_InputIDAndAvatarURL_ReturnsURL() throws Exception{
-        User user = new User("bakerBob", "password123", "baker", "bob","bakerBob@gmail.com");
-        user.setId(1L);
-        user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
-        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
-
-        String avatar = "www.avatar.com";
-
-        UserAvatarRequest request = new UserAvatarRequest(avatar);
-        user.setAvatar(avatar);
-
-        when(usersService.setAvatar(anyLong(), anyString())).thenReturn(user);
-
-        mockMvc.perform(post("/api/users/" + user.getId()).header("Authorization", token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("avatar").value(avatar))
-                .andExpect(jsonPath("createdAt").exists())
-                .andExpect(jsonPath("updatedAt").exists());
-    }
-
     /********** Address ***********/
 
     // Test GET for returned addresses
@@ -359,26 +334,6 @@ public class UsersControllerTests {
                 .andExpect(status().isAccepted());
         verify(usersService).deleteAddress(1L, 1L);
     }
-
-//    @Test
-//    public void searchUsername_byString_returnsFoundUsers() throws Exception {
-//        String username = "bob";
-//
-//        User user1 = new User("bakerBob", "password123", "baker", "bob","bakerBob1@gmail.com");
-//        User user2 = new User("bob", "password123", "bob", "smith","bakerBob2@gmail.com");
-//        User user3 = new User("bobBob", "password123", "bob", "bob","bakerBob3@gmail.com");
-//
-//        user1.setId(1L);
-//        user2.setId(2L);
-//        user3.setId(3L);
-//
-//        when(usersService.searchUsers(anyString())).thenReturn(new UsersList(Arrays.asList(user1, user2, user3)));
-//
-//        mockMvc.perform(get("/api/users?username=" + username))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("users", hasSize(3)));
-//    }
 
     @Test
     public void searchUsername_byString_returnsNoContent() throws Exception {
