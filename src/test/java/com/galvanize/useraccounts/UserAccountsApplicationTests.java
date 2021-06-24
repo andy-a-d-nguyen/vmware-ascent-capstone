@@ -1,9 +1,8 @@
 package com.galvanize.useraccounts;
 
+import com.galvanize.useraccounts.UsersList;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.galvanize.useraccounts.exception.DuplicateUserException;
-import com.galvanize.useraccounts.exception.InvalidUserException;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
 import com.galvanize.useraccounts.repository.AddressRepository;
@@ -11,9 +10,6 @@ import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserAvatarRequest;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
-import com.galvanize.useraccounts.UsersList;
-
-import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.AfterEach;
@@ -26,17 +22,11 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource(locations= "classpath:application-test.properties")
@@ -101,8 +91,6 @@ class UserAccountsApplicationTests {
                 .setSubject(username)
                 .claim("name", username)
                 .claim("guid", 99)
-                // Convert to list of strings.
-                // This is important because it affects the way we get them back in the Gateway.
                 .claim("authorities", roles)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + 5256000 * 1000L))  // in milliseconds
@@ -136,7 +124,6 @@ class UserAccountsApplicationTests {
 //        assertFalse(response.getBody().isEmpty());
 //        assertEquals(3, response.getBody().size());
 //    }
-
 
     @Test
     void createUser_returnsStatusOK() throws JsonProcessingException {
@@ -221,6 +208,7 @@ class UserAccountsApplicationTests {
 
         String body = mapper.writeValueAsString(request);
         HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<?> requestTwo = new HttpEntity<>(body, headers);
@@ -244,6 +232,7 @@ class UserAccountsApplicationTests {
         String body = mapper.writeValueAsString(request);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> requestTwo = new HttpEntity<>(body, headers);
         ResponseEntity<User> response = restTemplate.postForEntity(uri, requestTwo, User.class);
@@ -257,7 +246,12 @@ class UserAccountsApplicationTests {
 
         String uri = "/api/users/" + user.getId();
 
-        ResponseEntity<User> response = restTemplate.getForEntity(uri, User.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.GET, request, User.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(user.getUsername(), response.getBody().getUsername());
@@ -270,7 +264,12 @@ class UserAccountsApplicationTests {
     void getUser_withID_returnsNoContent() {
         String uri = "/api/users/" + 1234L;
 
-        ResponseEntity<User> response = restTemplate.getForEntity(uri, User.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.GET, request, User.class);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
@@ -286,6 +285,7 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
         HttpEntity<UserRequest> patchRequest = new HttpEntity<>(request, headers);
 
@@ -312,6 +312,7 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
         HttpEntity<UserRequest> patchRequest = new HttpEntity<>(request, headers);
 
@@ -331,6 +332,7 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> patchRequest = new HttpEntity<>(passwordRequest, headers);
 
@@ -354,6 +356,7 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> patchRequest = new HttpEntity<>(passwordRequest, headers);
 
@@ -370,6 +373,7 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> patchRequest = new HttpEntity<>(passwordRequest, headers);
 
@@ -385,6 +389,7 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> postRequest = new HttpEntity<>(body, headers);
 
@@ -403,6 +408,7 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> postRequest = new HttpEntity<>(body, headers);
 
@@ -420,9 +426,11 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
-        //This section grabs the id because the id of buddydoggo seems to be changing...
-        ResponseEntity<UsersList> getResponse = restTemplate.getForEntity(getUri, UsersList.class);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<UsersList> getResponse = restTemplate.exchange(getUri, HttpMethod.GET, request, UsersList.class);
         User getUser = Objects.requireNonNull(getResponse.getBody().getUsers().get(0));
         Long getUserId = getUser.getId();
 
@@ -449,9 +457,12 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
-        //This section grabs the id because the id of buddydoggo seems to be changing...
-        ResponseEntity<UsersList> getResponse = restTemplate.getForEntity(getUri, UsersList.class);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<UsersList> getResponse = restTemplate.exchange(getUri, HttpMethod.GET, request, UsersList.class);
+
         User getUser = Objects.requireNonNull(getResponse.getBody().getUsers().get(0));
         Long getUserId = getUser.getId();
         Address getAddress = getUser.getAddresses().get(0);
@@ -482,6 +493,7 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> patchRequest = new HttpEntity<>(body, headers);
 
@@ -497,6 +509,7 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> patchRequest = new HttpEntity<>(body, headers);
 
@@ -513,19 +526,26 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
-        //This section grabs the id because the id of buddydoggo seems to be changing...
-        ResponseEntity<UsersList> getResponse = restTemplate.getForEntity(getUri, UsersList.class);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<UsersList> getResponse = restTemplate.exchange(getUri, HttpMethod.GET, request, UsersList.class);
+
         User getUser = Objects.requireNonNull(getResponse.getBody().getUsers().get(0));
         Long getUserId = getUser.getId();
         Long getAddressId = getUser.getAddresses().get(0).getId();
 
         String deleteUri = String.format("/api/users/%d/addresses/%d", getUserId, getAddressId);
-        restTemplate.delete(deleteUri);
 
-        ResponseEntity<UsersList> checkUsers = restTemplate.getForEntity(getUri, UsersList.class);
+        restTemplate.exchange(deleteUri, HttpMethod.DELETE, request, User.class);
+
+        ResponseEntity<UsersList> checkUsers = restTemplate.exchange(getUri, HttpMethod.GET, request, UsersList.class);
+
         getUri = String.format("/api/users/%d", getUserId);
-        ResponseEntity <User> response = restTemplate.getForEntity(getUri, User.class);
+
+        ResponseEntity<User> response = restTemplate.exchange(getUri, HttpMethod.GET, request, User.class);
+
         int actual = Objects.requireNonNull(response.getBody()).getAddresses().size();
 
         assertEquals(3, actual);
@@ -534,6 +554,7 @@ class UserAccountsApplicationTests {
         assertEquals(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
         assertTrue(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getCreatedAt().before(usersRepository.findByUsernameExactMatch(getUser.getUsername()).get().getUpdatedAt()));
     }
+
     @Test
     void deleteUserAddress_failure_addressNotFound() throws JsonProcessingException {
         String searchParams = "buddydoggo";
@@ -541,19 +562,27 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.setBearerAuth(token);
 
-        //This section grabs the id because the id of buddydoggo seems to be changing...
-        ResponseEntity<UsersList> getResponse = restTemplate.getForEntity(getUri, UsersList.class);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<UsersList> getResponse = restTemplate.exchange(getUri, HttpMethod.GET, request, UsersList.class);
+
         User getUser = Objects.requireNonNull(getResponse.getBody().getUsers().get(0));
         Long getUserId = getUser.getId();
 
         String uri = String.format("/api/users/%d/addresses/234234", getUserId);
 
         getUri = String.format("/api/users/%d/addresses", getUserId);
-        ResponseEntity <User> response = restTemplate.getForEntity(getUri, User.class);
+
+        ResponseEntity<User> response = restTemplate.exchange(getUri, HttpMethod.GET, request, User.class);
+
         int expected =  Objects.requireNonNull(response.getBody()).getAddresses().size();
-        restTemplate.delete(uri);
-        response = restTemplate.getForEntity(getUri, User.class);
+
+        restTemplate.exchange(uri, HttpMethod.DELETE, request, User.class);
+
+        response = restTemplate.exchange(getUri, HttpMethod.GET, request, User.class);
+
         int actual = Objects.requireNonNull(response.getBody()).getAddresses().size();
 
         assertEquals(expected, actual);
