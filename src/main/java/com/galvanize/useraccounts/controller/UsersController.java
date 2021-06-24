@@ -31,6 +31,7 @@ public class UsersController {
         this.addressesService = addressesService;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/users")
     public User createUser(@Valid @RequestBody User user) throws InvalidUserException, DuplicateUserException, InvalidAddressException {
         return usersService.createUser(user);
