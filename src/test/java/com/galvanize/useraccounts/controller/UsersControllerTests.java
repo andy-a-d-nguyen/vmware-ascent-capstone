@@ -11,13 +11,17 @@ import com.galvanize.useraccounts.request.UserRequest;
 import com.galvanize.useraccounts.service.AddressesService;
 import com.galvanize.useraccounts.service.UsersService;
 import com.jayway.jsonpath.JsonPath;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -25,6 +29,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -42,7 +47,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UsersController.class)
+@TestPropertySource(locations="classpath:application-test.properties")
 public class UsersControllerTests {
+    @Value("${security.jwt.secret}")
+    String JWT_KEY;
+    String token;
+
     @Autowired
     MockMvc mockMvc;
 
@@ -60,6 +70,26 @@ public class UsersControllerTests {
     void setup() {
         user = new User("bakerBob", "password123", "bob","baker", "bakerBob@gmail.com");
         user.setId(1L);
+
+        token = getToken("user", Arrays.asList("ROLE_USER"));
+    }
+
+    private String getToken(String username, List<String> roles) {
+        long now = System.currentTimeMillis();
+        String token = Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setSubject(username)
+                .claim("name", username)
+                .claim("guid", 99)
+                // Convert to list of strings.
+                // This is important because it affects the way we get them back in the Gateway.
+                .claim("authorities", roles)
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + 5256000 * 1000L))  // in milliseconds
+                .signWith(SignatureAlgorithm.HS512, JWT_KEY.getBytes())
+                .compact();
+
+        return String.format("Bearer %s", token);
     }
 
     @DisplayName("It can successfully create a user with valid attributes, status code 200 ok")
@@ -72,7 +102,7 @@ public class UsersControllerTests {
         when(usersService.createUser(any(User.class))).thenReturn(userToAdd);
         //{"id":null,"username":"bakerBob","firstName":"bob","lastName":"baker","avatar":null,"email":"bakerBob@gmail.com",     "address":null,"creditCard":null,"verified":false}
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/users").header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(userToAdd)))
                 .andDo(print())
@@ -86,7 +116,7 @@ public class UsersControllerTests {
     public void CreateUser_invalidAttr() throws Exception {
         when(usersService.createUser(any(User.class))).thenThrow(InvalidUserException.class);
 
-        mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/users").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -99,7 +129,7 @@ public class UsersControllerTests {
         userToDelete.setId(1L);
 
 
-        mockMvc.perform(delete("/api/users/" + userToDelete.getId()))
+        mockMvc.perform(delete("/api/users/" + userToDelete.getId()).header("Authorization", token))
                 .andExpect(status().isAccepted());
 
         verify(usersService).deleteUser(anyLong());
@@ -109,7 +139,7 @@ public class UsersControllerTests {
     @Test
     public void deleteUser_byId_noContentStatusCode() throws Exception {
         doThrow(new UserNotFoundException()).when(usersService).deleteUser(anyLong());
-        mockMvc.perform(delete("/api/users/1495"))
+        mockMvc.perform(delete("/api/users/1495").header("Authorization", token))
                 .andExpect(status().isNoContent());
     }
 
@@ -122,7 +152,7 @@ public class UsersControllerTests {
 
         when(usersService.updateUser(anyLong(), any(UserRequest.class))).thenReturn(user);
 
-        mockMvc.perform(patch("/api/users/1234").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(user)))
+        mockMvc.perform(patch("/api/users/1234").header("Authorization", token).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(user)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("username").value("bakerBob"))
                 .andExpect(jsonPath("createdAt").exists())
@@ -136,7 +166,7 @@ public class UsersControllerTests {
 
         when(usersService.updateUser(anyLong(), any(UserRequest.class))).thenReturn(null);
 
-        mockMvc.perform(patch("/api/users/1234")
+        mockMvc.perform(patch("/api/users/1234").header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user)))
                 .andExpect(status().isNoContent());
@@ -152,7 +182,7 @@ public class UsersControllerTests {
 
         when(usersService.getUser(anyLong())).thenReturn(user);
 
-        mockMvc.perform(get("/api/users/" + user.getId()))
+        mockMvc.perform(get("/api/users/" + user.getId()).header("Authorization", token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("username").value(user.getUsername()))
                 .andExpect(jsonPath("firstName").value(user.getFirstName()))
@@ -168,7 +198,7 @@ public class UsersControllerTests {
 
         when(usersService.getUser(anyLong())).thenReturn(null);
 
-        mockMvc.perform(get("/api/users/1234"))
+        mockMvc.perform(get("/api/users/1234").header("Authorization", token))
                 .andExpect(status().isNoContent());
     }
 
@@ -179,7 +209,7 @@ public class UsersControllerTests {
 
         when(usersService.updateUserPassword(anyLong(), anyString(), anyString())).thenReturn(true);
 
-        mockMvc.perform(patch("/api/users/1234/reset")
+        mockMvc.perform(patch("/api/users/1234/reset").header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(userPasswordRequest)))
                 .andExpect(status().isOk());
@@ -192,7 +222,7 @@ public class UsersControllerTests {
 
         when(usersService.updateUserPassword(anyLong(), anyString(), anyString())).thenReturn(false);
 
-        mockMvc.perform(patch("/api/users/1234/reset").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(userPasswordRequest)))
+        mockMvc.perform(patch("/api/users/1234/reset").header("Authorization", token).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(userPasswordRequest)))
                 .andExpect(status().isNoContent());
     }
 
@@ -211,7 +241,7 @@ public class UsersControllerTests {
 
         when(usersService.setAvatar(anyLong(), anyString())).thenReturn(user);
 
-        mockMvc.perform(post("/api/users/" + user.getId())
+        mockMvc.perform(post("/api/users/" + user.getId()).header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request)))
                 .andDo(print())
@@ -238,7 +268,7 @@ public class UsersControllerTests {
         when(usersService.createUser(any(User.class))).thenReturn(user);
 
         String content = "{\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"password\":\"password\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\"}]}";
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/users").header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
                 .andExpect(status().isOk())
@@ -257,7 +287,7 @@ public class UsersControllerTests {
 
         newAddress.setId(1L);
         when(usersService.addAddress(anyLong(), any(Address.class))).thenReturn(user);
-        mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L))
+        mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L)).header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(newAddress)))
                 .andExpect(status().isOk())
@@ -273,7 +303,7 @@ public class UsersControllerTests {
     public void addAddress_invalidAttr() throws Exception{
         when(usersService.addAddress(anyLong(), any(Address.class))).thenThrow(InvalidAddressException.class);
 
-        mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L))
+        mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L)).header("Authorization", token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(""))
             .andExpect(status().isBadRequest());
@@ -293,7 +323,7 @@ public class UsersControllerTests {
         when(usersService.getUser(anyLong())).thenReturn(user);
         when(usersService.updateAddress(anyLong(), anyLong(), any(Address.class))).thenReturn(user);
 
-        MvcResult result = mockMvc.perform(patch(String.format("/api/users/%d/addresses/%d", 1L, 1L))
+        MvcResult result = mockMvc.perform(patch(String.format("/api/users/%d/addresses/%d", 1L, 1L)).header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(updatedAddress)))
                 .andExpect(status().isOk())
@@ -325,33 +355,30 @@ public class UsersControllerTests {
     @DisplayName("It should delete a user's address, status code 202 accepted")
     @Test
     public void deleteAddress() throws Exception {
-        mockMvc.perform(delete("/api/users/1/addresses/1"))
+        mockMvc.perform(delete("/api/users/1/addresses/1").header("Authorization", token))
                 .andExpect(status().isAccepted());
         verify(usersService).deleteAddress(1L, 1L);
     }
 
-
-
-
-    @Test
-    public void searchUsername_byString_returnsFoundUsers() throws Exception {
-        String username = "bob";
-
-        User user1 = new User("bakerBob", "password123", "baker", "bob","bakerBob1@gmail.com");
-        User user2 = new User("bob", "password123", "bob", "smith","bakerBob2@gmail.com");
-        User user3 = new User("bobBob", "password123", "bob", "bob","bakerBob3@gmail.com");
-
-        user1.setId(1L);
-        user2.setId(2L);
-        user3.setId(3L);
-
-        when(usersService.searchUsers(anyString())).thenReturn(new UsersList(Arrays.asList(user1, user2, user3)));
-
-        mockMvc.perform(get("/api/users?username=" + username))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("users", hasSize(3)));
-    }
+//    @Test
+//    public void searchUsername_byString_returnsFoundUsers() throws Exception {
+//        String username = "bob";
+//
+//        User user1 = new User("bakerBob", "password123", "baker", "bob","bakerBob1@gmail.com");
+//        User user2 = new User("bob", "password123", "bob", "smith","bakerBob2@gmail.com");
+//        User user3 = new User("bobBob", "password123", "bob", "bob","bakerBob3@gmail.com");
+//
+//        user1.setId(1L);
+//        user2.setId(2L);
+//        user3.setId(3L);
+//
+//        when(usersService.searchUsers(anyString())).thenReturn(new UsersList(Arrays.asList(user1, user2, user3)));
+//
+//        mockMvc.perform(get("/api/users?username=" + username))
+//                .andDo(print())
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("users", hasSize(3)));
+//    }
 
     @Test
     public void searchUsername_byString_returnsNoContent() throws Exception {
@@ -359,7 +386,7 @@ public class UsersControllerTests {
 
         when(usersService.searchUsers(anyString())).thenReturn(new UsersList(Arrays.asList()));
 
-        mockMvc.perform(get("/api/users?username=" + username))
+        mockMvc.perform(get("/api/users?username=" + username).header("Authorization", token))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }
@@ -370,7 +397,7 @@ public class UsersControllerTests {
 
         when(usersService.createUser(any(User.class))).thenThrow(DuplicateUserException.class);
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/users").header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user)))
                 .andExpect(status().isBadRequest());
@@ -389,7 +416,7 @@ public class UsersControllerTests {
         when(usersService.createUser(any(User.class))).thenReturn(user);
 
         String content = "{\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"password\":\"password\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\",\"label\":\"home\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\",\"label\":\"work\"}]}";
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/users").header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
                 .andExpect(status().isOk())

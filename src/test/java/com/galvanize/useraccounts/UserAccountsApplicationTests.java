@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource(locations= "classpath:application-test.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserAccountsApplicationTests {
-
+    
     @Autowired
     TestRestTemplate restTemplate;
 

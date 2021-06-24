@@ -78,7 +78,7 @@ public class UsersController {
         }
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         User user = usersService.getUser(id);
@@ -111,7 +111,7 @@ public class UsersController {
         return ResponseEntity.accepted().build();
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/users")
     public ResponseEntity<UsersList> searchUsers(@RequestParam(required = false) String username) {
         UsersList users = usersService.searchUsers(username);

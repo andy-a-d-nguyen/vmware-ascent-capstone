@@ -37,6 +37,7 @@ public class UsersService {
         }
             //this sets up the one to many relationship between user and addresses
             user.getAddresses().forEach( address -> address.setUser(user));
+        
             return usersRepository.save(user);
     }
 

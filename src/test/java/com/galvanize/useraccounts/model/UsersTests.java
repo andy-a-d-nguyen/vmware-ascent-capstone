@@ -81,13 +81,13 @@ public class UsersTests {
         assertFalse(violations.isEmpty());
     }
 
-    @Test
-    public void createUser_validatesPasswordIsNotBlank() {
-        User user = new User("bakerBob", "", "bob", "baker", "bakerBob@gmail.com");
-
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-        assertFalse(violations.isEmpty());
-    }
+//    @Test
+//    public void createUser_validatesPasswordIsNotBlank() {
+//        User user = new User("bakerBob", "", "bob", "baker", "bakerBob@gmail.com");
+//
+//        Set<ConstraintViolation<User>> violations = validator.validate(user);
+//        assertFalse(violations.isEmpty());
+//    }
 
     @Test
     public void createUser_validatesEmailIsNotBlank() {
