@@ -35,6 +35,7 @@ public class User {
 
     private String avatar;
 
+    @NotBlank
     private String password;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)

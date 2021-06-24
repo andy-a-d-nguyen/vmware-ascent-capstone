@@ -11,6 +11,7 @@ import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,6 +36,7 @@ public class UsersController {
         return usersService.createUser(user);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PatchMapping("/users/{id}")
     public ResponseEntity<User> update(@PathVariable Long id, @RequestBody UserRequest updatedUser) throws InvalidUserException {
         User user = usersService.updateUser(id, updatedUser);
@@ -42,6 +44,7 @@ public class UsersController {
         return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PatchMapping("/users/{id}/reset")
     public ResponseEntity<Boolean> update(@PathVariable Long id, @RequestBody UserPasswordRequest updatedUserPassword) throws InvalidUserException {
         Boolean isUpdated = usersService.updateUserPassword(id, updatedUserPassword.getOldPassword(), updatedUserPassword.getNewPassword());
@@ -49,6 +52,7 @@ public class UsersController {
         return !isUpdated ? ResponseEntity.noContent().build() : ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @DeleteMapping("/users/{id}")
     public ResponseEntity deleteUser(@PathVariable Long id) {
         try {
@@ -60,6 +64,8 @@ public class UsersController {
         return ResponseEntity.accepted().build();
 
     }
+
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/users/{id}")
     public ResponseEntity<User> setAvatar(@PathVariable Long id, @RequestBody UserAvatarRequest userAvatarRequest) {
         User user =  usersService.setAvatar(id, userAvatarRequest.getUrl());
@@ -71,6 +77,7 @@ public class UsersController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         User user = usersService.getUser(id);
@@ -79,17 +86,20 @@ public class UsersController {
 
     /*Addresses*/
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/users/{userId}/addresses")
     public User createAddress(@PathVariable Long userId, @Validated @RequestBody Address address) {
            return usersService.addAddress(userId, address);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PatchMapping("/users/{userId}/addresses/{addressId}")
     public ResponseEntity<User> updateAddress (@PathVariable Long userId, @PathVariable Long addressId, @Valid @RequestBody Address address) throws UserNotFoundException, InvalidAddressException {
         User updatedUser = usersService.updateAddress(userId, addressId, address);
         return updatedUser == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedUser);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     @DeleteMapping("/users/{userId}/addresses/{addressId}")
     public ResponseEntity deleteAddress(@PathVariable Long userId, @PathVariable Long addressId) {
         try {
@@ -100,6 +110,7 @@ public class UsersController {
         return ResponseEntity.accepted().build();
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/users")
     public ResponseEntity<UsersList> searchUsers(@RequestParam(required = false) String username) {
         UsersList users = usersService.searchUsers(username);
