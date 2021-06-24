@@ -39,5 +39,10 @@ spec:
                 secretKeyRef:
                   name: bakery-db-secrets
                   key: DB_PWD
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-key-secret
+                  key: JWT_SECRET_KEY
       imagePullSecrets: # Be sure the token name matches what you created on K8s
         - name: user-accounts-feature-deploy-token
