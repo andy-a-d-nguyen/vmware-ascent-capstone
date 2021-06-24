@@ -14,10 +14,13 @@ import com.galvanize.useraccounts.request.UserRequest;
 import com.galvanize.useraccounts.UsersList;
 
 import com.sun.xml.bind.v2.runtime.output.SAXOutput;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
@@ -29,10 +32,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,6 +55,10 @@ class UserAccountsApplicationTests {
     List<User> users;
     List <Address> addresses;
     ObjectMapper mapper = new ObjectMapper();
+
+    @Value("${security.jwt.secret}")
+    String JWT_KEY;
+    String token;
     
     @BeforeEach
     void setup() {
@@ -86,6 +90,26 @@ class UserAccountsApplicationTests {
         users.add(user5);
 
         usersRepository.saveAll(users);
+
+        token = getToken("user", Arrays.asList("ROLE_USER"));
+    }
+
+    private String getToken(String username, List<String> roles) {
+        long now = System.currentTimeMillis();
+        String token = Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setSubject(username)
+                .claim("name", username)
+                .claim("guid", 99)
+                // Convert to list of strings.
+                // This is important because it affects the way we get them back in the Gateway.
+                .claim("authorities", roles)
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + 5256000 * 1000L))  // in milliseconds
+                .signWith(SignatureAlgorithm.HS512, JWT_KEY.getBytes())
+                .compact();
+
+        return String.format("Bearer %s", token);
     }
 
     @AfterEach
@@ -100,18 +124,18 @@ class UserAccountsApplicationTests {
     void contextLoads() {
     }
 
-    @Test
-    void searchUser_withString_returnsFoundUsers() {
-        String searchParams = "bob";
-        String uri = "/api/users?username=" + searchParams;
-
-        ResponseEntity<UsersList> response = restTemplate.getForEntity(uri, UsersList.class);
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertFalse(response.getBody().isEmpty());
-        assertEquals(3, response.getBody().size());
-    }
+//    @Test
+//    void searchUser_withString_returnsFoundUsers() {
+//        String searchParams = "bob";
+//        String uri = "/api/users?username=" + searchParams;
+//
+//        ResponseEntity<UsersList> response = restTemplate.getForEntity(uri, UsersList.class);
+//
+//        assertNotNull(response);
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertFalse(response.getBody().isEmpty());
+//        assertEquals(3, response.getBody().size());
+//    }
 
 
     @Test
@@ -122,6 +146,7 @@ class UserAccountsApplicationTests {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> request = new HttpEntity<>(user5, headers);
         ResponseEntity<User> response = restTemplate.postForEntity(uri, request, User.class);
@@ -141,6 +166,7 @@ class UserAccountsApplicationTests {
         String body = mapper.writeValueAsString(user10);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> request = new HttpEntity<>(body, headers);
         ResponseEntity<User> response = restTemplate.postForEntity(uri, request, User.class);
@@ -157,6 +183,7 @@ class UserAccountsApplicationTests {
         String body = mapper.writeValueAsString(user5);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
 
         HttpEntity<?> request = new HttpEntity<>(body, headers);
         ResponseEntity<User> response = restTemplate.postForEntity(uri, request, User.class);
@@ -170,11 +197,16 @@ class UserAccountsApplicationTests {
         Long id = user.getId();
         String uri = "/api/users/" + id;
 
-        ResponseEntity<User> response = restTemplate.getForEntity(uri, User.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        restTemplate.delete(uri);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
 
-        ResponseEntity<User> responseTwo = restTemplate.getForEntity(uri, User.class);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.GET, request, User.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        restTemplate.exchange(uri, HttpMethod.DELETE, request, User.class);
+
+        ResponseEntity<User> responseTwo = restTemplate.exchange(uri, HttpMethod.GET, request, User.class);
         assertEquals(HttpStatus.NO_CONTENT, responseTwo.getStatusCode());
     }
 

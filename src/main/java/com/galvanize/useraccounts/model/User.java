@@ -58,7 +58,7 @@ public class User {
 
     public User() {}
 
-    public User(String username, String password, String firstName, String lastName,  String email) {
+    public User(String username, @NotBlank String password, String firstName, String lastName,  String email) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -126,11 +126,10 @@ public class User {
     }
 
     @JsonProperty
-    public void setPassword(String password) {
-        if (password.length() == 0) {
-            throw new NullPointerException("Password cant be empty");
-        }
-
+    public void setPassword(@NotBlank String password) {
+//        if (password.length() == 0) {
+//            throw new NullPointerException("Password cant be empty");
+//        }
         this.password = password;
     }
 
