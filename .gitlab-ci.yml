@@ -2,8 +2,8 @@ image: adoptopenjdk:11
 
 stages:
   - build
-#  - test
-#  - coverage
+  - test
+  - coverage
   - docker
   - deploy
 
@@ -20,36 +20,36 @@ build:
       - build/classes/java/
       - build/libs/*.jar
 
-#test:
-#  stage: test
-#  needs:
-#    - build
-#  script:
-#    ./gradlew test
-#  artifacts:
-#    paths:
-#      - build/test-results/test/TEST*.xml
-#
-#coverage:
-#  image: adoptopenjdk:11
-#  needs:
-#    - build
-#    - test
-#  stage: coverage
-#  script:
-#    - ./gradlew jacocoTestReport
-#    - ./gradlew jacocoTestCoverageVerification
-#  allow_failure: true
-#  artifacts:
-#    when: always
-#    paths:
-#      - build/reports/jacoco/
+test:
+  stage: test
+  needs:
+    - build
+  script:
+    ./gradlew test
+  artifacts:
+    paths:
+      - build/test-results/test/TEST*.xml
+
+coverage:
+  image: adoptopenjdk:11
+  needs:
+    - build
+    - test
+  stage: coverage
+  script:
+    - ./gradlew jacocoTestReport
+    - ./gradlew jacocoTestCoverageVerification
+  allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - build/reports/jacoco/
 
 docker:
   needs:
     - build
-#    - test
-#    - coverage
+    - test
+    - coverage
   stage: docker
   image: docker:latest
   services:
@@ -67,9 +67,9 @@ deploy:
   stage: deploy
   needs:
      - docker
-#  rules:
-#    - if: '$CI_COMMIT_BRANCH == "main"'
-#      when: always
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
   image: registry.gitlab.com/galv-vmw-apr-2021/capstone/base-aws-eks-image:latest
   before_script:
     - export IMAGE="$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
