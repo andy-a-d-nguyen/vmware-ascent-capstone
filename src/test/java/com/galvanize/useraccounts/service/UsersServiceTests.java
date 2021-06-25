@@ -139,32 +139,6 @@ public class UsersServiceTests {
     }
 
     @Test
-    void setAvatar_withIDAndURL_returnsUser() {
-        User user = users.get(0);
-        String url = "https://myavatar.com";
-        user.setAvatar(url);
-
-        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(usersRepository.save(any(User.class))).thenReturn(user);
-
-        User updatedUser = usersService.setAvatar(user.getId(), url);
-
-        assertEquals(url, updatedUser.getAvatar());
-        assertEquals(user.getUpdatedAt(), updatedUser.getUpdatedAt());
-    }
-
-    @Test
-    void setAvatar_withIDAndURL_returnsNoContent() {
-        String url = "https://myavatar.com";
-
-        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        User updatedUser = usersService.setAvatar(12345L, url);
-
-        assertNull(updatedUser);
-    }
-
-    @Test
     void getUser_withID_returnsUser() {
         User user = users.get(0);
 
@@ -194,7 +168,7 @@ public class UsersServiceTests {
         user.setLastName("Nguyen");
         user.setEmail("andynguyen@gmail.com");
 
-        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified(), user.getAvatar());
 
         when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(usersRepository.save(any(User.class))).thenReturn(user);
@@ -207,13 +181,14 @@ public class UsersServiceTests {
         assertEquals(user.isVerified(), updatedUser.isVerified());
         assertEquals(user.getCreatedAt(), updatedUser.getCreatedAt());
         assertEquals(user.getUpdatedAt(), updatedUser.getUpdatedAt());
+        assertEquals(user.getAvatar(), updatedUser.getAvatar());
     }
 
     @Test
     void updateUser_withIDAndBody_returnsNoContent() {
         User user = users.get(0);
 
-        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified());
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified(), user.getAvatar());
 
         when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
 

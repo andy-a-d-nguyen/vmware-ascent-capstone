@@ -9,16 +9,18 @@ public class UserRequest {
 
     private String creditCard;
     private boolean verified;
+    private String avatar;
 
     public UserRequest() {}
 
-    public UserRequest(String firstName, String lastName, String password, String email, String creditCard, boolean verified) {
+    public UserRequest(String firstName, String lastName, String password, String email, String creditCard, boolean verified, String avatar) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
         this.creditCard = creditCard;
         this.verified = verified;
+        this.avatar = avatar;
     }
 
     public String getFirstName() {
@@ -67,5 +69,13 @@ public class UserRequest {
 
     public void setVerified(boolean verified) {
         this.verified = verified;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class UserRequestTest {
     @MockBean
@@ -11,7 +12,7 @@ public class UserRequestTest {
 
     @Test
     void setMethods_work (){
-        UserRequest userRequest = new UserRequest("Bob", "baker", "password123", "bobbaker@gmail.com",  "ajdsfkl12312", true);
+        UserRequest userRequest = new UserRequest("Bob", "baker", "password123", "bobbaker@gmail.com",  "ajdsfkl12312", true, "myavatar.com");
 
         userRequest.setFirstName("Sally");
         userRequest.setLastName("Smith");
@@ -19,6 +20,7 @@ public class UserRequestTest {
         userRequest.setEmail("ajskfdl@gmail.com");
         userRequest.setCreditCard("asdfjk12123");
         userRequest.setVerified(false);
+        userRequest.setAvatar(null);
 
         assertEquals("Sally", userRequest.getFirstName());
         assertEquals("Smith", userRequest.getLastName());
@@ -26,7 +28,6 @@ public class UserRequestTest {
         assertEquals("ajskfdl@gmail.com", userRequest.getEmail());
         assertEquals("asdfjk12123", userRequest.getCreditCard());
         assertEquals(false, userRequest.isVerified());
-
-
+        assertNull(userRequest.getAvatar());
     }
 }
