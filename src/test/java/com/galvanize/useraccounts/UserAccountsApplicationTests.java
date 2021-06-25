@@ -444,7 +444,7 @@ class UserAccountsApplicationTests {
 
         ResponseEntity <User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_ACCEPTABLE, response.getStatusCode());
     }
 
     @Test
@@ -460,7 +460,7 @@ class UserAccountsApplicationTests {
 
         ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_ACCEPTABLE, response.getStatusCode());
     }
 
 

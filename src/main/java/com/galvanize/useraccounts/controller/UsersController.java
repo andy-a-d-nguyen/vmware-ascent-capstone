@@ -118,21 +118,4 @@ public class UsersController {
 
         return users == null || users.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(users);
     }
-
-
-    @ExceptionHandler()
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void userNotFoundException(UserNotFoundException exception) {
-    }
-
-    @ExceptionHandler()
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addressNotFoundException(AddressNotFoundException exception) {
-    }
-
-    @ExceptionHandler()
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public void invalidAddressException(InvalidAddressException exception) {
-    }
-
 }
