@@ -403,7 +403,7 @@ public class UsersServiceTests {
     }
 
     @Test
-    void getUser_withID_returnsUserCondensed() {
+    void getUserCondensed_withID_returnsUserCondensed() {
         User user = new User("user", "password123", "John", "Smith", "jsmith@gmail.com");
         user.setId(5L);
 
@@ -415,5 +415,15 @@ public class UsersServiceTests {
         assertEquals(user.getUsername(), foundUser.getUsername());
         assertEquals(user.getAvatar(), foundUser.getAvatar());
         assertEquals(user.getEmail(), foundUser.getEmail());
+    }
+
+    @Test
+    void getUserCondensed_withID_returnsNoContent() {
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+        
+        assertThatExceptionOfType(UserNotFoundException.class)
+            .isThrownBy(() -> {
+                usersService.getUserCondensed(12345L);
+            });
     }
 }

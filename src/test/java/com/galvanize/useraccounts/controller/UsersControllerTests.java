@@ -384,7 +384,7 @@ public class UsersControllerTests {
    @Test
    public void showUser_returnsIDUsernameAvatarEmail() throws Exception {
        UserCondensed user = new UserCondensed(1L, "bakerBob", "myavatar.com", "bakerBob@gmail.com");
-       
+
        when(usersService.getUserCondensed(anyLong())).thenReturn(user);
 
        mockMvc.perform(get("/api/users/" + user.getId() + "/condensed").header("Authorization", token))
@@ -397,15 +397,9 @@ public class UsersControllerTests {
 
     @Test
     public void showUser_returnsUserCondensedNoContent() throws Exception {
-        UserCondensed user = new UserCondensed(1L, "bakerBob", "myavatar.com", "bakerBob@gmail.com");
+        when(usersService.getUserCondensed(anyLong())).thenReturn(null);
 
-        when(usersService.getUserCondensed(anyLong())).thenReturn(user);
-
-        mockMvc.perform(get("/api/users/" + user.getId() + "/condensed").header("Authorization", token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("id").value(user.getId()))
-                .andExpect(jsonPath("username").value(user.getUsername()))
-                .andExpect(jsonPath("avatar").value(user.getAvatar()))
-                .andExpect(jsonPath("email").value(user.getEmail()));
+        mockMvc.perform(get("/api/users/123243/condensed").header("Authorization", token))
+                .andExpect(status().isNoContent());
     }
 }

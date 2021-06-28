@@ -535,7 +535,7 @@ class UserAccountsApplicationTests {
 
 
     @Test
-    void getUser_withID_returnsUserCondensed() {
+    void getUserCondensed_withID_returnsUserCondensed() {
         User user = users.get(0);
 
         String uri = "/api/users/" + user.getId() + "/condensed";
@@ -552,6 +552,20 @@ class UserAccountsApplicationTests {
         assertEquals(user.getUsername(), response.getBody().getUsername());
         assertEquals(user.getAvatar(), response.getBody().getAvatar());
         assertEquals(user.getEmail(), response.getBody().getEmail());
+    }
+
+    @Test
+    void getUserCondensed_withID_returnsNoContent() {
+        String uri = "/api/users/12345/condensed";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<UserCondensed> response = restTemplate.exchange(uri, HttpMethod.GET, request, UserCondensed.class);
+
+        assertEquals(HttpStatus.NOT_ACCEPTABLE, response.getStatusCode());
     }
 
 }
