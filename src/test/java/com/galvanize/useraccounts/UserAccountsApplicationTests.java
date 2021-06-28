@@ -5,9 +5,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.model.UserCondensed;
 import com.galvanize.useraccounts.repository.AddressRepository;
 import com.galvanize.useraccounts.repository.UsersRepository;
-import com.galvanize.useraccounts.request.UserAvatarRequest;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
 import io.jsonwebtoken.Jwts;
@@ -225,7 +225,7 @@ class UserAccountsApplicationTests {
 
         String uri = "/api/users/" + user.getId();
 
-        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified(), user.getAvatar());
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getBio(), user.isVerified(), user.getAvatar());
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
@@ -239,7 +239,7 @@ class UserAccountsApplicationTests {
         assertThat(response.getBody().getFirstName()).isEqualTo(request.getFirstName());
         assertThat(response.getBody().getLastName()).isEqualTo(request.getLastName());
         assertThat(response.getBody().getEmail()).isEqualTo(request.getEmail());
-        assertThat(response.getBody().getCreditCard()).isEqualTo(request.getCreditCard());
+        assertThat(response.getBody().getBio()).isEqualTo(request.getBio());
         assertThat(response.getBody().isVerified()).isEqualTo(request.isVerified());
         assertThat(response.getBody().getAvatar()).isEqualTo(request.getAvatar());
 
@@ -253,7 +253,7 @@ class UserAccountsApplicationTests {
 
         String uri = "/api/users/" + 1234L;
 
-        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified(), user.getAvatar());
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getBio(), user.isVerified(), user.getAvatar());
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
@@ -534,5 +534,24 @@ class UserAccountsApplicationTests {
     }
 
 
+    @Test
+    void getUser_withID_returnsUserCondensed() {
+        User user = users.get(0);
+
+        String uri = "/api/users/" + user.getId() + "/condensed";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<UserCondensed> response = restTemplate.exchange(uri, HttpMethod.GET, request, UserCondensed.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(user.getId(), response.getBody().getId());
+        assertEquals(user.getUsername(), response.getBody().getUsername());
+        assertEquals(user.getAvatar(), response.getBody().getAvatar());
+        assertEquals(user.getEmail(), response.getBody().getEmail());
+    }
 
 }

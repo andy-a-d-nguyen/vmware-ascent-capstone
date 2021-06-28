@@ -3,6 +3,7 @@ package com.galvanize.useraccounts.controller;
 import com.galvanize.useraccounts.UsersList;
 import com.galvanize.useraccounts.exception.*;
 import com.galvanize.useraccounts.model.Address;
+import com.galvanize.useraccounts.model.UserCondensed;
 import com.galvanize.useraccounts.request.UserAvatarRequest;
 import com.galvanize.useraccounts.service.AddressesService;
 import com.galvanize.useraccounts.service.UsersService;
@@ -119,4 +120,12 @@ public class UsersController {
 
         return users == null || users.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(users);
     }
+
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @GetMapping("/users/{id}/condensed")
+    public ResponseEntity<UserCondensed> getUserCondensed(@PathVariable Long id) {
+        UserCondensed user = usersService.getUserCondensed(id);
+        return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
+    }    
+    
 }

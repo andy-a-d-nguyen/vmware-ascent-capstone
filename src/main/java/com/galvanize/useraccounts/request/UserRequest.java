@@ -7,18 +7,18 @@ public class UserRequest {
     private String password;
     private String email;
 
-    private String creditCard;
+    private String bio;
     private boolean verified;
     private String avatar;
 
     public UserRequest() {}
 
-    public UserRequest(String firstName, String lastName, String password, String email, String creditCard, boolean verified, String avatar) {
+    public UserRequest(String firstName, String lastName, String password, String email, String bio, boolean verified, String avatar) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
-        this.creditCard = creditCard;
+        this.bio = bio;
         this.verified = verified;
         this.avatar = avatar;
     }
@@ -55,12 +55,12 @@ public class UserRequest {
         this.email = email;
     }
 
-    public String getCreditCard() {
-        return creditCard;
+    public String getBio() {
+        return bio;
     }
 
-    public void setCreditCard(String creditCard) {
-        this.creditCard = creditCard;
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public boolean isVerified() {

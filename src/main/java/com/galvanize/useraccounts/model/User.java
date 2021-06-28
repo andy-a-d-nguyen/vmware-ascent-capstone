@@ -47,7 +47,7 @@ public class User {
     @Size(max = 30, message="Email should not be greater than 30.")
     private String email;
 
-    private String creditCard;
+    private String bio;
     private boolean verified;
 
     @CreationTimestamp
@@ -143,12 +143,12 @@ public class User {
 
 
 
-    public String getCreditCard() {
-        return creditCard;
+    public String getBio() {
+        return bio;
     }
 
-    public void setCreditCard(String creditCard) {
-        this.creditCard = creditCard;
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public boolean isVerified() {
