@@ -2,15 +2,14 @@ package com.galvanize.useraccounts.service;
 
 import com.galvanize.useraccounts.exception.AddressNotFoundException;
 import com.galvanize.useraccounts.exception.DuplicateUserException;
-import com.galvanize.useraccounts.exception.InvalidAddressException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.model.UserCondensed;
 import com.galvanize.useraccounts.repository.AddressRepository;
 import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
-import com.galvanize.useraccounts.service.UsersService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -168,7 +167,7 @@ public class UsersServiceTests {
         user.setLastName("Nguyen");
         user.setEmail("andynguyen@gmail.com");
 
-        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified(), user.getAvatar());
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getBio(), user.isVerified(), user.getAvatar());
 
         when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(usersRepository.save(any(User.class))).thenReturn(user);
@@ -188,7 +187,7 @@ public class UsersServiceTests {
     void updateUser_withIDAndBody_returnsNoContent() {
         User user = users.get(0);
 
-        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getCreditCard(), user.isVerified(), user.getAvatar());
+        UserRequest request = new UserRequest("Andy", "Nguyen", user.getPassword(), "andynguyen@gmail.com", user.getBio(), user.isVerified(), user.getAvatar());
 
         when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -401,5 +400,30 @@ public class UsersServiceTests {
                 .isThrownBy(() -> {
                     usersService.deleteAddress(1L, 18L);
                 });
+    }
+
+    @Test
+    void getUserCondensed_withID_returnsUserCondensed() {
+        User user = new User("user", "password123", "John", "Smith", "jsmith@gmail.com");
+        user.setId(5L);
+
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        UserCondensed foundUser = usersService.getUserCondensed(user.getId());
+
+        assertEquals(user.getId(), foundUser.getId());
+        assertEquals(user.getUsername(), foundUser.getUsername());
+        assertEquals(user.getAvatar(), foundUser.getAvatar());
+        assertEquals(user.getEmail(), foundUser.getEmail());
+    }
+
+    @Test
+    void getUserCondensed_withID_returnsNoContent() {
+        when(usersRepository.findById(anyLong())).thenReturn(Optional.empty());
+        
+        assertThatExceptionOfType(UserNotFoundException.class)
+            .isThrownBy(() -> {
+                usersService.getUserCondensed(12345L);
+            });
     }
 }

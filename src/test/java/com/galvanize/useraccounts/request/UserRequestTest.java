@@ -18,7 +18,7 @@ public class UserRequestTest {
         userRequest.setLastName("Smith");
         userRequest.setPassword("121password");
         userRequest.setEmail("ajskfdl@gmail.com");
-        userRequest.setCreditCard("asdfjk12123");
+        userRequest.setBio("asdfjk12123");
         userRequest.setVerified(false);
         userRequest.setAvatar(null);
 
@@ -26,7 +26,7 @@ public class UserRequestTest {
         assertEquals("Smith", userRequest.getLastName());
         assertEquals("121password", userRequest.getPassword());
         assertEquals("ajskfdl@gmail.com", userRequest.getEmail());
-        assertEquals("asdfjk12123", userRequest.getCreditCard());
+        assertEquals("asdfjk12123", userRequest.getBio());
         assertEquals(false, userRequest.isVerified());
         assertNull(userRequest.getAvatar());
     }

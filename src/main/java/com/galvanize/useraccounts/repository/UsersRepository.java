@@ -1,6 +1,7 @@
 package com.galvanize.useraccounts.repository;
 
 import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.model.UserCondensed;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,6 +23,4 @@ public interface UsersRepository extends JpaRepository<User, Long> {
 
     @Query(nativeQuery=true, value="SELECT * FROM users WHERE id = ?")
     Optional<User> findById(Long id);
-
-
 }

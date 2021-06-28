@@ -5,16 +5,15 @@ import com.galvanize.useraccounts.exception.*;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
 
+import com.galvanize.useraccounts.model.UserCondensed;
 import com.galvanize.useraccounts.repository.AddressRepository;
 import com.galvanize.useraccounts.repository.UsersRepository;
 import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.stereotype.Service;
 
 
-import javax.swing.text.html.Option;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -58,7 +57,7 @@ public class UsersService {
             user.setFirstName(updatedUser.getFirstName());
             user.setLastName(updatedUser.getLastName());
             user.setEmail(updatedUser.getEmail());
-            user.setCreditCard(updatedUser.getCreditCard());
+            user.setBio(updatedUser.getBio());
             user.setVerified(updatedUser.isVerified());
             user.setAvatar(updatedUser.getAvatar());
             return usersRepository.save(user);
@@ -161,4 +160,16 @@ public class UsersService {
         }
     }
 
+    public UserCondensed getUserCondensed(Long id) {
+        Optional<User> oUser = usersRepository.findById(id);
+        UserCondensed user;
+
+        if (oUser.isPresent()) {
+            user = new UserCondensed(oUser.get().getId(), oUser.get().getUsername(), oUser.get().getAvatar(), oUser.get().getEmail());
+        } else {
+            throw new UserNotFoundException();
+        }
+
+        return user;
+    }
 }

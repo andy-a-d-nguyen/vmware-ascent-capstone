@@ -5,6 +5,7 @@ import com.galvanize.useraccounts.UsersList;
 import com.galvanize.useraccounts.exception.*;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.User;
+import com.galvanize.useraccounts.model.UserCondensed;
 import com.galvanize.useraccounts.request.UserAvatarRequest;
 import com.galvanize.useraccounts.request.UserPasswordRequest;
 import com.galvanize.useraccounts.request.UserRequest;
@@ -379,4 +380,26 @@ public class UsersControllerTests {
                 .andExpect(jsonPath("createdAt").exists())
                 .andExpect(jsonPath("updatedAt").exists());
    }
+
+   @Test
+   public void showUser_returnsIDUsernameAvatarEmail() throws Exception {
+       UserCondensed user = new UserCondensed(1L, "bakerBob", "myavatar.com", "bakerBob@gmail.com");
+
+       when(usersService.getUserCondensed(anyLong())).thenReturn(user);
+
+       mockMvc.perform(get("/api/users/" + user.getId() + "/condensed").header("Authorization", token))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("id").value(user.getId()))
+               .andExpect(jsonPath("username").value(user.getUsername()))
+               .andExpect(jsonPath("avatar").value(user.getAvatar()))
+               .andExpect(jsonPath("email").value(user.getEmail()));
+   }
+
+    @Test
+    public void showUser_returnsUserCondensedNoContent() throws Exception {
+        when(usersService.getUserCondensed(anyLong())).thenReturn(null);
+
+        mockMvc.perform(get("/api/users/123243/condensed").header("Authorization", token))
+                .andExpect(status().isNoContent());
+    }
 }
