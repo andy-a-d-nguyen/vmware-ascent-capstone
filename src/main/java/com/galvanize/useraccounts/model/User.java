@@ -20,31 +20,33 @@ import java.sql.Timestamp;
 @Table(name = "users")
 public class User {
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message="Username cannot be null and trimmed length must be greater than zero.")
-    @Size(min = 5, max = 20, message="Username must have between 5-20 characters.")
+    private Long guid;
+
+    @NotBlank(message = "Username cannot be null and trimmed length must be greater than zero.")
+    @Size(min = 5, max = 20, message = "Username must have between 5-20 characters.")
     private String username;
 
-    @NotBlank(message="First name cannot be null and trimmed length must be greater than zero.")
+    @NotBlank(message = "First name cannot be null and trimmed length must be greater than zero.")
     private String firstName;
 
-    @NotBlank(message="Last name cannot be null and trimmed length must be greater than zero.")
+    @NotBlank(message = "Last name cannot be null and trimmed length must be greater than zero.")
     private String lastName;
 
     private String avatar;
 
-    private String password;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
 
     @Valid
     private List<Address> addresses = new ArrayList<>();
 
-    @NotBlank(message="Email cannot be null and trimmed length must be greater than zero.")
-    @Email(message="Email should be valid.")
-    @Size(max = 30, message="Email should not be greater than 30.")
+    @NotBlank(message = "Email cannot be null and trimmed length must be greater than zero.")
+    @Email(message = "Email should be valid.")
+    @Size(max = 30, message = "Email should not be greater than 30.")
     private String email;
 
     private String bio;
@@ -56,26 +58,27 @@ public class User {
     @UpdateTimestamp
     private Timestamp updatedAt;
 
-    public User() {}
+    public User() {
+    }
 
-    public User(String username, @Valid @NotBlank String password, String firstName, String lastName,  String email) {
+    public User(Long guid, String username, String firstName, String lastName, String email) {
+        this.guid = guid;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = password;
         this.email = email;
     }
 
-    public User(String username, String password, String firstName, String lastName,  String email, List<Address> addresses) {
+    public User(Long guid, String username, String firstName, String lastName, String email, List<Address> addresses) {
+        this.guid = guid;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = password;
         this.email = email;
         this.addresses = addresses;
     }
 
-    public void addAddress(Address address){
+    public void addAddress(Address address) {
         this.addresses.add(address);
         address.setUser(this);
     }
@@ -120,17 +123,12 @@ public class User {
         this.username = username;
     }
 
-    @JsonIgnore
-    public String getPassword() {
-        return password;
+    public Long getGuid() {
+        return guid;
     }
 
-    @JsonProperty
-    public void setPassword(@Valid @NotBlank String password) {
-//        if (password.length() == 0) {
-//            throw new NullPointerException("Password cant be empty");
-//        }
-        this.password = password;
+    public void setGuid(Long guid) {
+        this.guid = guid;
     }
 
     public String getEmail() {
@@ -140,7 +138,6 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
-
 
 
     public String getBio() {
@@ -167,7 +164,6 @@ public class User {
     public void setAddresses(List<Address> addresses) {
         this.addresses = addresses;
     }
-
 
     public Timestamp getCreatedAt() {
         return createdAt;

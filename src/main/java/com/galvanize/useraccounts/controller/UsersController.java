@@ -5,6 +5,7 @@ import com.galvanize.useraccounts.exception.*;
 import com.galvanize.useraccounts.model.Address;
 import com.galvanize.useraccounts.model.UserCondensed;
 import com.galvanize.useraccounts.request.UserAvatarRequest;
+import com.galvanize.useraccounts.security.JwtUser;
 import com.galvanize.useraccounts.service.AddressesService;
 import com.galvanize.useraccounts.service.UsersService;
 import com.galvanize.useraccounts.model.User;
@@ -13,6 +14,7 @@ import com.galvanize.useraccounts.request.UserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -40,74 +42,57 @@ public class UsersController {
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    @PatchMapping("/users/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody UserRequest updatedUser) throws InvalidUserException {
-        User user = usersService.updateUser(id, updatedUser);
+    @PatchMapping("/users/{guid}")
+    public ResponseEntity<User> update(@PathVariable Long guid, @RequestBody UserRequest updatedUser, @AuthenticationPrincipal JwtUser jwtUser) throws InvalidUserException {
+        User user = usersService.updateUser(guid, updatedUser);
+        // compare jwt user with user's guid
+        // not same, invalid
 
         return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_USER')")
-    @PatchMapping("/users/{id}/reset")
-    public ResponseEntity<Boolean> update(@PathVariable Long id, @RequestBody UserPasswordRequest updatedUserPassword) throws InvalidUserException {
-        Boolean isUpdated = usersService.updateUserPassword(id, updatedUserPassword.getOldPassword(), updatedUserPassword.getNewPassword());
-
-        return !isUpdated ? ResponseEntity.noContent().build() : ResponseEntity.ok().build();
-    }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity deleteUser(@PathVariable Long id) {
+    @DeleteMapping("/users/{guid}")
+    public ResponseEntity deleteUser(@PathVariable Long guid) {
         try {
-            usersService.deleteUser(id);
-        } catch(UserNotFoundException e) {
+            usersService.deleteUser(guid);
+        } catch (UserNotFoundException e) {
             return ResponseEntity.noContent().build();
         }
-        
+
         return ResponseEntity.accepted().build();
 
     }
 
-//    @PreAuthorize("hasAuthority('ROLE_USER')")
-//    @PatchMapping("/users/{id}")
-//    public ResponseEntity<User> setAvatar(@PathVariable Long id, @RequestBody UserAvatarRequest userAvatarRequest) {
-//        User user =  usersService.setAvatar(id, userAvatarRequest.getUrl());
-//
-//        if (user != null) {
-//            return ResponseEntity.ok(user);
-//        } else {
-//            return ResponseEntity.noContent().build();
-//        }
-//    }
-
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    @GetMapping("/users/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        User user = usersService.getUser(id);
+    @GetMapping("/users/{guid}")
+    public ResponseEntity<User> getUser(@PathVariable Long guid) {
+        User user = usersService.getUser(guid);
         return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
     }
 
     /*Addresses*/
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    @PostMapping("/users/{userId}/addresses")
-    public User createAddress(@PathVariable Long userId, @Validated @RequestBody Address address) {
-           return usersService.addAddress(userId, address);
+    @PostMapping("/users/{guid}/addresses")
+    public User createAddress(@PathVariable Long guid, @Validated @RequestBody Address address) {
+        return usersService.addAddress(guid, address);
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    @PatchMapping("/users/{userId}/addresses/{addressId}")
-    public ResponseEntity<User> updateAddress (@PathVariable Long userId, @PathVariable Long addressId, @Valid @RequestBody Address address) throws UserNotFoundException, InvalidAddressException {
-        User updatedUser = usersService.updateAddress(userId, addressId, address);
+    @PatchMapping("/users/{guid}/addresses/{addressId}")
+    public ResponseEntity<User> updateAddress(@PathVariable Long guid, @PathVariable Long addressId, @Valid @RequestBody Address address) throws UserNotFoundException, InvalidAddressException {
+        User updatedUser = usersService.updateAddress(guid, addressId, address);
         return updatedUser == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedUser);
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    @DeleteMapping("/users/{userId}/addresses/{addressId}")
-    public ResponseEntity deleteAddress(@PathVariable Long userId, @PathVariable Long addressId) {
+    @DeleteMapping("/users/{guid}/addresses/{addressId}")
+    public ResponseEntity deleteAddress(@PathVariable Long guid, @PathVariable Long addressId) {
         try {
-          usersService.deleteAddress(userId, addressId);
-        } catch(AddressNotFoundException e) {
+            usersService.deleteAddress(guid, addressId);
+        } catch (AddressNotFoundException e) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.accepted().build();
@@ -122,10 +107,10 @@ public class UsersController {
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    @GetMapping("/users/{id}/condensed")
-    public ResponseEntity<UserCondensed> getUserCondensed(@PathVariable Long id) {
-        UserCondensed user = usersService.getUserCondensed(id);
+    @GetMapping("/users/{guid}/condensed")
+    public ResponseEntity<UserCondensed> getUserCondensed(@PathVariable Long guid) {
+        UserCondensed user = usersService.getUserCondensed(guid);
         return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
-    }    
-    
+    }
+
 }

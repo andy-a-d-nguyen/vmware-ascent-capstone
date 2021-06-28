@@ -40,7 +40,7 @@ public class AddressesServiceTests {
     void setup() {
         addressesService = new AddressesService(addressRepository);
         usersService = new UsersService(usersRepository, addressRepository);
-        user = new User("bakerBob", "password123", "bob","baker", "bakerBob@gmail.com");
+        user = new User(1L, "bakerBob", "bob", "baker", "bakerBob@gmail.com");
         user.setId(1L);
     }
 
