@@ -34,14 +34,14 @@ public class UsersService {
         if (foundUser.isPresent() || foundUserEmail.isPresent()) {
             throw new DuplicateUserException();
         }
-            //this sets up the one to many relationship between user and addresses
-            user.getAddresses().forEach( address -> address.setUser(user));
-        
-            return usersRepository.save(user);
+        //this sets up the one to many relationship between user and addresses
+        user.getAddresses().forEach(address -> address.setUser(user));
+
+        return usersRepository.save(user);
     }
 
-    public void deleteUser(Long id) {
-        Optional<User> user = usersRepository.findById(id);
+    public void deleteUser(Long guid) {
+        Optional<User> user = usersRepository.findByGuid(guid);
 
         if (user.isPresent()) {
             usersRepository.delete(user.get());
@@ -50,8 +50,8 @@ public class UsersService {
         }
     }
 
-    public User updateUser(Long id, UserRequest updatedUser) {
-        User user = getUser(id);
+    public User updateUser(Long guid, UserRequest updatedUser) {
+        User user = getUser(guid);
 
         if (user != null) {
             user.setFirstName(updatedUser.getFirstName());
@@ -65,32 +65,10 @@ public class UsersService {
         return null;
     }
 
-    public User getUser(Long id) {
-        return usersRepository.findById(id).orElse(null);
+    public User getUser(Long guid) {
+        return usersRepository.findByGuid(guid).orElse(null);
     }
 
-    public Boolean updateUserPassword(Long id, String oldPassword, String newPassword) {
-        User user = getUser(id);
-
-        if (user != null && user.getPassword().equals(oldPassword)) {
-            user.setPassword(newPassword);
-            usersRepository.save(user);
-            return true;
-        }
-
-        return false;
-    }
-
-//    public User setAvatar(Long id, String url) {
-//        User user = getUser(id);
-//
-//        if (user != null) {
-//            user.setAvatar(url);
-//            return usersRepository.save(user);
-//        }
-//
-//        return null;
-//    }
 
     public UsersList searchUsers(String username) {
         if (username == null) username = "";
@@ -100,8 +78,8 @@ public class UsersService {
         return users.isEmpty() ? null : users;
     }
 
-    public User addAddress(Long userId, Address address) {
-        Optional<User> user = usersRepository.findById(userId);
+    public User addAddress(Long userGuid, Address address) {
+        Optional<User> user = usersRepository.findByGuid(userGuid);
 
         user.ifPresent(u -> u.addAddress(address));
 
@@ -113,8 +91,8 @@ public class UsersService {
         }
     }
 
-    public User updateAddress(Long userId, Long addressId, Address address) {
-        Optional<User> oUser = usersRepository.findById(userId);
+    public User updateAddress(Long userGuid, Long addressId, Address address) {
+        Optional<User> oUser = usersRepository.findByGuid(userGuid);
         Optional<Address> oAddress = addressRepository.findById(addressId);
         if (oUser.isPresent()) {
             //int doesNotWork = oUser.get().getAddresses().indexOf(oAddress);
@@ -138,8 +116,8 @@ public class UsersService {
         }
     }
 
-    public void deleteAddress(Long userId, Long addressId) {
-        Optional<User> oUser = usersRepository.findById(userId);
+    public void deleteAddress(Long userGuid, Long addressId) {
+        Optional<User> oUser = usersRepository.findByGuid(userGuid);
         Optional<Address> oAddress = addressRepository.findById(addressId);
         if (oUser.isPresent()) {
             int oAddressIndex = IntStream.range(0, oUser.get().getAddresses().size())
@@ -160,12 +138,12 @@ public class UsersService {
         }
     }
 
-    public UserCondensed getUserCondensed(Long id) {
-        Optional<User> oUser = usersRepository.findById(id);
+    public UserCondensed getUserCondensed(Long guid) {
+        Optional<User> oUser = usersRepository.findByGuid(guid);
         UserCondensed user;
 
         if (oUser.isPresent()) {
-            user = new UserCondensed(oUser.get().getId(), oUser.get().getUsername(), oUser.get().getAvatar(), oUser.get().getEmail());
+            user = new UserCondensed(oUser.get().getGuid(), oUser.get().getUsername(), oUser.get().getAvatar(), oUser.get().getEmail());
         } else {
             throw new UserNotFoundException();
         }

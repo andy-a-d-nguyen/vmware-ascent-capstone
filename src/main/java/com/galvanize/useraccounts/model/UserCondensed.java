@@ -16,26 +16,27 @@ import java.util.List;
 
 public class UserCondensed {
 
-    private Long id;
+    private Long guid;
     private String username;
     private String avatar;
     private String email;
 
-    public UserCondensed() {}
-    
-    public UserCondensed(Long id, String username, String avatar, String email) {
-        this.id = id;
+    public UserCondensed() {
+    }
+
+    public UserCondensed(Long guid, String username, String avatar, String email) {
+        this.guid = guid;
         this.username = username;
         this.avatar = avatar;
         this.email = email;
     }
 
-    public Long getId() {
-        return id;
+    public Long getGuid() {
+        return guid;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setGuid(Long id) {
+        this.guid = id;
     }
 
     public String getUsername() {
@@ -61,5 +62,7 @@ public class UserCondensed {
     public void setEmail(String email) {
         this.email = email;
     }
+
+
 }
 

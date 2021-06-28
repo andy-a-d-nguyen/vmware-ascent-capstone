@@ -12,15 +12,17 @@ import java.util.Optional;
 @Repository
 public interface UsersRepository extends JpaRepository<User, Long> {
 
-    @Query(nativeQuery=true, value="SELECT * FROM users WHERE LOWER(username) LIKE LOWER(?)")
+    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE LOWER(username) LIKE LOWER(?)")
     List<User> findByUsername(String username);
 
-    @Query(nativeQuery=true, value="SELECT * FROM users WHERE username = ?")
+    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE username = ?")
     Optional<User> findByUsernameExactMatch(String username);
 
-    @Query(nativeQuery=true, value="SELECT * FROM users WHERE email = ?")
+    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE email = ?")
     Optional<User> findByEmailExactMatch(String email);
 
-    @Query(nativeQuery=true, value="SELECT * FROM users WHERE id = ?")
-    Optional<User> findById(Long id);
+    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE guid = ?")
+    Optional<User> findByGuid(Long guid);
+    
+
 }

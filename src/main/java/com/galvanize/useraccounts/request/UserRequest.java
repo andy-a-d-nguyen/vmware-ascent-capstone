@@ -4,19 +4,18 @@ public class UserRequest {
 
     private String firstName;
     private String lastName;
-    private String password;
     private String email;
 
     private String bio;
     private boolean verified;
     private String avatar;
 
-    public UserRequest() {}
+    public UserRequest() {
+    }
 
-    public UserRequest(String firstName, String lastName, String password, String email, String bio, boolean verified, String avatar) {
+    public UserRequest(String firstName, String lastName, String email, String bio, boolean verified, String avatar) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = password;
         this.email = email;
         this.bio = bio;
         this.verified = verified;
@@ -37,14 +36,6 @@ public class UserRequest {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {
