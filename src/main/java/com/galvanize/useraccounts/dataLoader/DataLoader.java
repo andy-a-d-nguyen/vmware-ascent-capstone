@@ -12,7 +12,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.print.attribute.standard.Media;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static org.aspectj.runtime.internal.Conversions.intValue;
 
@@ -29,7 +31,7 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
+        seedUserData();
     }
 
     private void seedUserData() {
@@ -43,7 +45,28 @@ public class DataLoader implements CommandLineRunner {
             }
         }
 
-        //CREATE USER
+        List<Address> addresses = new ArrayList<>();
+
+        // CREATE ADDRESSES
+        String[] streets = {"123 Baker Ave", "12356 Croissant Lane", "54326 Cookie Street", "233 Sesame Street", "22 Jump Street"};
+        String[] cities = {"San Francisco", "San Jose", "Austin", "New York", "Denver", "Boston", "Mountain View", "Palo Alto", "Seattle", "Atlanta"};
+        String[] states = {"CA", "TX", "NY", "GA", "CO"};
+        String[] labels = {"home", "work", "mom's place", "pop's place"};
+
+        Random random = new Random();
+
+        for (int i = 0; i < streets.length; i++) {
+            String zipcode = null;
+
+            for (int j = 0; j < 5; j++) {
+                zipcode.concat(String.valueOf(random.nextInt(9)));
+            }
+
+            Address address = new Address(streets[random.nextInt(streets.length)], cities[random.nextInt(cities.length)], states[random.nextInt(states.length)], zipcode, String.valueOf(random.nextInt(50) + 10), labels[random.nextInt(labels.length)]);
+            addresses.add(address);
+        }
+
+        // CREATE USER
         List<String> names = new ArrayList<>();
         names.add("Bob Smith");
         names.add("Jane Doe");
@@ -57,60 +80,26 @@ public class DataLoader implements CommandLineRunner {
         names.add("Jack Sparrow");
 
         for (int i = 0; i < names.size(); i++) {
-            User userToAdd = new User(Long.valueOf(i),
-                    names.get(i).split(" ")[0] + "user",
-                    names.get(i).split(" ")[0],
-                    names.get(i).split(" ")[1],
-                    names.get(i).split(" ")[0] + "@email.com"
-            );
+            User userToAdd;
+
+            if (random.nextInt(10) % 2 == 0) {
+                userToAdd = new User(Long.valueOf(i),
+                        names.get(i).split(" ")[0] + i + "user",
+                        names.get(i).split(" ")[0],
+                        names.get(i).split(" ")[1],
+                        names.get(i).split(" ")[0] + "@email.com"
+                );
+            } else {
+                userToAdd = new User(Long.valueOf(i),
+                        names.get(i).split(" ")[0] + i + "user",
+                        names.get(i).split(" ")[0],
+                        names.get(i).split(" ")[1],
+                        names.get(i).split(" ")[0] + "@email.com",
+                        Arrays.asList(addresses.get(random.nextInt(addresses.size())))
+                );
+            }
+
             usersRepository.save(userToAdd);
         }
-
-        /*
-        for(int i = 0; i < 70; i++) {
-            //CREATE TITLE
-            String title = loremIpsum.getParagraphs()[(int) Math.floor(Math.random() * 30)].split("\\. ")[0].substring(0, 25);
-
-            //CREATE BODY (every 3rd paragraph will have more than 255 characters)
-            String paragraph = loremIpsum.getParagraphs()[(int) Math.floor(Math.random() * 30)];
-            String body = i % 3 == 0 ? paragraph.substring(0, 250) + "." : paragraph.substring(0, 400) + ".";
-
-            //CREATE POST
-            Post post = new Post((long) Math.ceil(Math.random() * 10), body, title, Post.Visibility_status.PUBLIC);
-
-            //CREATE MEDIA
-            for(int j = 0; j < Math.floor(Math.random() * 5); j++) {
-                Media media = new Media("https://picsum.photos/id/" + (int) Math.ceil(100 + Math.random() * 50) + "/200", "alt text" + j, Media.Media_Type.IMAGE);
-                post.getMediaList().add(media);
-            }
-
-            //EVERY 5 POSTS WILL HAVE VIDEO URLS (1 or 2)
-            if(i % 5 == 0) {
-                for(int j = 0; j < Math.ceil(Math.random() * 2); j++) {
-                    Media media = new Media(videos.getVideos()[(int) Math.floor(Math.random() * 16)], "alt text" + i, Media.Media_Type.VIDEO);
-                    post.getMediaList().add(media);
-                }
-            }
-
-            List<Media> mediaList = post.getMediaList();
-            for (Media media : mediaList) {
-                media.setPost(post);
-                mediaRepository.save(media);
-            }
-
-            postRepository.save(post);
-        }
-
-        //ASSIGN TAGS TO POSTS. FOR SOME REASON I HAD TO PLACE THIS OUTSIDE THE PREVIOUS LOOP
-        //KEPT HAVE ISSUES WITH A DUPLICATE ERROR
-        for(int i = 0; i < 70; i++) {
-            Post post = postRepository.findById((long) i + 1).orElse(null);
-            for(int j = 0; j < Math.floor(Math.random() * 5); j++) {
-                post.addTag(tags.get((int) Math.floor(Math.random() * 30)));
-            }
-            postRepository.save(post);*/
     }
 }
-
-
-
