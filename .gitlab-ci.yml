@@ -78,7 +78,7 @@ deploy:
     - aws configure set region us-west-2
     - aws configure set output json
     - aws sts get-caller-identity
-    - aws eks update-kubeconfig --name "$TEST_CLUSTER_NAME"
+    - aws eks update-kubeconfig --name "$CLUSTER_NAME"
   script:
     - envsubst < deploy.yaml | kubectl apply -f -
     - kubectl apply -f service.yaml

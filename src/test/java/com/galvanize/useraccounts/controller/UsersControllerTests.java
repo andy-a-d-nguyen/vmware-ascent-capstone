@@ -362,7 +362,7 @@ public class UsersControllerTests {
         when(usersService.getUserCondensed(anyLong())).thenReturn(null);
 
         mockMvc.perform(get("/api/users/123243/condensed").header("Authorization", token))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNotAcceptable());
     }
 
    @Test

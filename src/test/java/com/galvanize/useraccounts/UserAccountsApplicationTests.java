@@ -309,23 +309,15 @@ class UserAccountsApplicationTests {
     void CreateUser_withValidAttr_withAddress_returnsUser() throws JsonProcessingException {
         String uri = "/api/users";
 
-        Address newAddress = new Address("test street", "test city", "test state", "00000", "test apt", "test label");
-        newAddress.setId(1L);
-        List<Address> addresses = new ArrayList<>();
-        addresses.add(newAddress);
-        User body = new User(1001L, "TestUsername3", "First3", "Last3", "email3@email.com", addresses);
-//        body.setId(1001L);
-
-//        body.setAddresses(addresses);
-        token = getUserToken("user", Arrays.asList("ROLE_USER"), body.getGuid());
+        String body = "{\"guid\":\"1009\", \"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\"}]}";
+        
+        token = getUserToken("user", Arrays.asList("ROLE_USER"), 1009L);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         headers.setBearerAuth(token);
 
         HttpEntity<?> postRequest = new HttpEntity<>(body, headers);
-
-//        ResponseEntity<User> response = restTemplate.postForEntity(uri, postRequest, User.class);
 
         ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.POST, postRequest, User.class);
 
