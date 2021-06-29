@@ -63,15 +63,15 @@ class UserAccountsApplicationTests {
         addresses.add(address2);
         addresses.add(address3);
 
-        User user1 = new User(1L, "bakerBob", "baker", "bob", "bakerBob1@gmail.com");
+        User user1 = new User(99L, "bakerBob", "baker", "bob", "bakerBob1@gmail.com");
         User user2 = new User(2L, "bobBobBob", "bob", "smith", "bakerBob2@gmail.com");
         User user3 = new User(3L, "bobBob", "bob", "bob", "bakerBob3@gmail.com");
         User user4 = new User(4L, "janeDoe", "jane", "doe", "janeDoe@gmail.com");
         User user5 = new User(5L, "buddydoggo", "buddy", "bud", "buddydog@gmail.com");
-        user5.addAddress(address1);
-        user5.addAddress(address2);
-        user5.addAddress(address3);
-        user5.addAddress(address4);
+        user1.addAddress(address1);
+        user1.addAddress(address2);
+        user1.addAddress(address3);
+        user1.addAddress(address4);
 
         users.add(user1);
         users.add(user2);
@@ -100,6 +100,22 @@ class UserAccountsApplicationTests {
         return String.format("Bearer %s", token);
     }
 
+    private String getUserToken(String username, List<String> roles, Long guid) {
+        long now = System.currentTimeMillis();
+        String token = Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setSubject(username)
+                .claim("name", username)
+                .claim("guid", guid)
+                .claim("authorities", roles)
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + 5256000 * 1000L))  // in milliseconds
+                .signWith(SignatureAlgorithm.HS512, JWT_KEY.getBytes())
+                .compact();
+
+        return String.format("Bearer %s", token);
+    }
+
     @AfterEach
     void teardown() {
         usersRepository.flush();
@@ -116,7 +132,9 @@ class UserAccountsApplicationTests {
     void createUser_returnsStatusOK() throws JsonProcessingException {
         String uri = "/api/users";
 
-        User user5 = new User(6L, "andynguyen", "Andy", "Nguyen", "andynguyen@gmail.com");
+        User user5 = new User(6L, "testusername", "testfirstname", "testlastname", "testemail@email.com");
+
+        token = getUserToken("user", Arrays.asList("ROLE_USER"), user5.getGuid());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -166,7 +184,7 @@ class UserAccountsApplicationTests {
     }
 
     @Test
-    void deleteUser_withID_returnsNoContent() {
+    void deleteUser_withGuid_returnsNoContent() {
         User user = users.get(0);
         Long guid = user.getGuid();
         String uri = "/api/users/" + guid;
@@ -250,7 +268,7 @@ class UserAccountsApplicationTests {
     }
 
     @Test
-    void updateUser_withIDAndBody_returnsNoContent() {
+    void updateUser_withGuidAndBody_returnsNotAcceptable() {
         User user = users.get(0);
 
         String uri = "/api/users/" + 1234L;
@@ -265,16 +283,16 @@ class UserAccountsApplicationTests {
 
         ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        assertNull(response.getBody());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
     }
 
 
     @Test
     void CreateUser_withValidAttr_nullAddress_returnsUser() throws JsonProcessingException {
         String uri = "/api/users";
-        String body = "{\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"password\":\"password\",\"email\":\"email3@email.com\"}";
 
+        User body = new User(1000L, "TestUsername3", "First3", "Last3", "email3@email.com");
+        token = getUserToken("user", Arrays.asList("ROLE_USER"), body.getGuid());
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         headers.setBearerAuth(token);
@@ -284,15 +302,16 @@ class UserAccountsApplicationTests {
         ResponseEntity<User> response = restTemplate.postForEntity(uri, postRequest, User.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-
         assertEquals(response.getBody().getCreatedAt(), response.getBody().getUpdatedAt());
-
     }
 
     @Test
     void CreateUser_withValidAttr_withAddress_returnsUser() throws JsonProcessingException {
         String uri = "/api/users";
-        String body = "{\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"password\":\"password\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\"}]}";
+
+        String body = "{\"guid\":\"1009\", \"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\"}]}";
+        
+        token = getUserToken("user", Arrays.asList("ROLE_USER"), 1009L);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
@@ -300,7 +319,7 @@ class UserAccountsApplicationTests {
 
         HttpEntity<?> postRequest = new HttpEntity<>(body, headers);
 
-        ResponseEntity<User> response = restTemplate.postForEntity(uri, postRequest, User.class);
+        ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.POST, postRequest, User.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
@@ -309,7 +328,7 @@ class UserAccountsApplicationTests {
 
     @Test
     void editUser_allowedAttributes_success() throws JsonProcessingException, InterruptedException {
-        String searchParams = "buddydoggo";
+        String searchParams = "bob";
         String getUri = "/api/users?username=" + searchParams;
 
         HttpHeaders headers = new HttpHeaders();
@@ -340,7 +359,7 @@ class UserAccountsApplicationTests {
 
     @Test
     void editUserAddress_success() throws JsonProcessingException {
-        String searchParams = "buddydoggo";
+        String searchParams = "bob";
         String getUri = "/api/users?username=" + searchParams;
 
         HttpHeaders headers = new HttpHeaders();
@@ -351,7 +370,7 @@ class UserAccountsApplicationTests {
 
         ResponseEntity<UsersList> getResponse = restTemplate.exchange(getUri, HttpMethod.GET, request, UsersList.class);
 
-        User getUser = Objects.requireNonNull(getResponse.getBody().getUsers().get(0));
+        User getUser = Objects.requireNonNull(Objects.requireNonNull(getResponse.getBody()).getUsers().get(0));
         Long getUserGuid = getUser.getGuid();
         Address getAddress = getUser.getAddresses().get(0);
         Long getAddressId = getAddress.getId();
@@ -392,7 +411,7 @@ class UserAccountsApplicationTests {
 
     @Test
     void editUserAddress_fails_AddressNotFound() throws JsonProcessingException {
-        String uri = "/api/users/1/addresses/100";
+        String uri = "/api/users/99/addresses/100";
         String body = "{\"id\":1,\"street\":\"WOOOOOO\",\"city\":\"LMAO\",\"state\":\"test state\",\"zipcode\":\"00000\",\"apartment\":null}";
 
         HttpHeaders headers = new HttpHeaders();
@@ -409,7 +428,7 @@ class UserAccountsApplicationTests {
 
     @Test
     void deleteUserAddress_success() throws JsonProcessingException {
-        String searchParams = "buddydoggo";
+        String searchParams = "bob";
         String getUri = "/api/users?username=" + searchParams;
 
         HttpHeaders headers = new HttpHeaders();
@@ -498,7 +517,7 @@ class UserAccountsApplicationTests {
     }
 
     @Test
-    void getUserCondensed_withID_returnsNoContent() {
+    void getUserCondensed_withGuid_returnsNoContent() {
         String uri = "/api/users/12345/condensed";
 
         HttpHeaders headers = new HttpHeaders();

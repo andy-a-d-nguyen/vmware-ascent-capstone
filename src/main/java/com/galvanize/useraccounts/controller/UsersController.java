@@ -37,29 +37,52 @@ public class UsersController {
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/users")
-    public User createUser(@Valid @RequestBody User user) throws InvalidUserException, DuplicateUserException, InvalidAddressException {
-        return usersService.createUser(user);
+    public User createUser(@Valid @RequestBody User user, @AuthenticationPrincipal JwtUser jwtUser) throws InvalidUserException, DuplicateUserException, InvalidAddressException {
+        // check whether guid already exists
+        Long jwtGuid = jwtUser.getGuid();
+        User foundUser = usersService.getUser(jwtGuid);
+        if (foundUser == null) {
+            return usersService.createUser(user);
+        } else {
+            throw new DuplicateUserException();
+        }
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @PatchMapping("/users/{guid}")
     public ResponseEntity<User> update(@PathVariable Long guid, @RequestBody UserRequest updatedUser, @AuthenticationPrincipal JwtUser jwtUser) throws InvalidUserException {
-        User user = usersService.updateUser(guid, updatedUser);
+        // get guid from token
+        Long jwtGuid = jwtUser.getGuid();
+
+        // get guid from database
+        User updatedUserReturned = null;
         // compare jwt user with user's guid
-        // not same, invalid
+        if (jwtGuid.equals(guid)) {
+            updatedUserReturned = usersService.updateUser(guid, updatedUser);
+        } else {
+            // not same, invalid
+            throw new UserNotFoundException();
+        }
 
-        return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
+        return updatedUserReturned == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedUserReturned);
     }
-
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @DeleteMapping("/users/{guid}")
-    public ResponseEntity deleteUser(@PathVariable Long guid) {
-        try {
+    public ResponseEntity deleteUser(@PathVariable Long guid, @AuthenticationPrincipal JwtUser jwtUser) {
+        Long jwtGuid = jwtUser.getGuid();
+
+        if (jwtGuid.equals(guid) && usersService.getUser(jwtGuid) != null) {
             usersService.deleteUser(guid);
-        } catch (UserNotFoundException e) {
+        } else {
             return ResponseEntity.noContent().build();
         }
+
+//        try {
+//            usersService.deleteUser(guid);
+//        } catch (UserNotFoundException e) {
+//            return ResponseEntity.noContent().build();
+//        }
 
         return ResponseEntity.accepted().build();
 
@@ -67,35 +90,82 @@ public class UsersController {
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/users/{guid}")
-    public ResponseEntity<User> getUser(@PathVariable Long guid) {
-        User user = usersService.getUser(guid);
-        return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
+    public ResponseEntity<User> getUser(@PathVariable Long guid, @AuthenticationPrincipal JwtUser jwtUser) {
+        Long jwtGuid = jwtUser.getGuid();
+
+        User user = null;
+        
+        if (jwtGuid.equals(guid)) {
+            user = usersService.getUser(guid);
+            if (user == null) return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.noContent().build();
+        }
+        
+        return ResponseEntity.ok(user);
     }
 
     /*Addresses*/
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/users/{guid}/addresses")
-    public User createAddress(@PathVariable Long guid, @Validated @RequestBody Address address) {
-        return usersService.addAddress(guid, address);
+    public User createAddress(@PathVariable Long guid, @Validated @RequestBody Address address, @AuthenticationPrincipal JwtUser jwtUser) {
+        Long jwtGuid = jwtUser.getGuid();
+        
+        if (jwtGuid.equals(guid)) return usersService.addAddress(guid, address);
+        else return null;
+
+//        return usersService.addAddress(guid, address);
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @PatchMapping("/users/{guid}/addresses/{addressId}")
-    public ResponseEntity<User> updateAddress(@PathVariable Long guid, @PathVariable Long addressId, @Valid @RequestBody Address address) throws UserNotFoundException, InvalidAddressException {
-        User updatedUser = usersService.updateAddress(guid, addressId, address);
-        return updatedUser == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedUser);
+    public ResponseEntity<User> updateAddress(@PathVariable Long guid, @PathVariable Long addressId, @Valid @RequestBody Address address,
+                                              @AuthenticationPrincipal JwtUser jwtUser) throws UserNotFoundException, InvalidAddressException, AddressNotFoundException {
+        Long jwtGuid = jwtUser.getGuid();
+        
+        User updatedUser = null;
+        
+        if (jwtGuid.equals(guid)) updatedUser = usersService.updateAddress(guid, addressId, address);
+        
+        if (updatedUser == null) throw new UserNotFoundException();
+        else return ResponseEntity.ok(updatedUser);
+
+//        return updatedUser == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedUser);
+
+//        try {
+//            if (jwtGuid.equals(guid)) {
+//                updatedUser = usersService.updateAddress(guid, addressId, address);
+//            }
+//        } catch (AddressNotFoundException e) {
+//            return ResponseEntity.noContent().build();
+//        } catch (UserNotFoundException e) {
+//            throw new UserNotFoundException();
+//            return ResponseEntity.noContent().build();
+//        }
+//
+//        return ResponseEntity.ok(updatedUser);
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @DeleteMapping("/users/{guid}/addresses/{addressId}")
-    public ResponseEntity deleteAddress(@PathVariable Long guid, @PathVariable Long addressId) {
-        try {
+    public ResponseEntity deleteAddress(@PathVariable Long guid, @PathVariable Long addressId, @AuthenticationPrincipal JwtUser jwtUser) {
+        Long jwtGuid = jwtUser.getGuid();
+
+        if (jwtGuid.equals(guid) && usersService.getUser(jwtGuid) != null) {
             usersService.deleteAddress(guid, addressId);
-        } catch (AddressNotFoundException e) {
+        } else {
             return ResponseEntity.noContent().build();
         }
+        
         return ResponseEntity.accepted().build();
+        
+//        try {
+//            usersService.deleteAddress(guid, addressId);
+//        } catch (AddressNotFoundException e) {
+//            return ResponseEntity.noContent().build();
+//        }
+//        return ResponseEntity.accepted().build();
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -108,9 +178,17 @@ public class UsersController {
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/users/{guid}/condensed")
-    public ResponseEntity<UserCondensed> getUserCondensed(@PathVariable Long guid) {
-        UserCondensed user = usersService.getUserCondensed(guid);
-        return user == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(user);
-    }
+    public ResponseEntity<UserCondensed> getUserCondensed(@PathVariable Long guid, @AuthenticationPrincipal JwtUser jwtUser) {
+        Long jwtGuid = jwtUser.getGuid();
 
+        UserCondensed user = null;
+        if (jwtGuid.equals(guid) && usersService.getUser(jwtGuid) != null) {
+            user = usersService.getUserCondensed(guid);
+        } else {
+            throw new UserNotFoundException();
+//            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(user);
+    }
 }

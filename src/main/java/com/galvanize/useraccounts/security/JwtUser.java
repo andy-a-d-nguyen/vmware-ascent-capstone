@@ -6,7 +6,7 @@ public class JwtUser {
     Long guid;
     String username;
     String email;
-    Collection<String> authorities;;
+    Collection<String> authorities;
 
     public JwtUser(Long guid, String username, String email,
                    Collection<String> authorities) {
