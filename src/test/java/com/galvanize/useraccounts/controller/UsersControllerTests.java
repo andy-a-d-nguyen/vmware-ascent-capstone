@@ -69,8 +69,7 @@ public class UsersControllerTests {
 
     @BeforeEach
     void setup() {
-        user = new User(1L, "bakerBob", "bob", "baker", "bakerBob@gmail.com");
-        user.setId(1L);
+        user = new User(99L, "bakerBob", "bob", "baker", "bakerBob@gmail.com");
 
         token = getToken("user", Arrays.asList("ROLE_USER"));
     }
@@ -126,11 +125,11 @@ public class UsersControllerTests {
     @DisplayName("It should delete a user by id, status code 202 accepted ")
     @Test
     public void deleteUser_byId_acceptedStatusCode() throws Exception {
-        User userToDelete = new User(1L, "bakerBob", "baker", "bob", "bakerBob@gmail.com");
-        userToDelete.setId(1L);
+        User userToDelete = new User(99L, "bakerBob", "baker", "bob", "bakerBob@gmail.com");
 
+        when(usersService.getUser(anyLong())).thenReturn(userToDelete);
 
-        mockMvc.perform(delete("/api/users/" + userToDelete.getId()).header("Authorization", token))
+        mockMvc.perform(delete("/api/users/" + userToDelete.getGuid()).header("Authorization", token))
                 .andExpect(status().isAccepted());
 
         verify(usersService).deleteUser(anyLong());
@@ -147,13 +146,13 @@ public class UsersControllerTests {
     @DisplayName("It can successfully edit an existing account, status 200 ok")
     @Test
     public void editUser() throws Exception {
-        User user = new User(1L, "bakerBob", "baker", "bob", "bakerBob@gmail.com");
+        User user = new User(99L, "bakerBob", "baker", "bob", "bakerBob@gmail.com");
         user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
         user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
         when(usersService.updateUser(anyLong(), any(UserRequest.class))).thenReturn(user);
 
-        mockMvc.perform(patch("/api/users/1234").header("Authorization", token).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(user)))
+        mockMvc.perform(patch("/api/users/99").header("Authorization", token).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(user)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("username").value("bakerBob"))
                 .andExpect(jsonPath("createdAt").exists())
@@ -170,25 +169,23 @@ public class UsersControllerTests {
         mockMvc.perform(patch("/api/users/1234").header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user)))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNotAcceptable());
     }
 
     @DisplayName("It should show user by id, status code 200 ok")
     @Test
     public void showUser_inputID_returnsUsers() throws Exception {
-        User user = new User(1L, "bakerBob", "baker", "bob", "bakerBob@gmail.com");
-        user.setId(1L);
+        User user = new User(99L, "bakerBob", "baker", "bob", "bakerBob@gmail.com");
         user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
         user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
         when(usersService.getUser(anyLong())).thenReturn(user);
 
-        mockMvc.perform(get("/api/users/" + user.getId()).header("Authorization", token))
+        mockMvc.perform(get("/api/users/" + user.getGuid()).header("Authorization", token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("username").value(user.getUsername()))
                 .andExpect(jsonPath("firstName").value(user.getFirstName()))
                 .andExpect(jsonPath("lastName").value(user.getLastName()))
-                .andExpect(jsonPath("password").doesNotExist())
                 .andExpect(jsonPath("createdAt").exists())
                 .andExpect(jsonPath("updatedAt").exists());
     }
@@ -238,7 +235,7 @@ public class UsersControllerTests {
 
         newAddress.setId(1L);
         when(usersService.addAddress(anyLong(), any(Address.class))).thenReturn(user);
-        mockMvc.perform(post(String.format("/api/users/%d/addresses", 1L)).header("Authorization", token)
+        mockMvc.perform(post(String.format("/api/users/%d/addresses", user.getGuid())).header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(newAddress)))
                 .andExpect(status().isOk())
@@ -272,7 +269,7 @@ public class UsersControllerTests {
         when(usersService.getUser(anyLong())).thenReturn(user);
         when(usersService.updateAddress(anyLong(), anyLong(), any(Address.class))).thenReturn(user);
 
-        MvcResult result = mockMvc.perform(patch(String.format("/api/users/%d/addresses/%d", 1L, 1L)).header("Authorization", token)
+        MvcResult result = mockMvc.perform(patch(String.format("/api/users/%d/addresses/%d", user.getGuid(), 1L)).header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(updatedAddress)))
                 .andExpect(status().isOk())
@@ -304,20 +301,11 @@ public class UsersControllerTests {
     @DisplayName("It should delete a user's address, status code 202 accepted")
     @Test
     public void deleteAddress() throws Exception {
-        mockMvc.perform(delete("/api/users/1/addresses/1").header("Authorization", token))
+        when(usersService.getUser(anyLong())).thenReturn(user);
+
+        mockMvc.perform(delete("/api/users/" + user.getGuid() + "/addresses/1").header("Authorization", token))
                 .andExpect(status().isAccepted());
-        verify(usersService).deleteAddress(1L, 1L);
-    }
-
-    @Test
-    public void searchUsername_byString_returnsNoContent() throws Exception {
-        String username = "bob";
-
-        when(usersService.searchUsers(anyString())).thenReturn(new UsersList(Arrays.asList()));
-
-        mockMvc.perform(get("/api/users?username=" + username).header("Authorization", token))
-                .andDo(print())
-                .andExpect(status().isNoContent());
+        verify(usersService).deleteAddress(user.getGuid(), 1L);
     }
 
     @Test
@@ -356,11 +344,12 @@ public class UsersControllerTests {
 
     @Test
     public void showUser_returnsIDUsernameAvatarEmail() throws Exception {
-        UserCondensed user = new UserCondensed(1L, "bakerBob", "myavatar.com", "bakerBob@gmail.com");
+        UserCondensed userCondensed = new UserCondensed(user.getGuid(), user.getUsername(), user.getAvatar(), user.getEmail());
 
-        when(usersService.getUserCondensed(anyLong())).thenReturn(user);
+        when(usersService.getUser(anyLong())).thenReturn(user);
+        when(usersService.getUserCondensed(anyLong())).thenReturn(userCondensed);
 
-        mockMvc.perform(get("/api/users/" + user.getGuid() + "/condensed").header("Authorization", token))
+        mockMvc.perform(get("/api/users/" + userCondensed.getGuid() + "/condensed").header("Authorization", token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("guid").value(user.getGuid()))
                 .andExpect(jsonPath("username").value(user.getUsername()))
@@ -369,12 +358,24 @@ public class UsersControllerTests {
     }
 
     @Test
-    public void showUser_returnsUserCondensedNoContent() throws Exception {
+    public void showUserCondensed_returnsNoContent() throws Exception {
         when(usersService.getUserCondensed(anyLong())).thenReturn(null);
 
         mockMvc.perform(get("/api/users/123243/condensed").header("Authorization", token))
                 .andExpect(status().isNoContent());
     }
+
+   @Test
+    public void searchUsername_byString_returnsNoContent() throws Exception {
+        String username = "bob";
+
+        when(usersService.searchUsers(anyString())).thenReturn(new UsersList(Arrays.asList()));
+
+        mockMvc.perform(get("/api/users?username=" + username).header("Authorization", token))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
 
     /**** guid ***/
 
