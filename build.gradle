@@ -57,20 +57,20 @@ dependencyManagement {
 test {
     useJUnitPlatform()
     //finalizedBy jacocoTestReport
-    jacoco {
-        excludes += ["src/main/java/com/galvanize/useraccounts/dataLoader"]
-    }
+//    jacoco {
+//        excludes += ["src/main/java/com/galvanize/useraccounts/dataLoader"]
+//    }
 
 }
 
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
 
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: "src/main/java/com/galvanize/useraccounts/dataLoader")
-        }))
-    }
+//    doFirst {
+//        classDirectories.setFrom(files(classDirectories.files.collect {
+//            fileTree(dir: it, exclude: "src/main/java/com/galvanize/useraccounts/dataLoader")
+//        }))
+//    }
 }
 
 jacocoTestCoverageVerification {
