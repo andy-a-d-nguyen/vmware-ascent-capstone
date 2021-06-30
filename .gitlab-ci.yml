@@ -39,9 +39,6 @@ coverage:
   script:
     - ./gradlew jacocoTestReport
     - ./gradlew jacocoTestCoverageVerification
-  rules:
-    exclude:
-      - src/main/java/com/galvanize/useraccounts/dataLoader
   allow_failure: true
   artifacts:
     when: always
