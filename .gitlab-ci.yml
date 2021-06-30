@@ -37,6 +37,8 @@ coverage:
     - test
   stage: coverage
   script:
+    - exclude:
+      - src/main/java/com/galvanize/useraccounts/dataLoader
     - ./gradlew jacocoTestReport
     - ./gradlew jacocoTestCoverageVerification
   allow_failure: true
