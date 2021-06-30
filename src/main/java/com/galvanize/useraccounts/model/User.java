@@ -38,6 +38,7 @@ public class User {
 
     private String avatar;
 
+    //@JoinColumn(name = "user_id")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
     @Valid
     private List<Address> addresses = new ArrayList<>();
