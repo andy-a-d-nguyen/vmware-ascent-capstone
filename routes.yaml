@@ -9,9 +9,9 @@ spec:
     namespace: default
   routes:
     - predicates:
-      - Path=/api/users/actuator/**
-    filters:
-      - StripPrefix=2
+        - Path=/api/users/actuator/**
+      filters:
+        - StripPrefix=2
     - predicates:
         - Path=/api/users/** # main api route path
       filters:
