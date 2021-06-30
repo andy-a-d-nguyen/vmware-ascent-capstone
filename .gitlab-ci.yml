@@ -45,7 +45,7 @@ coverage:
     paths:
       - build/reports/jacoco/
     exclude:
-      - src/main/java/com/galvanize/userAccounts/dataLoader
+      - src/main/java/com/galvanize/useraccounts/dataLoader
 
 docker:
   needs:
