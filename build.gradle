@@ -63,7 +63,7 @@ test {
 
 }
 
-def jacocoExclude = ['**/dataLoader/**']
+def jacocoExclude = ['src/main/java/com/galvanize/useraccounts/dataLoader']
 
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
