@@ -68,7 +68,7 @@ jacocoTestReport {
 
     doFirst {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: "src/main/java/com/galvanize/useraccounts/dataLoader")
+            fileTree(dir: it, exclude: "src/main/java/com/galvanize/useraccounts/dataLoader/*")
         }))
     }
 }
