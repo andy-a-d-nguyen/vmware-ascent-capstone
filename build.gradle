@@ -57,9 +57,9 @@ dependencyManagement {
 test {
     useJUnitPlatform()
     //finalizedBy jacocoTestReport
-    /*jacoco {
-        destinationFile file("$buildDir/jacoco/junitPlatformTest.exec")
-    }*/
+    jacoco {
+        excludes += ["src/main/java/com/galvanize/useraccounts/dataLoader"]
+    }
 
 }
 
