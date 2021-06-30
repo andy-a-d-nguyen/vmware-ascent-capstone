@@ -71,6 +71,7 @@ jacocoTestReport {
 //            fileTree(dir: it, exclude: "src/main/java/com/galvanize/useraccounts/dataLoader")
 //        }))
 //    }
+
 }
 
 jacocoTestCoverageVerification {
