@@ -28,8 +28,8 @@ ext {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    testRuntimeOnly 'com.h2database:h2'
-    runtimeOnly 'mysql:mysql-connector-java'
+    runtimeOnly 'com.h2database:h2'
+    //runtimeOnly 'mysql:mysql-connector-java'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
@@ -57,22 +57,21 @@ dependencyManagement {
 test {
     useJUnitPlatform()
     //finalizedBy jacocoTestReport
-    /*jacoco {
-        destinationFile file("$buildDir/jacoco/junitPlatformTest.exec")
-    }*/
+//    jacoco {
+//        excludes += ["src/main/java/com/galvanize/useraccounts/dataLoader"]
+//    }
 
 }
-
-def jacocoExclude = ['**/dataLoader/**']
 
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
 
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: jacocoExclude)
-        }))
-    }
+//    doFirst {
+//        classDirectories.setFrom(files(classDirectories.files.collect {
+//            fileTree(dir: it, exclude: "src/main/java/com/galvanize/useraccounts/dataLoader")
+//        }))
+//    }
+
 }
 
 jacocoTestCoverageVerification {

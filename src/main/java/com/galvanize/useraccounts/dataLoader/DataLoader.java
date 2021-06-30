@@ -19,6 +19,7 @@ import java.util.Random;
 
 import static org.aspectj.runtime.internal.Conversions.intValue;
 
+@Generated
 @Profile("!test")
 @Component
 public class DataLoader implements CommandLineRunner {
@@ -58,10 +59,10 @@ public class DataLoader implements CommandLineRunner {
         Random random = new Random();
 
         for (int i = 0; i < streets.length; i++) {
-            String zipcode = null;
+            String zipcode = "zipcode";
 
             for (int j = 0; j < 5; j++) {
-                zipcode.concat(String.valueOf(random.nextInt(9)));
+                zipcode = zipcode + String.valueOf(random.nextInt(9));
             }
 
             Address address = new Address(streets[random.nextInt(streets.length)], cities[random.nextInt(cities.length)], states[random.nextInt(states.length)], zipcode, String.valueOf(random.nextInt(50) + 10), labels[random.nextInt(labels.length)]);
@@ -92,16 +93,22 @@ public class DataLoader implements CommandLineRunner {
                         names.get(i).split(" ")[0] + "@email.com"
                 );
             } else {
+                Address address = addresses.get(random.nextInt(addresses.size()));
+
                 userToAdd = new User(Long.valueOf(i),
                         names.get(i).split(" ")[0] + i + "user",
                         names.get(i).split(" ")[0],
                         names.get(i).split(" ")[1],
                         names.get(i).split(" ")[0] + "@email.com",
-                        Arrays.asList(addresses.get(random.nextInt(addresses.size())))
+                        Arrays.asList(address)
                 );
+                address.setUser(userToAdd);
+                addressRepository.save(address);
             }
 
             usersRepository.save(userToAdd);
+            //System.out.println(usersRepository.findAll().toString());
+            //System.out.println(addressRepository.findAll().toString());
         }
     }
 }

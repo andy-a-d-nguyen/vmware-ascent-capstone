@@ -18,17 +18,17 @@ public class Address {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
     // private Long userId;
-    @NotBlank(message="Street cannot be null and trimmed length must be greater than zero.")
+    @NotBlank(message = "Street cannot be null and trimmed length must be greater than zero.")
     private String street;
-    @NotBlank(message="City cannot be null and trimmed length must be greater than zero.")
+    @NotBlank(message = "City cannot be null and trimmed length must be greater than zero.")
     private String city;
-    @NotBlank (message="State cannot be null and trimmed length must be greater than zero.")
+    @NotBlank(message = "State cannot be null and trimmed length must be greater than zero.")
     private String state;
-    @NotBlank(message="Zipcode cannot be null and trimmed length must be greater than zero.")
+    @NotBlank(message = "Zipcode cannot be null and trimmed length must be greater than zero.")
     private String zipcode;
     private String apartment;
     private String label;
@@ -36,7 +36,7 @@ public class Address {
     public Address() {
     }
 
-    public Address( String street, String city, String state, String zipcode, String apartment, String label) {
+    public Address(String street, String city, String state, String zipcode, String apartment, String label) {
         this.street = street;
         this.city = city;
         this.state = state;
@@ -45,7 +45,7 @@ public class Address {
         this.label = label;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
