@@ -1,11 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-accounts-feature-lb
+  name: user-accounts-api-lb
+  namespace: default
 spec:
   type: LoadBalancer
   selector:
-    app: user-accounts-feature
+    app: user-accounts-api
   ports:
     - protocol: TCP
       port: 8080

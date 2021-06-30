@@ -1,20 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-accounts-feature
+  name: user-accounts-api
+  namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user-accounts-feature
+      app: user-accounts-api
   template:
     metadata:
       labels:
-        app: user-accounts-feature
+        app: user-accounts-api
+        namespace: default
     spec:
+      serviceAccountName: api-service-account
       containers:
         - image: $IMAGE
-          name: user-accounts-feature
+          name: user-accounts-api
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

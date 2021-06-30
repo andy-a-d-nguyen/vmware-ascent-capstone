@@ -1,0 +1,18 @@
+apiVersion: "tanzu.vmware.com/v1"
+kind: SpringCloudGatewayRouteConfig
+metadata:
+  name: user-accounts-api-routes
+  namespace: default
+spec:
+  service:
+    name: user-accounts-api-lb
+    namespace: default
+  routes:
+    - predicates:
+        - Path=/api/users/actuator/** # include actuator health
+    filters:
+      - StripPrefix=2
+    - predicates:
+        - Path=/api/users/** # main api route path
+      filters:
+        - StripPrefix=0
