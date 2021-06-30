@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.sql.Timestamp;
@@ -29,6 +30,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserAccountsApplicationTests {
@@ -310,7 +312,7 @@ class UserAccountsApplicationTests {
         String uri = "/api/users";
 
         String body = "{\"guid\":\"1009\", \"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\"}]}";
-        
+
         token = getUserToken("user", Arrays.asList("ROLE_USER"), 1009L);
 
         HttpHeaders headers = new HttpHeaders();

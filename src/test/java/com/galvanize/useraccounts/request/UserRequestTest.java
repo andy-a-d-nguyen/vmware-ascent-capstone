@@ -2,10 +2,12 @@ package com.galvanize.useraccounts.request;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+@ActiveProfiles("test")
 public class UserRequestTest {
     @MockBean
     UserRequest userRequest;
