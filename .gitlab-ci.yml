@@ -44,6 +44,8 @@ coverage:
     when: always
     paths:
       - build/reports/jacoco/
+    exclude:
+      - src/main/java/com/galvanize/userAccounts/dataLoader
 
 docker:
   needs:
@@ -66,7 +68,7 @@ docker:
 deploy:
   stage: deploy
   needs:
-     - docker
+    - docker
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
