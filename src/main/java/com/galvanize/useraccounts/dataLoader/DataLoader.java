@@ -19,7 +19,7 @@ import java.util.Random;
 
 import static org.aspectj.runtime.internal.Conversions.intValue;
 
-@Profile("!test")
+/*@Profile("!test")
 @Component
 public class DataLoader implements CommandLineRunner {
     @Autowired
@@ -104,4 +104,4 @@ public class DataLoader implements CommandLineRunner {
             usersRepository.save(userToAdd);
         }
     }
-}
+}*/
