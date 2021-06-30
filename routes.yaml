@@ -9,7 +9,7 @@ spec:
     namespace: default
   routes:
     - predicates:
-        - Path=/api/users/actuator/** # include actuator health
+      - Path=/api/users/actuator/**
     filters:
       - StripPrefix=2
     - predicates:
