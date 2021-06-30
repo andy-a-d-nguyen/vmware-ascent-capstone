@@ -39,13 +39,14 @@ coverage:
   script:
     - ./gradlew jacocoTestReport
     - ./gradlew jacocoTestCoverageVerification
+  paths:
+    exclude:
+      - src/main/java/com/galvanize/useraccounts/dataLoader
   allow_failure: true
   artifacts:
     when: always
     paths:
       - build/reports/jacoco/
-    exclude:
-      - src/main/java/com/galvanize/useraccounts/dataLoader
 
 docker:
   needs:
