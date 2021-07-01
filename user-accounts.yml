@@ -13,8 +13,8 @@ components:
     user:
       type: object
       properties:
-        id:
-          type: long
+        guid:
+          type: integer
         username:
           type: string
         firstName:
@@ -23,21 +23,25 @@ components:
           type: string
         avatar:
           type: string
-        password:
-          type: string
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/address'
         email:
           type: string
-        creditCard:
+        bio:
           type: string
         verified:
           type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
     address:
       type: object
       properties:
         id:
-          type: long
-        userid:
-          type: long
+          type: integer
         street:
           type: string
         city:
@@ -48,32 +52,19 @@ components:
           type: string
         apartment:
           type: string
-    userLogin:
+        label:
+          type: string
+    userCondensed:
       type: object
       properties:
-        username:
-          type: string
-        password:
-          type: string
-    userReturn:
-      type: object
-      properties:
-        id:
+        guid:
           type: integer
         username:
           type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        image:
+        avatar:
           type: string
         email:
           type: string
-        address:
-          type: string
-        verified:
-          type: boolean
 
 servers:
   - url: https://localhost:/8080
@@ -84,130 +75,105 @@ paths:
       tags:
         - users
       summary: Find all users
-      description:
+      description: Returns all users
       responses:
         '200':
           description: Successful operation
-  /api/users/registration:
     post:
       tags:
-        - Authentication
-      summary: Add a new user
-      description: user object that needs to be added
+        - users
+      summary: Create an user
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/user'
-        required: true
       responses:
         '200':
           description: Successful operation
         '400':
           description: Bad request
-  /api/users/login:
-    post:
-      tags:
-        - Authentication
-      summary: Login an existing user
-      description: log in an existing user
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/userLogin'
-        required: true
-      responses:
-        '200':
-          description: Successful operation
-        '400':
-          description: Bad request
-  /api/users/logout:
-    post:
-      tags:
-        - Authentication
-      summary: Logout an existing user
-      description: log out an existing user
-      responses:
-        '202':
-          description: Accepted
-  /api/users/{id}:
+        '406':
+          description: Not Acceptable
+  /api/users/{guid}:
     get:
       tags:
         - user
-      summary: Find user by id
+      summary: Find user by guid
       description: Returns a single user
       parameters:
-        - name: id
+        - name: guid
+          schema:
+            $ref: '#/components/schemas/user'
           in: path
-          description: id of user to return
+          description: guid of user to return
           required: true
       responses:
         '200':
           description: Successful operation
         '204':
           description: No content
-    post:
-      tags:
-        - user
-      summary: Sets profile pic for user
-      description: Returns updated user
-      parameters:
-        - name: id
-          in: path
-          description: id of user to return
-          required: true
-        - name: URL
-          in: request body
-          description: string of URL
-          required: true
-      responses:
-        '200':
-          description: Successful operation
     patch:
       tags:
         - user
-      summary: Edit user by id
-      description: Edit a user by id
+      summary: Edit user by guid
+      description: Edit a user by guid
       parameters:
-        - name: id
+        - name: guid
+          schema:
+            $ref: '#/components/schemas/user'
           in: path
-          description: id of user to edit
+          description: guid of user to edit
           required: true
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/userReturn'
+              $ref: '#/components/schemas/user'
       responses:
         '200':
           description: Successful operation
-        '204':
-          description: No content
+        '406':
+          description: Not Acceptable
     delete:
       tags:
         - user
-      summary: Delete user by ID
+      summary: Delete user by guid
       parameters:
-        - name: id
+        - name: guid
+          schema:
+            $ref: '#/components/schemas/user'
           in: path
-          description: id of user to delete
+          description: guid of user to delete
           required: true
       responses:
         '202':
           description: Accepted
         '204':
           description: No content
-  /api/users/{userId}/addresses:
+  /api/users/{guid}/condensed:
+    get:
+      tags:
+        - user
+      summary: get condensed info about a user by guid
+      description: get condensed info about a user by guid
+      responses:
+        '200':
+          description: Successful operation
+        '406':
+          description: Not Acceptable
+  /api/users/{guid}/addresses:
     get:
       tags:
         - address
       summary: Fetch all of a user's shipping addresses
       parameters:
-        -name: userId
-        in: path
-        description: id of a user whose shipping addresses are being fetched
-        required: true
+        - name: guid
+          schema:
+            $ref: '#/components/schemas/user'
+          in: path
+          description: guid of a user whose shipping addresses are being fetched
+          required: true
       responses:
         '200':
           description: Successful operation
@@ -219,12 +185,18 @@ paths:
       summary: Posts a user's shipping address
       parameters:
         - name: userId
+          schema:
+            $ref: '#/components/schemas/user'
           in: path
-          description: userId of user whose address to delete
-        - name: address
-          in: request body
-          description: shipping address of user to add
+          description: guid of user whose address to delete
           required: true
+      requestBody:
+        description: shipping address of user to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/address'
       responses:
         '200':
           description: Successful operation
@@ -235,32 +207,45 @@ paths:
         - address
       summary: Edit's a user's shipping address
       parameters:
-        - name: userId
+        - name: guid
+          schema:
+              $ref: '#/components/schemas/address'
           in: path
-          description: userId of user whose address to edit
-
-        - name: address
-          in: request body
-          description: shipping address of user to add
+          description: guid of user whose address to edit
           required: true
+      requestBody:
+        description: shipping address of user to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/address'
       responses:
         '200':
           description: Successful operation
         '400':
           description: Bad request
-  /api/users/{userId}/addresses/{addressId}:
+        '406':
+          description: Not Acceptable
+  /api/users/{guid}/addresses/{addressId}:
     delete:
       tags:
         - address
       summary: Deletes a user's shipping address
       parameters:
-        - name: userId
+        - name: guid
+          schema:
+              $ref: '#/components/schemas/address'
           in: path
-          description: userId of user whose address to delete
-        - name: address
-          in: request body
-          description: shipping address of user to delete
+          description: guid of user whose address to delete
           required: true
+      requestBody:
+        description: shipping address of user to delete
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/address'
       responses:
         '202':
           description: Accepted
