@@ -18,7 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
 public class UsersTests {
 
     public static ValidatorFactory validatorFactory;

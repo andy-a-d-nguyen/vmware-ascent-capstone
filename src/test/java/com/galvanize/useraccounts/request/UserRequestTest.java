@@ -7,7 +7,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
 public class UserRequestTest {
     @MockBean
     UserRequest userRequest;

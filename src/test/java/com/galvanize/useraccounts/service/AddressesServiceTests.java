@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class AddressesServiceTests {
     private AddressesService addressesService;
