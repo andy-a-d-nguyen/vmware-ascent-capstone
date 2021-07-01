@@ -44,8 +44,6 @@ coverage:
     when: always
     paths:
       - build/reports/jacoco/
-    exclude:
-      - src/main/java/com/galvanize/useraccounts/dataLoader
 
 docker:
   needs:
@@ -84,3 +82,5 @@ deploy:
   script:
     - envsubst < deploy.yaml | kubectl apply -f -
     - kubectl apply -f service.yaml
+    - kubectl apply -f routes.yaml
+    - kubectl apply -f mapping.yaml

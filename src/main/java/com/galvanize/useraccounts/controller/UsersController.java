@@ -78,12 +78,6 @@ public class UsersController {
             return ResponseEntity.noContent().build();
         }
 
-//        try {
-//            usersService.deleteUser(guid);
-//        } catch (UserNotFoundException e) {
-//            return ResponseEntity.noContent().build();
-//        }
-
         return ResponseEntity.accepted().build();
 
     }
@@ -114,8 +108,6 @@ public class UsersController {
         
         if (jwtGuid.equals(guid)) return usersService.addAddress(guid, address);
         else return null;
-
-//        return usersService.addAddress(guid, address);
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -130,21 +122,6 @@ public class UsersController {
         
         if (updatedUser == null) throw new UserNotFoundException();
         else return ResponseEntity.ok(updatedUser);
-
-//        return updatedUser == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(updatedUser);
-
-//        try {
-//            if (jwtGuid.equals(guid)) {
-//                updatedUser = usersService.updateAddress(guid, addressId, address);
-//            }
-//        } catch (AddressNotFoundException e) {
-//            return ResponseEntity.noContent().build();
-//        } catch (UserNotFoundException e) {
-//            throw new UserNotFoundException();
-//            return ResponseEntity.noContent().build();
-//        }
-//
-//        return ResponseEntity.ok(updatedUser);
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -159,13 +136,6 @@ public class UsersController {
         }
         
         return ResponseEntity.accepted().build();
-        
-//        try {
-//            usersService.deleteAddress(guid, addressId);
-//        } catch (AddressNotFoundException e) {
-//            return ResponseEntity.noContent().build();
-//        }
-//        return ResponseEntity.accepted().build();
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -186,7 +156,6 @@ public class UsersController {
             user = usersService.getUserCondensed(guid);
         } else {
             throw new UserNotFoundException();
-//            return ResponseEntity.noContent().build();
         }
 
         return ResponseEntity.ok(user);

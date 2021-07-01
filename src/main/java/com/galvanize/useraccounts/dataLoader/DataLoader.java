@@ -19,6 +19,7 @@ import java.util.Random;
 
 import static org.aspectj.runtime.internal.Conversions.intValue;
 
+@Generated
 @Profile("!test")
 @Component
 public class DataLoader implements CommandLineRunner {
