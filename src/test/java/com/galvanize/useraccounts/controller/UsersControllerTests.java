@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
 @WebMvcTest(UsersController.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class UsersControllerTests {
@@ -217,7 +217,8 @@ public class UsersControllerTests {
         newAddress.setId(1L);
         when(usersService.createUser(any(User.class))).thenReturn(user);
 
-        String content = "{\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"password\":\"password\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\"}]}";
+        String content = "{\"guid\":\"99\",\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"email\":\"email3@email.com\"," +
+                "\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\"}]}";
         mockMvc.perform(post("/api/users").header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
@@ -334,7 +335,8 @@ public class UsersControllerTests {
 
         when(usersService.createUser(any(User.class))).thenReturn(user);
 
-        String content = "{\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"password\":\"password\",\"email\":\"email3@email.com\",\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\",\"label\":\"home\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\",\"label\":\"work\"}]}";
+        String content = "{\"guid\":\"99\",\"username\":\"TestUsername3\",\"firstName\":\"First3\",\"lastName\":\"Last3\",\"email\":\"email3@email.com\"," +
+                "\"addresses\":[{\"street\":\"test street\",\"state\":\"test state\",\"city\":\"test city\",\"zipcode\":\"00000\",\"label\":\"home\"},{\"street\":\"test street2\",\"state\":\"test state2\",\"city\":\"test city2\",\"zipcode\":\"00000\",\"label\":\"work\"}]}";
         mockMvc.perform(post("/api/users").header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
