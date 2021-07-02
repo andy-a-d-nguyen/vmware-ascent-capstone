@@ -79,7 +79,6 @@ public class UsersController {
         }
 
         return ResponseEntity.accepted().build();
-
     }
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -88,14 +87,14 @@ public class UsersController {
         Long jwtGuid = jwtUser.getGuid();
 
         User user = null;
-        
+
         if (jwtGuid.equals(guid)) {
             user = usersService.getUser(guid);
             if (user == null) return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.noContent().build();
         }
-        
+
         return ResponseEntity.ok(user);
     }
 
@@ -105,7 +104,7 @@ public class UsersController {
     @PostMapping("/users/{guid}/addresses")
     public User createAddress(@PathVariable Long guid, @Validated @RequestBody Address address, @AuthenticationPrincipal JwtUser jwtUser) {
         Long jwtGuid = jwtUser.getGuid();
-        
+
         if (jwtGuid.equals(guid)) return usersService.addAddress(guid, address);
         else return null;
     }
@@ -115,11 +114,11 @@ public class UsersController {
     public ResponseEntity<User> updateAddress(@PathVariable Long guid, @PathVariable Long addressId, @Valid @RequestBody Address address,
                                               @AuthenticationPrincipal JwtUser jwtUser) throws UserNotFoundException, InvalidAddressException, AddressNotFoundException {
         Long jwtGuid = jwtUser.getGuid();
-        
+
         User updatedUser = null;
-        
+
         if (jwtGuid.equals(guid)) updatedUser = usersService.updateAddress(guid, addressId, address);
-        
+
         if (updatedUser == null) throw new UserNotFoundException();
         else return ResponseEntity.ok(updatedUser);
     }
@@ -134,7 +133,7 @@ public class UsersController {
         } else {
             return ResponseEntity.noContent().build();
         }
-        
+
         return ResponseEntity.accepted().build();
     }
 

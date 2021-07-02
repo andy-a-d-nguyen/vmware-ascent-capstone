@@ -69,7 +69,7 @@ class UserAccountsApplicationTests {
         User user2 = new User(2L, "bobBobBob", "bob", "smith", "bakerBob2@gmail.com");
         User user3 = new User(3L, "bobBob", "bob", "bob", "bakerBob3@gmail.com");
         User user4 = new User(4L, "janeDoe", "jane", "doe", "janeDoe@gmail.com");
-        User user5 = new User(5L, "buddydoggo", "buddy", "bud", "buddydog@gmail.com");
+        User user5 = new User(5L, "chefCesar", "cesar", "chu", "chefCesar@gmail.com");
         user1.addAddress(address1);
         user1.addAddress(address2);
         user1.addAddress(address3);
@@ -466,7 +466,7 @@ class UserAccountsApplicationTests {
 
     @Test
     void deleteUserAddress_failure_addressNotFound() throws JsonProcessingException {
-        String searchParams = "buddydoggo";
+        String searchParams = "chefCesar";
         String getUri = "/api/users?username=" + searchParams;
 
         HttpHeaders headers = new HttpHeaders();

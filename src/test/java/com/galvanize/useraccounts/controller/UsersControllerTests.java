@@ -102,7 +102,6 @@ public class UsersControllerTests {
         userToAdd.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
         when(usersService.createUser(any(User.class))).thenReturn(userToAdd);
-        //{"id":null,"username":"bakerBob","firstName":"bob","lastName":"baker","avatar":null,"email":"bakerBob@gmail.com",     "address":null,"creditCard":null,"verified":false}
 
         mockMvc.perform(post("/api/users").header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -205,7 +204,6 @@ public class UsersControllerTests {
 
     /********** Address ***********/
 
-    // Test GET for returned addresses
     @DisplayName("It should allow users to add addresses when creating an account , status code 200 ok")
     @Test
     public void createUserWithAddresses() throws Exception {
@@ -247,7 +245,6 @@ public class UsersControllerTests {
                 .andExpect(jsonPath("updatedAt").exists());
     }
 
-
     @DisplayName("It should throw an InvalidAddress error, status code 400 bad request")
     @Test
     public void addAddress_invalidAttr() throws Exception {
@@ -258,7 +255,6 @@ public class UsersControllerTests {
                 .content(""))
                 .andExpect(status().isBadRequest());
     }
-
 
     @DisplayName("It should successfully edit a user's address, status code 200 ok")
     @Test
@@ -280,26 +276,24 @@ public class UsersControllerTests {
                 .andExpect(jsonPath("updatedAt").exists())
                 .andReturn();
 
-        //String id = JsonPath.read(result.getResponse().getContentAsString(), "$.id")
         String street = JsonPath.read(result.getResponse().getContentAsString(), "$.addresses[0].street");
 
         assertEquals(updatedAddress.getStreet(), street);
     }
 
-    //FIX THIS TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-/*    @DisplayName("It fails to edit a user's address, status code 400 bad request")
+    @DisplayName("It fails to edit a user's address, status code 400 bad request")
     @Test()
     public void updateAddress_fail() throws Exception {
-      //  doThrow(new InvalidAddressException("bad")).when(usersService).updateAddress(anyLong(), anyLong(), any(Address.class));
+        Address updatedAddress = new Address("Test Street", "Test City", "Test State", "Test Zipcode", "Test Apartment", null);
+        updatedAddress.setId(1L);
+
         when(usersService.updateAddress(anyLong(), anyLong(), any(Address.class))).thenReturn(null);
 
-        mockMvc.perform(patch(String.format("/api/users/%d/addresses/%d", 1L, 1L))
+        mockMvc.perform(patch(String.format("/api/users/%d/addresses/%d", 1L, 1L)).header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(user)))
-                .andExpect(status().isBadRequest());
-       //         .andExpect(result -> assertTrue(result.getResolvedException() instanceof InvalidAddressException));
-    }*/
-
+                .content(mapper.writeValueAsString(updatedAddress)))
+                .andExpect(status().isNotAcceptable());
+    }
 
     @DisplayName("It should delete a user's address, status code 202 accepted")
     @Test
@@ -379,8 +373,5 @@ public class UsersControllerTests {
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }
-
-
-    /**** guid ***/
 
 }
