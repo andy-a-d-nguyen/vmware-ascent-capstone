@@ -26,7 +26,7 @@ public class User {
     private Long id;
 
     @Column(unique = true)
-    @NotNull(message = "guid cannot be null")
+    @NotNull(message = "Guid cannot be null")
     private Long guid;
 
     @NotBlank(message = "Username cannot be null and trimmed length must be greater than zero.")
@@ -41,7 +41,6 @@ public class User {
 
     private String avatar;
 
-    //@JoinColumn(name = "user_id")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
     @Valid
     private List<Address> addresses = new ArrayList<>();
@@ -141,7 +140,6 @@ public class User {
         this.email = email;
     }
 
-
     public String getBio() {
         return bio;
     }
@@ -157,7 +155,6 @@ public class User {
     public void setVerified(boolean verified) {
         this.verified = verified;
     }
-
 
     public List<Address> getAddresses() {
         return addresses;

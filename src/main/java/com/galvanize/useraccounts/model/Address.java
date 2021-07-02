@@ -21,7 +21,7 @@ public class Address {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
-    // private Long userId;
+
     @NotBlank(message = "Street cannot be null and trimmed length must be greater than zero.")
     private String street;
     @NotBlank(message = "City cannot be null and trimmed length must be greater than zero.")
