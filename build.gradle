@@ -60,7 +60,6 @@ test {
 //    jacoco {
 //        excludes += ["src/main/java/com/galvanize/useraccounts/dataLoader"]
 //    }
-
 }
 
 jacocoTestReport {
@@ -71,7 +70,6 @@ jacocoTestReport {
 //            fileTree(dir: it, exclude: "src/main/java/com/galvanize/useraccounts/dataLoader")
 //        }))
 //    }
-
 }
 
 jacocoTestCoverageVerification {
@@ -82,5 +80,4 @@ jacocoTestCoverageVerification {
             }
         }
     }
-
 }

@@ -29,6 +29,7 @@ public class User {
     @NotNull(message = "Guid cannot be null")
     private Long guid;
 
+    @Column(unique = true)
     @NotBlank(message = "Username cannot be null and trimmed length must be greater than zero.")
     @Size(min = 5, max = 20, message = "Username must have between 5-20 characters.")
     private String username;
@@ -45,6 +46,7 @@ public class User {
     @Valid
     private List<Address> addresses = new ArrayList<>();
 
+    @Column(unique = true)
     @NotBlank(message = "Email cannot be null and trimmed length must be greater than zero.")
     @Email(message = "Email should be valid.")
     @Size(max = 30, message = "Email should not be greater than 30.")
