@@ -65,6 +65,39 @@ components:
           type: string
         email:
           type: string
+    userRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        avatar:
+          type: string
+        email:
+          type: string
+        bio:
+          type: string
+        verified:
+          type: boolean
+    userPost:
+      type: object
+      properties:
+        guid:
+          type: integer
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        addresses:
+          type: array
+          items:
+          type: string
+      
 
 servers:
   - url: https://localhost:/8080
@@ -87,7 +120,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/userPost'
       responses:
         '200':
           description: Successful operation
@@ -129,7 +162,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/userRequest'
       responses:
         '200':
           description: Successful operation
@@ -141,8 +174,6 @@ paths:
       summary: Delete user by guid
       parameters:
         - name: guid
-          schema:
-            $ref: '#/components/schemas/user'
           in: path
           description: guid of user to delete
           required: true
@@ -155,30 +186,21 @@ paths:
     get:
       tags:
         - user
-      summary: get condensed info about a user by guid
+      summary: get condensed info about a user by guid *DOES NOT REQUIRE AUTHENTICATION*
       description: get condensed info about a user by guid
+      parameters:
+      - name: guid
+        schema:
+          $ref: '#/components/schemas/userCondensed'
+        in: path
+        description: guid of user to show
+        required: true
       responses:
         '200':
           description: Successful operation
         '406':
           description: Not Acceptable
   /api/users/{guid}/addresses:
-    get:
-      tags:
-        - address
-      summary: Fetch all of a user's shipping addresses
-      parameters:
-        - name: guid
-          schema:
-            $ref: '#/components/schemas/user'
-          in: path
-          description: guid of a user whose shipping addresses are being fetched
-          required: true
-      responses:
-        '200':
-          description: Successful operation
-        '204':
-          description: No content
     post:
       tags:
         - address
@@ -209,7 +231,7 @@ paths:
       parameters:
         - name: guid
           schema:
-              $ref: '#/components/schemas/address'
+              $ref: '#/components/schemas/user'
           in: path
           description: guid of user whose address to edit
           required: true
@@ -234,18 +256,13 @@ paths:
       summary: Deletes a user's shipping address
       parameters:
         - name: guid
-          schema:
-              $ref: '#/components/schemas/address'
           in: path
-          description: guid of user whose address to delete
+          description: guid of user to delete
           required: true
-      requestBody:
-        description: shipping address of user to delete
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/address'
+        - name: addressId
+          in: path
+          description: id of address to delete
+          required: true
       responses:
         '202':
           description: Accepted
