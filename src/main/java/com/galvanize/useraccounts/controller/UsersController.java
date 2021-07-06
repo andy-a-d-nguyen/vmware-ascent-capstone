@@ -62,7 +62,14 @@ public class UsersController {
         if (jwtGuid.equals(guid)) {
             oFoundUser = usersService.searchByEmail(updatedUser.getEmail());
 
-            if (oFoundUser.isPresent() && jwtUser.getUsername() != oFoundUser.get().getUsername() && updatedUser.getEmail() == oFoundUser.get().getEmail()) {
+        /*    if (oFoundUser.isPresent()) {
+                System.out.println("hi");
+            }
+            if (!jwtUser.getUsername().equals(oFoundUser.get().getUsername())) {
+                System.out.println("hi2");
+            }*/
+
+            if (oFoundUser.isPresent() && !jwtUser.getUsername().equals(oFoundUser.get().getUsername())) {
                 throw new DuplicateEmailException();
             } else {
                 updatedUserReturned = usersService.updateUser(guid, updatedUser);
