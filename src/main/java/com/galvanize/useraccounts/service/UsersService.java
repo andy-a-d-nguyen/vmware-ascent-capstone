@@ -69,6 +69,9 @@ public class UsersService {
         return usersRepository.findByGuid(guid).orElse(null);
     }
 
+    public Optional<User> searchByEmail(String email) {
+        return usersRepository.findByEmailExactMatch(email);
+    }
 
     public UsersList searchUsers(String username) {
         if (username == null) username = "";

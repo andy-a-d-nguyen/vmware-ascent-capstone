@@ -22,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -50,15 +51,23 @@ public class UsersController {
 
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @PatchMapping("/users/{guid}")
-    public ResponseEntity<User> update(@PathVariable Long guid, @RequestBody UserRequest updatedUser, @AuthenticationPrincipal JwtUser jwtUser) throws InvalidUserException {
+    public ResponseEntity<User> update(@PathVariable Long guid, @RequestBody UserRequest updatedUser, @AuthenticationPrincipal JwtUser jwtUser) throws InvalidUserException, DuplicateEmailException {
         // get guid from token
         Long jwtGuid = jwtUser.getGuid();
+        Optional<User> oFoundUser;
 
         // get guid from database
         User updatedUserReturned = null;
         // compare jwt user with user's guid
         if (jwtGuid.equals(guid)) {
-            updatedUserReturned = usersService.updateUser(guid, updatedUser);
+            oFoundUser = usersService.searchByEmail(updatedUser.getEmail());
+
+            if (oFoundUser.isPresent() && jwtUser.getUsername() != oFoundUser.get().getUsername() && updatedUser.getEmail() == oFoundUser.get().getEmail()) {
+                throw new DuplicateEmailException();
+            } else {
+                updatedUserReturned = usersService.updateUser(guid, updatedUser);
+            }
+
         } else {
             // not same, invalid
             throw new UserNotFoundException();
@@ -145,12 +154,11 @@ public class UsersController {
         return users == null || users.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(users);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/users/{guid}/condensed")
-    public ResponseEntity<UserCondensed> getUserCondensed(@PathVariable Long guid, @AuthenticationPrincipal JwtUser jwtUser) {
+    public ResponseEntity<UserCondensed> getUserCondensed(@PathVariable Long guid) {
         UserCondensed userCondensed;
         userCondensed = usersService.getUserCondensed(guid);
-      
+
         if (userCondensed == null) throw new UserNotFoundException();
         else return ResponseEntity.ok(userCondensed);
     }
