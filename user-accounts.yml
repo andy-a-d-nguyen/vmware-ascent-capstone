@@ -96,7 +96,7 @@ components:
         addresses:
           type: array
           items:
-          type: string
+            type: string
       
 
 servers:
