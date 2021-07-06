@@ -43,7 +43,8 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
                 // HEALTH is EXPOSED
                 .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                 // ADMIN ACTUATOR ENDPOINTS (ARE NOT EXPOSED)
-                .antMatchers(HttpMethod.GET,"/actuator/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/actuator/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                 // any other requests must be authenticated
                 .anyRequest().authenticated();
     }
