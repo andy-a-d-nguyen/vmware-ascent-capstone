@@ -533,7 +533,7 @@ class UserAccountsApplicationTests {
     }
 
     /*duplicate email*/
-    @Test
+/*    @Test
     void TESTTESTTEST() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 
@@ -563,6 +563,6 @@ class UserAccountsApplicationTests {
         assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
         assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
         assertTrue(response.getBody().getCreatedAt().before(response.getBody().getUpdatedAt()));
-    }
+    }*/
 
 }

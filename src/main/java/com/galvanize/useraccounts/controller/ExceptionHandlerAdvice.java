@@ -80,7 +80,7 @@ public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity handleDuplicateEmailException(DuplicateEmailException e) {
-        return new ResponseEntity<>(new JsonResponse(ErrorMessage.DUPLICATE_EMAIL.toString()), HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(new JsonResponse(ErrorMessage.DUPLICATE_EMAIL.toString()), HttpStatus.BAD_REQUEST);
 
     }
 

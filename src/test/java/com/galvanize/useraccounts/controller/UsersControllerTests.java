@@ -147,16 +147,18 @@ public class UsersControllerTests {
     @DisplayName("It can successfully edit an existing account, status 200 ok")
     @Test
     public void editUser() throws Exception {
-        User user = new User(99L, "bakerBob", "baker", "bob", "bakerBob@gmail.com");
+        User user = new User(99L, "bakerBob19321", "baker", "bob", "bakerBob9078655aaaaaaaaas@gmail.com");
         user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
         user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
+        token = getToken(user.getUsername(), Arrays.asList("ROLE_USER"));
 
         when(usersService.updateUser(anyLong(), any(UserRequest.class))).thenReturn(user);
         when(usersService.searchByEmail(anyString())).thenReturn(java.util.Optional.of(user));
 
         mockMvc.perform(patch("/api/users/99").header("Authorization", token).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(user)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("username").value("bakerBob"))
+                .andExpect(jsonPath("username").value(user.getUsername()))
                 .andExpect(jsonPath("createdAt").exists())
                 .andExpect(jsonPath("updatedAt").exists());
     }
