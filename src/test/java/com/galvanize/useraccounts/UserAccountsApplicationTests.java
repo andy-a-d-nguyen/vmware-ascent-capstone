@@ -532,37 +532,4 @@ class UserAccountsApplicationTests {
         assertEquals(HttpStatus.NOT_ACCEPTABLE, response.getStatusCode());
     }
 
-    /*duplicate email*/
-/*    @Test
-    void TESTTESTTEST() {
-        restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-
-        User user = users.get(0);
-        token = getToken(user.getUsername(), Arrays.asList("ROLE_USER"));
-        
-        String uri = "/api/users/" + user.getGuid();
-
-        UserRequest request = new UserRequest("Andy", "Nguyen", "bakerBob2@gmail.com", user.getBio(), user.isVerified(), user.getAvatar());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        headers.setBearerAuth(token);
-
-        HttpEntity<UserRequest> patchRequest = new HttpEntity<>(request, headers);
-
-        ResponseEntity<User> response = restTemplate.exchange(uri, HttpMethod.PATCH, patchRequest, User.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getFirstName()).isEqualTo(request.getFirstName());
-        assertThat(response.getBody().getLastName()).isEqualTo(request.getLastName());
-        assertThat(response.getBody().getEmail()).isEqualTo(request.getEmail());
-        assertThat(response.getBody().getBio()).isEqualTo(request.getBio());
-        assertThat(response.getBody().isVerified()).isEqualTo(request.isVerified());
-        assertThat(response.getBody().getAvatar()).isEqualTo(request.getAvatar());
-
-        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getCreatedAt(), response.getBody().getCreatedAt());
-        assertEquals(usersRepository.findByUsernameExactMatch(user.getUsername()).get().getUpdatedAt(), response.getBody().getUpdatedAt());
-        assertTrue(response.getBody().getCreatedAt().before(response.getBody().getUpdatedAt()));
-    }*/
-
 }
