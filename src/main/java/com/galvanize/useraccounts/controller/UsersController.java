@@ -148,15 +148,11 @@ public class UsersController {
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/users/{guid}/condensed")
     public ResponseEntity<UserCondensed> getUserCondensed(@PathVariable Long guid, @AuthenticationPrincipal JwtUser jwtUser) {
-        Long jwtGuid = jwtUser.getGuid();
-
-        UserCondensed user = null;
-        if (jwtGuid.equals(guid) && usersService.getUser(jwtGuid) != null) {
-            user = usersService.getUserCondensed(guid);
-        } else {
-            throw new UserNotFoundException();
-        }
-
-        return ResponseEntity.ok(user);
+        UserCondensed userCondensed;
+        userCondensed = usersService.getUserCondensed(guid);
+      
+        if (userCondensed == null) throw new UserNotFoundException();
+        else return ResponseEntity.ok(userCondensed);
     }
+
 }
