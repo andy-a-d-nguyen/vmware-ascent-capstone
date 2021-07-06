@@ -152,6 +152,7 @@ public class UsersControllerTests {
         user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
         when(usersService.updateUser(anyLong(), any(UserRequest.class))).thenReturn(user);
+        when(usersService.searchByEmail(anyString())).thenReturn(java.util.Optional.of(user));
 
         mockMvc.perform(patch("/api/users/99").header("Authorization", token).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(user)))
                 .andExpect(status().isOk())

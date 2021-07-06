@@ -2,6 +2,7 @@ package com.galvanize.useraccounts.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.useraccounts.exception.AddressNotFoundException;
+import com.galvanize.useraccounts.exception.DuplicateEmailException;
 import com.galvanize.useraccounts.exception.DuplicateUserException;
 import com.galvanize.useraccounts.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -16,19 +17,20 @@ import java.util.ArrayList;
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 
-    private enum ErrorMessage{
+    private enum ErrorMessage {
         ADDRESS_NOT_FOUND("Address not found"),
         DUPLICATE_USER("Username already taken, please choose a different username"),
-        USER_NOT_FOUND("Username not found");
+        USER_NOT_FOUND("Username not found"),
+        DUPLICATE_EMAIL("Email already taken, please choose a different email");
 
         public final String label;
 
-        ErrorMessage(String label){
+        ErrorMessage(String label) {
             this.label = label;
         }
 
         @Override
-        public String toString(){
+        public String toString() {
             return this.label;
         }
     }
@@ -75,6 +77,13 @@ public class ExceptionHandlerAdvice {
         return new ResponseEntity<>(new JsonResponse(ErrorMessage.USER_NOT_FOUND.toString()), HttpStatus.NOT_ACCEPTABLE);
 
     }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity handleDuplicateEmailException(DuplicateEmailException e) {
+        return new ResponseEntity<>(new JsonResponse(ErrorMessage.DUPLICATE_EMAIL.toString()), HttpStatus.NOT_ACCEPTABLE);
+
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<JsonResponse> handleInvalidAddressException(MethodArgumentNotValidException e) {
