@@ -110,6 +110,7 @@ public class UsersService {
                 updatedAddress.setState(address.getState());
                 updatedAddress.setZipcode(address.getZipcode());
                 updatedAddress.setApartment(address.getApartment());
+                updatedAddress.setLabel((address.getLabel()));
                 oUser.get().setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
                 return usersRepository.save(oUser.get());
             } else {
