@@ -72,6 +72,15 @@ public class User {
         this.email = email;
     }
 
+    public User(Long guid, String username, String firstName, String lastName, String email, boolean verified) {
+        this.guid = guid;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.verified = verified;
+    }
+
     public User(Long guid, String username, String firstName, String lastName, String email, List<Address> addresses) {
         this.guid = guid;
         this.username = username;
@@ -79,6 +88,16 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.addresses = addresses;
+    }
+
+    public User(Long guid, String username, String firstName, String lastName, String email, List<Address> addresses, boolean verified) {
+        this.guid = guid;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.addresses = addresses;
+        this.verified = verified;
     }
 
     public void addAddress(Address address) {
