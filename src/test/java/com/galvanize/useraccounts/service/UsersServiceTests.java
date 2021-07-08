@@ -201,10 +201,10 @@ public class UsersServiceTests {
     @DisplayName("It should save a user's address and returns updated user")
     @Test
     void addAddress_to_User() {
-        User expected = new User(1L, "username", "John", "Smith", "jsmith@gmail.com");
+        User expected = new User(11L, "username", "John", "Smith", "jsmith@gmail.com");
         Address address = new Address("StreetName", "Honolulu", "Hawaii", "21343-343", null, null);
-        expected.setId(1L);
         expected.addAddress(address);
+        expected.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
 //        List<Address> addressList = new ArrayList<>();
 //        addressList.add(address);
@@ -212,9 +212,9 @@ public class UsersServiceTests {
         when(usersRepository.findByGuid(anyLong())).thenReturn(Optional.of(expected));
         when(usersRepository.save(any(User.class))).thenReturn(expected);
 
-        User actual = usersService.addAddress(1L, address);
+        User actual = usersService.addAddress(11L, address);
         assertEquals(expected.getAddresses().size(), actual.getAddresses().size());
-        assertEquals(users.get(0).getUpdatedAt(), actual.getUpdatedAt());
+        assertEquals(expected.getUpdatedAt(), actual.getUpdatedAt());
     }
 
     @DisplayName("It should throw UserNotFoundException when adding an address to non existing user")

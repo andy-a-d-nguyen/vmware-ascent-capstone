@@ -78,8 +78,6 @@ components:
           type: string
         bio:
           type: string
-        verified:
-          type: boolean
     userPost:
       type: object
       properties:
@@ -97,7 +95,8 @@ components:
           type: array
           items:
             type: string
-      
+        verified:
+          type: boolean
 
 servers:
   - url: https://localhost:/8080

@@ -87,6 +87,7 @@ public class UsersService {
         user.ifPresent(u -> u.addAddress(address));
 
         if (user.isPresent()) {
+            user.get().setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
             return usersRepository.save(user.get());
 
         } else {
