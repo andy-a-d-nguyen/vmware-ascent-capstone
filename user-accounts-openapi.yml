@@ -223,6 +223,7 @@ paths:
           description: Successful operation
         '400':
           description: Bad request
+  /api/users/{guid}/addresses/{addressId}:
     patch:
       tags:
         - address
@@ -248,7 +249,6 @@ paths:
           description: Bad request
         '406':
           description: Not Acceptable
-  /api/users/{guid}/addresses/{addressId}:
     delete:
       tags:
         - address
